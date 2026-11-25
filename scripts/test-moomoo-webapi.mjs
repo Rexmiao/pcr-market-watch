@@ -85,7 +85,7 @@ const oauthFetch=async(url,options)=>{
   assert.equal(url,'https://webapi.moomoo.com/oauth2/token');form=new URLSearchParams(options.body);
   assert.equal(form.get('grant_type'),'authorization_code');assert.equal(form.get('code'),'synthetic-one-time-code');
   assert.equal(createHash('sha256').update(form.get('code_verifier')).digest('base64url'),authorization.searchParams.get('code_challenge'));
-  return reply({access_token:access,refresh_token:refresh,token_type:'Bearer',expires_in:7200,scope:'quote:read'});
+  return reply({access_token:access,refresh_token:refresh,token_type:'Bearer',expires_in:7200,scope:'quote:read accid:123456'});
 };
 const connected=await connectMoomooWebApi({fetcher:oauthFetch,onProgress:stage=>progress.push(stage),saveBundle:async bundle=>{savedBundle=bundle;},openBrowser:async value=>{
   authorization=new URL(value);assert.equal(authorization.origin,'https://webapi.moomoo.com');assert.equal(authorization.pathname,'/oauth2/authorize/confirm');assert.equal(authorization.searchParams.get('scope'),'quote:read');
@@ -99,6 +99,6 @@ const connected=await connectMoomooWebApi({fetcher:oauthFetch,onProgress:stage=>
   const response=await fetch(callback,{redirect:'manual'});assert.equal(response.status,303);assert.equal(response.headers.get('location'),'/done');
   const done=await fetch(new URL('/done',callback));assert.equal(done.status,200);const text=await done.text();assert(!text.includes(access)&&!text.includes(refresh)&&!text.includes('synthetic-one-time-code'));
 }});
-assert.equal(savedBundle.scope,'quote:read');assert.equal(connected.configured,true);assert(!JSON.stringify(connected).includes(access));
+assert.equal(savedBundle.scope,'quote:read');assert.equal(savedBundle.hasAccountContext,true);assert(!JSON.stringify(savedBundle).includes('123456'));assert.equal(connected.configured,true);assert(!JSON.stringify(connected).includes(access));
 assert(progress.includes('registration_starting')&&progress.includes('registration_succeeded')&&progress.includes('browser_opened')&&progress.includes('authorization_callback_received')&&progress.includes('token_response_scope_present'));assert(!JSON.stringify(progress).includes(access));
 console.log('PASS direct WebAPI: fixed read-only hosts/endpoints, bounded payloads/timeouts, exact symbol scope, safe errors, T-1 OI, pagination limits, encrypted-token refresh/coalescing, 401 retry, quote-only PKCE and callback state validation');
