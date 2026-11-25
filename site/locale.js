@@ -122,7 +122,10 @@ const storageKey='pcr-market-watch:site-language:v1';
 const repository='https://github.com/Rexmiao/pcr-market-watch/blob/main/';
 const links={zh:{spec:repository+'docs/PRODUCT_SPEC.md',readme:repository+'README.md'},en:{spec:repository+'docs/PRODUCT_SPEC.en.md',readme:repository+'README.en.md'}};
 let language='zh';
-try {const parameter=new URL(location.href).searchParams.get('lang'),saved=localStorage.getItem(storageKey);language=['zh','en'].includes(parameter)?parameter:['zh','en'].includes(saved)?saved:'zh';}catch{}
+let parameter=null,saved=null;
+try {parameter=new URL(location.href).searchParams.get('lang');}catch{}
+try {saved=localStorage.getItem(storageKey);}catch{}
+language=['zh','en'].includes(parameter)?parameter:['zh','en'].includes(saved)?saved:'zh';
 const languageToggle=document.getElementById('language-toggle');
 function renderLanguage(){
   const copy=translations[language];

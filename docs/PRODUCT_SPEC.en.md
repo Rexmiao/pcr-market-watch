@@ -2,7 +2,9 @@
 
 [简体中文](PRODUCT_SPEC.md) | **English**
 
-Date: 2026-11-25. Scope: the current project's watchlists, groups, PCR data, historical comparisons, and local moomoo market-data backend. This document describes source-code behavior and acceptance requirements for this iteration. Completed source changes, passing tests, local operation, and a published deployment are separate states.
+Date: 2026-11-25. Scope: the current project's watchlists, groups, PCR data, historical comparisons, local moomoo market-data backend, and bilingual GitHub Pages showcase and documentation entry points. This document describes source-code behavior and acceptance requirements for this iteration. Completed source changes, passing tests, local operation, and a published deployment are separate states.
+
+Maintenance requirement: changes to features, data methodology, or publication must update the affected Chinese and English specifications in the same change. See [project maintenance rules](../AGENTS.md) for documentation responsibilities and completion criteria.
 
 The structure uses user stories, requirement IDs, acceptance scenarios, and verifiable success criteria, drawing on the [official GitHub Spec Kit specification template](https://github.com/github/spec-kit/blob/main/templates/spec-template.md). Only the writing structure is reused; Spec Kit, OpenBB, and a new application framework are not installed.
 
@@ -19,6 +21,7 @@ Users can maintain personal U.S. stock watchlists and groups, view OCC volume PC
 | OI PCR | Existing one-time snapshot retained | Not refreshed with volume. An unknown actual settlement date is identified explicitly; unavailable sources remain blank. |
 | Historical comparisons | Implemented and passed local acceptance checks | Historical percentiles and prior-year comparisons are separate views. Historical statistics are not converted into price-direction probabilities. |
 | Local moomoo market-data backend | Read-only adapter endpoints implemented | Requires the local CLI, market-data service, and actual permissions. This does not imply a complete market-data terminal interface. |
+| Bilingual GitHub Pages showcase | Chinese/English switching, an English GIF, and language-specific documentation links published | Static showcase and download entry point. The full PCR interface, database, and refresh run on the local backend. |
 | Cloud access to moomoo on the user's computer | Not implemented; a possible later option | No persistent cloud bridge, remote-computer connection, or automatic credential synchronization. |
 | Trading and brokerage account/position operations | Outside product scope | No account/position queries, order placement, modification, cancellation, or trading unlock. |
 
@@ -53,6 +56,12 @@ Independent acceptance: use controlled CLI responses to verify allowed queries, 
 Users want the upper market PCR list to support additions and removals. The initial recommendations are four Cboe categories, INDEX, TOTAL, ETP, and EQUITY, plus the three OCC ETFs SPY, QQQ, and DIA. These entries are not permanently fixed. Valid OCC stocks or ETFs can be added to the same selector, with each entry retaining its own source and coverage dates.
 
 Independent acceptance: remove all seven recommendations and reopen the page; the list remains empty. Add SNDK and an OCC ticker with the same text as a Cboe category; source identities and curves must not mix. Editing the market list must not change the original personal items or groups, and the reverse must also remain independent.
+
+### US-06: Choose the showcase and documentation language (P1)
+
+Visitors can switch the GitHub Pages showcase between Chinese and English and open the corresponding README and product Spec. Their language preference is retained on return visits; English demonstration images and the GIF keep their original content.
+
+Independent acceptance: open Chinese and English direct links to `#preview`, switch language, open the demo dialog and documentation links, and return. Check the language, metadata, document targets, and mobile layout.
 
 ## 3. Watchlist and group requirements
 
@@ -238,6 +247,10 @@ The page order in this iteration is “market reference strip → market PCR →
 | AC-19 Enter to add | Enter immediately after typing a code, after arrow-key selection, or after pointer highlighting adds the correct ticker. IME confirmation, repeated keys, and stale candidates do not add unintended symbols. Neither language's placeholder fixes one ticker. |
 | AC-20 Historical percentiles | Independently recompute midrank percentiles and medians. Current/future outliers do not enter historical samples. Changing display range does not change the same date's percentile. Missing values are excluded, and n is reported truthfully. |
 | AC-21 Annual comparison | Verify regular sessions, market closures, leap days, limited early history, and empty data. Curves match exact calendar dates only. Summary fallback is limited to 7 days and shows the actual comparison date and coverage count. |
+| AC-22 Showcase language | Body copy, buttons, navigation, image captions and alt text, dialog captions and close button, html lang, page title, and meta description all follow the selected Chinese or English language. |
+| AC-23 Language preference | A valid lang parameter takes precedence. Without one, use a valid saved preference, otherwise Chinese. A reload after switching restores the selection; unavailable storage still allows valid URL selection and switching. Keep #preview when switching. |
+| AC-24 Document language | Chinese and English README/product Spec links open the corresponding .md/.en.md files. Targets exist, and documents link back to the other language. |
+| AC-25 Demo and mobile | GIF/screenshots remain English while surrounding and dialog copy follows the selected language. At 320px there is no page-wide horizontal overflow; the language control remains visible and usable when entering #preview directly. |
 
 Database behavior is verified by `scripts/test-watchlists.mjs`, `scripts/test-market-settings.mjs`, and `scripts/test-local-db.mjs`. PCR uses the corresponding backend/Cboe tests and independent raw-quantity calculations. The local market-data adapter is verified by `scripts/test-moomoo.mjs`. Interface acceptance must additionally exercise watchlists, groups, date changes, and failures in an actual browser. Do not label this iteration's capabilities as completed online before a successful deployment.
 
@@ -259,6 +272,8 @@ Database behavior is verified by `scripts/test-watchlists.mjs`, `scripts/test-ma
 | `drizzle/` | Versioned schema migrations and metadata. Published migrations must not be arbitrarily modified or replayed. |
 | `data/` | Market-data seeds used by builds. Personal databases are not stored here. |
 | `docs/` | This specification, data methodology, and moomoo backend documentation. |
+| `site/` | Static bilingual GitHub Pages showcase, `locale.js` translations and language-specific document links, and English demo media. It does not run the PCR backend. |
+| `AGENTS.md` | Development maintenance rules and paired Chinese/English documentation requirements. |
 
 Local operation requires Node.js and Python 3. Build with `node scripts/build.mjs` and start with `node scripts/preview.mjs`; the default address is `http://127.0.0.1:8765/`. `PCR_DB_PATH`, `PCR_PREVIEW_PORT`, and `PCR_PYTHON` can specify the database, port, and Python executable respectively. Startup applies controlled migrations. Closing a webpage and stopping the backend are separate operations. The release ZIP uses `start.cmd` at its root; an existing local installation may also use its outer Chinese-named CMD launcher. Both start a local service, not a cloud service.
 
@@ -266,7 +281,24 @@ Local operation requires Node.js and Python 3. Build with `node scripts/build.mj
 
 The project is published in the personal repository https://github.com/Rexmiao/pcr-market-watch with its showcase at https://rexmiao.github.io/pcr-market-watch/. Public scope is limited to reviewed source, public-market snapshots and demonstration material. Local databases, DPAPI credentials, account information, private account or portfolio screenshots, runtime logs and browser profiles are excluded.
 
+For subsequent GitHub operations, use the existing GitHub App/native connection first, limited to the selected personal repository `Rexmiao/pcr-market-watch`. Continue reads, writes, checks, and publication supported by existing permissions without restarting login. Do not initiate a GitHub CLI/OAuth authorization flow that includes organization access, access organizations, or request organization permissions. If a capability is missing, identify the specific unavailable repository operation rather than expanding authorization to organizations. These operating rules are also recorded in [AGENTS.md](../AGENTS.md).
+
 Development materials suitable for publication include the README, this specification, installation/build instructions, source code, migrations, and tests without personal information. Check both ignore rules and actually tracked files: `.gitignore` does not automatically remove tracked content or commit history. Source code uses the repository’s MIT License. Third-party market data remains subject to its source rights and terms; webpage accessibility must not be taken to imply unrestricted redistribution. GitHub Pages is static hosting and cannot directly run this project's Node/moomoo/SQLite backend or Cloudflare Worker.
+
+### Bilingual showcase and documentation entry points
+
+The showcase entry point is `site/index.html`; `site/locale.js` manages both languages and documentation links. Its language preference is independent of the full PCR application's device preferences.
+
+| ID | Requirement and current behavior |
+| --- | --- |
+| HP-001 | Switching covers visible copy, navigation and buttons, image captions/alt text, dialog content and close button, accessibility labels, html lang, page title, and meta description. |
+| HP-002 | Valid `?lang=zh` or `?lang=en` takes precedence over a saved preference. Without a valid parameter, use a valid saved preference, otherwise default to Chinese. |
+| HP-003 | Clicking the control saves the preference under `pcr-market-watch:site-language:v1` and updates the lang query parameter using history.replaceState, preserving other parameters and anchors such as #preview. If storage is unavailable, URL language selection and the control still work without preventing page access. |
+| HP-004 | Chinese README/Spec entry points open `README.md`/`docs/PRODUCT_SPEC.md`; English opens `README.en.md`/`docs/PRODUCT_SPEC.en.md`. README, product, source-methodology, moomoo, and release documents have paired languages and reciprocal links. |
+| HP-005 | Demo GIF and screenshots remain English as requested. Their surrounding captions, alt text, and enlarged-dialog copy follow the selected language. Media records a version snapshot, not live market data. |
+| HP-006 | The header stays reachable and anchor offsets follow its changing height. The language control works at 320px and after direct #preview entry. The showcase presents the product and download, without providing the running PCR application, database, or local moomoo service. |
+
+These rules describe the showcase and documentation on `main`. The published v0.1.0 ZIP, tag, and checksum retain that release's contents. Later showcase or Spec updates do not mean the installer has also been updated; see the [Release Spec](RELEASE_SPEC.en.md).
 
 ## 11. External references and design influences
 
