@@ -1,5 +1,7 @@
 # PCR 观察台产品规格
 
+**简体中文** | [English](PRODUCT_SPEC.en.md)
+
 日期：2026-11-25。范围：当前项目的自选名单、分组、PCR 数据、历史比较与本机 moomoo 行情后端。本文描述源码行为与本轮验收要求；源码完成、测试通过、本地运行和线上发布是不同状态。
 
 本文采用用户故事、需求编号、验收场景和可核查成功标准组织内容，借鉴 [GitHub Spec Kit 官方规格模板](https://github.com/github/spec-kit/blob/main/templates/spec-template.md)。只借鉴写法，不安装 Spec Kit、OpenBB 或新的应用框架。
@@ -259,13 +261,13 @@ PCR 是主要任务，行情及解读只提供辅助事实，不自动生成开�
 | `data/` | 构建使用的市场数据种子；个人数据库不在此目录。 |
 | `docs/` | 本规格、数据口径和moomoo后端说明。 |
 
-本地运行依赖Node.js与Python 3：`node scripts/build.mjs`构建，`node scripts/preview.mjs`启动；默认绑定`http://127.0.0.1:8765/`。`PCR_DB_PATH`、`PCR_PREVIEW_PORT`、`PCR_PYTHON`可分别指定数据库、端口和Python。启动时应用受控迁移；关闭网页与停止后台是两件事。当前交付目录外层的CMD用于本机便捷启动，不是云端服务。
+本地运行依赖Node.js与Python 3：`node scripts/build.mjs`构建，`node scripts/preview.mjs`启动；默认绑定`http://127.0.0.1:8765/`。`PCR_DB_PATH`、`PCR_PREVIEW_PORT`、`PCR_PYTHON`可分别指定数据库、端口和Python。启动时应用受控迁移；关闭网页与停止后台是两件事。发行 ZIP 使用根目录的 `start.cmd`；既有本地部署也可使用外层的中文 CMD 启动器。两者都是本机便捷启动方式，不是云端服务。
 
-## 10. GitHub分享准备
+## 10. GitHub发布与公开范围
 
-用户计划后续分享源码；本轮整理规格不等于已经创建仓库、设为public或完成推送。公开范围应限定到应用源码目录；本机数据库、DPAPI凭证、账户资料、截图、运行日志及浏览器测试资料不作为项目内容。
+项目已发布至个人仓库 https://github.com/Rexmiao/pcr-market-watch ，介绍页为 https://rexmiao.github.io/pcr-market-watch/ 。公开范围限定到审阅过的源码、公共市场快照及演示材料；本机数据库、DPAPI凭证、账户资料、个人账户／持仓截图、运行日志及浏览器配置不随项目公开。
 
-可公开的开发材料包括README、本规格、安装/构建说明、源码、迁移和不含个人信息的测试。GitHub仓库还应核对忽略规则与实际跟踪文件；`.gitignore`不会自动清除已跟踪内容或提交历史。市场数据再分发权与开源许可证尚需单独明确，不能因为网页可读取就推定可任意分发。GitHub Pages仅静态托管，不能直接运行本项目的Node/moomoo/SQLite后端或Cloudflare Worker。
+可公开的开发材料包括README、本规格、安装/构建说明、源码、迁移和不含个人信息的测试。GitHub仓库还应核对忽略规则与实际跟踪文件；`.gitignore`不会自动清除已跟踪内容或提交历史。源码采用仓库中的 MIT License；第三方市场数据仍适用各自来源的权利与使用条件，不能因为网页可读取就推定可任意分发。GitHub Pages仅静态托管，不能直接运行本项目的Node/moomoo/SQLite后端或Cloudflare Worker。
 
 ## 11. 外部参考与借鉴点
 

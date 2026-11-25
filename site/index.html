@@ -1,70 +1,73 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="PCR 观察台：查看美股期权单日、20日和60日 Put/Call Ratio，比较历史分位与往年同期，维护自己的关注名单。">
-  <meta name="theme-color" content="#203654">
-  <title>PCR 观察台 · 项目主页</title>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="PCR 观察台：查看美股期权单日、20日和60日 Put/Call Ratio，比较历史分位与往年同期，维护自己的关注名单。" name="description"/>
+<meta content="#203654" name="theme-color"/>
+<title>PCR 观察台 · 项目主页</title>
+<style>
     :root{color-scheme:light;--ink:#182e4b;--body:#425570;--muted:#65758c;--line:#dce4ef;--blue:#2867c7;--paper:#fff;--wash:#f4f6fa;--soft:#edf3fc}
     *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:30px}body{margin:0;background:var(--wash);color:var(--ink);font:16px/1.75 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}a{color:inherit;text-underline-offset:4px}button{font:inherit}button,a{-webkit-tap-highlight-color:transparent}a:focus-visible,button:focus-visible{outline:3px solid #7da7e9;outline-offset:5px}img{display:block;max-width:100%}h1,h2,h3,p,figure{margin:0}h1,h2,h3{line-height:1.3;letter-spacing:-.025em}h1{font-size:clamp(2.2rem,5.3vw,4.4rem);font-weight:700}h2{font-size:clamp(1.65rem,3vw,2.3rem)}h3{font-size:1.05rem}p{color:var(--body)}.wrap{width:min(1160px,calc(100% - 64px));margin:auto}.site-header{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:24px 0;border-bottom:1px solid var(--line)}.brand{text-decoration:none;font-weight:700;display:flex;gap:12px;align-items:center;white-space:nowrap}.brand-mark{display:grid;place-items:center;width:42px;height:42px;border-radius:10px;color:#fff;background:var(--ink);font-size:13px;letter-spacing:.02em}.nav{display:flex;align-items:center;gap:25px;font-size:14px}.nav a{color:var(--body);text-decoration:none}.nav a:hover{text-decoration:underline}.hero{padding:66px 0 46px}.hero-top{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:56px;align-items:end;margin-bottom:36px}.eyebrow{display:flex;gap:12px;align-items:center;color:var(--blue);font-size:14px;margin-bottom:20px}.version{border:1px solid var(--line);border-radius:6px;padding:1px 8px;color:var(--muted);background:var(--paper);font-size:12px}h1 em{font-style:normal;color:var(--blue)}.hero-copy{padding-bottom:5px}.hero-copy p{max-width:400px;font-size:18px}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}.button{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:10px 20px;border-radius:8px;border:1px solid #cbd7e8;background:var(--paper);color:var(--ink);font-weight:500;line-height:1.4;text-decoration:none}.button.primary{background:var(--ink);border-color:var(--ink);color:#fff}.button:hover{filter:brightness(.97)}.hero-caption{display:flex;gap:20px;justify-content:space-between;align-items:baseline;margin:16px 2px 0;color:var(--muted);font-size:14px}.screenshot-button{display:block;width:100%;padding:0;border:0;border-radius:12px;background:var(--paper);cursor:zoom-in;overflow:hidden;box-shadow:0 10px 40px #263d5c12,0 0 0 1px var(--line)}.screenshot-button img{width:100%;height:auto}.hero-figure .screenshot-button{max-height:none;max-width:1000px;margin-inline:auto}.hero-figure img{object-fit:cover;object-position:top}.section{padding:62px 0;border-top:1px solid var(--line)}.section-heading{max-width:740px;margin-bottom:28px}.section-heading p{margin-top:12px}.reading-flow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:35px}.flow-item{border-top:2px solid #c6d4e9;padding-top:20px}.flow-kicker{display:block;color:var(--blue);font-size:14px;margin-bottom:8px}.flow-item p{margin-top:10px;font-size:15px}.history-section{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:44px;align-items:center}.history-copy h2{margin-bottom:18px}.history-copy p+p{margin-top:16px}.history-copy .detail-link{display:inline-block;margin-top:20px;color:var(--blue);font-size:14px}.history-section figcaption{color:var(--muted);font-size:14px;margin-top:14px}.history-image{max-height:620px;object-fit:cover;object-position:top}.principles{display:grid;grid-template-columns:1fr 1.5fr;gap:54px}.source-list{margin:0}.source-row{display:grid;grid-template-columns:120px minmax(0,1fr);gap:22px;padding:18px 0;border-bottom:1px solid var(--line)}.source-row:first-child{padding-top:0}.source-row dt{font-weight:600}.source-row dd{margin:0;color:var(--body);font-size:15px}.run-box{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:34px}.run-heading{display:flex;align-items:start;justify-content:space-between;gap:30px;margin-bottom:25px}.run-heading p{max-width:580px;margin-top:10px}.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px;counter-reset:steps;list-style:none;margin:0;padding:0}.steps li{counter-increment:steps;border-top:1px solid var(--line);padding-top:18px;color:var(--body);font-size:15px}.steps li::before{content:counter(steps,decimal-leading-zero);display:block;margin-bottom:10px;font-size:14px;color:var(--blue);font-variant-numeric:tabular-nums}.steps strong{display:block;color:var(--ink);font-size:16px;margin-bottom:5px}.steps code{font-size:14px;overflow-wrap:anywhere}.run-note{margin-top:24px;font-size:14px;color:var(--muted)}.technical{display:flex;align-items:center;justify-content:space-between;gap:30px;padding-top:28px}.technical p{font-size:15px;max-width:650px}.footer{display:flex;justify-content:space-between;gap:20px;border-top:1px solid var(--line);padding:26px 0 35px;color:var(--muted);font-size:14px}.footer a{color:var(--muted)}dialog{padding:0;border:0;border-radius:10px;background:var(--paper);max-width:min(1500px,96vw);max-height:94vh}dialog::backdrop{background:#13233cba}.dialog-top{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:12px 16px;background:var(--paper);border-bottom:1px solid var(--line)}.dialog-top p{font-size:14px}.dialog-close{border:1px solid var(--line);background:var(--paper);border-radius:6px;min-width:44px;min-height:36px;padding:5px 12px;color:var(--ink);cursor:pointer}dialog img{width:100%;height:auto}
     @media(max-width:850px){.hero-top{grid-template-columns:1fr;gap:24px}.hero-copy p{max-width:650px}.hero{padding-top:46px}.history-section{grid-template-columns:1fr;gap:28px}.history-copy{order:-1}.principles{grid-template-columns:1fr;gap:28px}.steps{grid-template-columns:1fr 1fr}.reading-flow{gap:22px}.technical{align-items:start}.hero-figure .screenshot-button{max-height:none}}
     @media(max-width:600px){.wrap{width:calc(100% - 36px)}.site-header{padding:18px 0;gap:12px;flex-wrap:wrap}.brand-mark{width:36px;height:36px}.nav{width:100%;gap:20px;flex-wrap:wrap;font-size:14px}.hero{padding:34px 0}.hero-top{margin-bottom:26px}.hero-copy p{font-size:16px}.eyebrow{margin-bottom:14px}.button{min-height:44px;padding:10px 16px}.hero-caption{display:block}.hero-caption span{display:block;margin-top:4px}.reading-flow{grid-template-columns:1fr;gap:24px}.section{padding:38px 0}.source-row{grid-template-columns:85px minmax(0,1fr);gap:18px}.run-box{padding:22px}.run-heading{display:block}.run-heading .button{margin-top:20px}.steps{grid-template-columns:1fr;gap:20px}.technical{display:block}.technical .button{margin-top:18px}.footer{display:block}.footer a{display:inline-block;margin-top:8px}.screenshot-button{border-radius:8px}.hero-figure .screenshot-button{max-height:none}.history-image{max-height:none}.hero-caption{font-size:13px}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
-  </style>
-</head>
+  
+html{scroll-padding-top:var(--header-offset,120px)}.site-header{position:sticky;top:0;z-index:10;background:var(--wash)}.nav{flex-wrap:wrap;gap:20px}.language-toggle{padding:7px 13px;min-height:40px;font-size:14px;white-space:nowrap}@media(max-width:600px){html{scroll-padding-top:var(--header-offset,180px)}.nav{gap:14px}}
+</style>
+<script defer="True" src="locale.js"></script></head>
 <body>
-  <div class="wrap">
-    <header class="site-header">
-      <a class="brand" href="#"><span class="brand-mark" aria-hidden="true">PCR</span><span>PCR 观察台</span></a>
-      <nav class="nav" aria-label="项目导航"><a href="#preview">界面预览</a><a href="#sources">数据口径</a><a href="#install">本地运行</a><a href="https://github.com/Rexmiao/pcr-market-watch">GitHub</a></nav>
-    </header>
-    <main>
-      <section class="hero" id="preview" aria-labelledby="hero-title">
-        <div class="hero-top">
-          <div><p class="eyebrow">US OPTIONS · PUT / CALL RATIO <span class="version">v0.1.0</span></p><h1 id="hero-title">把期权成交结构<br><em>看清楚。</em></h1></div>
-          <div class="hero-copy"><p>从整体市场到自己的 watchlist，观察单日、20 日与 60 日 PCR，再放回历史中比较。</p><div class="actions"><a class="button primary" href="https://github.com/Rexmiao/pcr-market-watch/releases/latest">下载安装包</a><a class="button" href="https://github.com/Rexmiao/pcr-market-watch">查看源码</a></div></div>
-        </div>
-        <figure class="hero-figure">
-          <button class="screenshot-button" type="button" data-image="assets/demo.gif" data-caption="PCR 观察台 · 历史分位与往年同期切换演示" aria-label="放大 PCR 观察台实际操作动图"><img src="assets/demo.gif" width="1000" height="800" alt="英文实际操作动图：切换 PCR 趋势、历史分位，以及往年同期的单日、20日和60日指标。" fetchpriority="high"></button>
-          <figcaption class="hero-caption"><span>动态操作演示 · 点击可放大</span><span>演示使用版本快照，最新数据日期以应用内标注为准。</span></figcaption>
-        </figure>
-      </section>
-      <section class="section" aria-labelledby="workflow-title">
-        <div class="section-heading"><h2 id="workflow-title">一个围绕 PCR 的观察流程。</h2><p>先了解市场背景，再检查关注标的，最后用历史水平给当前读数找参照。</p></div>
-        <div class="reading-flow">
-          <article class="flow-item"><span class="flow-kicker">市场背景</span><h3>Cboe 汇总与指数 ETF</h3><p>区分 INDEX、TOTAL、EQUITY 与 ETF／ETP；SPY、QQQ、DIA 等参考保留各自的数据来源与日期。</p></article>
-          <article class="flow-item"><span class="flow-kicker">个人关注</span><h3>自己维护 watchlist</h3><p>搜索代码、回车添加、创建分组或移除标的。名单保存在本地数据库，重新打开仍可继续查看。</p></article>
-          <article class="flow-item"><span class="flow-kicker">历史参照</span><h3>让当前读数有上下文</h3><p>同时观察单日和滚动窗口，查看历史分位，或选择一种 PCR 与往年同期作双线对照。</p></article>
-        </div>
-      </section>
-      <section class="section history-section" aria-labelledby="history-title">
-        <figure><button class="screenshot-button" type="button" data-image="assets/history.png" data-caption="历史比较 · 分位、样本数与同期走势" aria-label="放大历史比较实际界面截图"><img class="history-image" src="assets/history.png" width="1440" height="1000" alt="历史比较界面，展示 PCR 历史中位数、历史分位、实际样本数及趋势图。" loading="lazy"></button><figcaption>分位、同期与缺失数据都使用明确的计算规则。</figcaption></figure>
-        <div class="history-copy"><p class="eyebrow">HISTORICAL CONTEXT</p><h2 id="history-title">同一个数值，<br>放在历史里再看一次。</h2><p><strong>历史分位</strong>分别比较单日、20 日与 60 日 PCR。参考样本取当前统计日之前最多 252 个有效观察值，并显示实际样本数。</p><p><strong>往年同期</strong>每次选择一个指标，以两条线比较同月同日的记录。缺失数据留空，摘要列出目标日与实际比较日。</p><a class="detail-link" href="https://github.com/Rexmiao/pcr-market-watch/blob/main/docs/PRODUCT_SPEC.md">查看完整计算规则与验收条件</a></div>
-      </section>
-      <section class="section principles" id="sources" aria-labelledby="sources-title">
-        <div class="section-heading"><h2 id="sources-title">来源、时间与口径<br>一起呈现。</h2><p>成交量、未平仓量和价格行情分别标注，让每个读数都有可核查的含义。</p></div>
-        <dl class="source-list">
-          <div class="source-row"><dt>成交量 PCR</dt><dd>单日 PCR 为 Put 成交量 ÷ Call 成交量；20／60 日使用窗口内合计成交量之比，数据不足时留空。</dd></div>
-          <div class="source-row"><dt>Cboe / OCC</dt><dd>Cboe 分类遵循其公布范围；个股与 ETF 的成交量来自 OCC。完整日数据按来源发布日期更新。</dd></div>
-          <div class="source-row"><dt>OI 快照</dt><dd>持仓 PCR 单独展示，不随成交量刷新。缺少可靠快照的标的显示为空，不当成零。</dd></div>
-          <div class="source-row"><dt>辅助行情</dt><dd>三大指数、原油与黄金提供市场参考。本机可选接入 moomoo 只读行情后端，数据权限以实际账户为准。</dd></div>
-        </dl>
-      </section>
-      <section class="section" id="install" aria-labelledby="install-title">
-        <div class="run-box">
-          <div class="run-heading"><div><h2 id="install-title">在自己的电脑上运行。</h2><p>安装包保留这一版界面和后端；个人名单在首次运行后由本机创建。</p></div><a class="button primary" href="https://github.com/Rexmiao/pcr-market-watch/releases/latest">下载 Windows 运行包</a></div>
-          <ol class="steps"><li><strong>准备环境</strong>安装 Node.js 22 或更新版本，以及 Python 3。</li><li><strong>下载并解压</strong>从 GitHub Releases 下载运行包，完整解压到一个文件夹。</li><li><strong>启动后台</strong>双击 <code>start.cmd</code>，使用时保留 CMD 窗口。</li><li><strong>打开观察台</strong>浏览器访问 <code>http://127.0.0.1:8765/</code>。</li></ol>
-          <p class="run-note">这个 GitHub Pages 页面用于介绍项目。完整 PCR 交互、数据库和数据刷新在本地后端中运行。</p>
-        </div>
-        <div class="technical"><p>想了解实现细节？Spec 包含功能范围、数据算法、接口契约、数据库结构、运行方式和验收场景。</p><a class="button" href="https://github.com/Rexmiao/pcr-market-watch/blob/main/docs/PRODUCT_SPEC.md">阅读产品 Spec</a></div>
-      </section>
-    </main>
-    <footer class="footer"><span>PCR 观察台 · v0.1.0</span><a href="https://github.com/Rexmiao/pcr-market-watch">Rexmiao / pcr-market-watch</a></footer>
-  </div>
-  <dialog id="image-dialog" aria-labelledby="image-caption"><div class="dialog-top"><p id="image-caption"></p><button class="dialog-close" type="button">关闭</button></div><img id="dialog-image" alt=""></dialog>
-  <script>
+<div class="wrap">
+<header class="site-header">
+<a class="brand" href="#"><span aria-hidden="true" class="brand-mark">PCR</span><span data-i18n="brand">PCR 观察台</span></a>
+<nav aria-label="项目导航" class="nav" data-i18n-aria-label="navLabel"><a data-i18n="preview" href="#preview">界面预览</a><a data-i18n="sources" href="#sources">数据口径</a><a data-i18n="install" href="#install">本地运行</a><a data-i18n-href="readme" href="https://github.com/Rexmiao/pcr-market-watch/blob/main/README.md">README</a><a href="https://github.com/Rexmiao/pcr-market-watch">GitHub</a><button aria-label="Switch to English" class="button language-toggle" id="language-toggle" type="button">English</button></nav>
+</header>
+<main>
+<section aria-labelledby="hero-title" class="hero" id="preview">
+<div class="hero-top">
+<div><p class="eyebrow">US OPTIONS · PUT / CALL RATIO <span class="version">v0.1.0</span></p><h1 data-i18n-html="heroTitle" id="hero-title">把期权成交结构<br/><em>看清楚。</em></h1></div>
+<div class="hero-copy"><p data-i18n="heroCopy">从整体市场到自己的 watchlist，观察单日、20 日与 60 日 PCR，再放回历史中比较。</p><div class="actions"><a class="button primary" data-i18n="download" href="https://github.com/Rexmiao/pcr-market-watch/releases/latest">下载安装包</a><a class="button" data-i18n="sourceCode" href="https://github.com/Rexmiao/pcr-market-watch">查看源码</a></div></div>
+</div>
+<figure class="hero-figure">
+<button aria-label="放大 PCR 观察台实际操作动图" class="screenshot-button" data-caption="PCR 观察台 · 历史分位与往年同期切换演示" data-i18n-aria-label="demoZoom" data-i18n-data-caption="demoCaption" data-image="assets/demo.gif" type="button"><img alt="英文实际操作动图：切换 PCR 趋势、历史分位，以及往年同期的单日、20日和60日指标。" data-i18n-alt="demoAlt" fetchpriority="high" height="800" src="assets/demo.gif" width="1000"/></button>
+<figcaption class="hero-caption"><span data-i18n="demoHint">动态操作演示 · 点击可放大</span><span data-i18n="demoDate">演示使用版本快照，最新数据日期以应用内标注为准。</span></figcaption>
+</figure>
+</section>
+<section aria-labelledby="workflow-title" class="section">
+<div class="section-heading"><h2 data-i18n="workflowTitle" id="workflow-title">一个围绕 PCR 的观察流程。</h2><p data-i18n="workflowCopy">先了解市场背景，再检查关注标的，最后用历史水平给当前读数找参照。</p></div>
+<div class="reading-flow">
+<article class="flow-item"><span class="flow-kicker" data-i18n="flow1Label">市场背景</span><h3 data-i18n="flow1Title">Cboe 汇总与指数 ETF</h3><p data-i18n="flow1Copy">区分 INDEX、TOTAL、EQUITY 与 ETF／ETP；SPY、QQQ、DIA 等参考保留各自的数据来源与日期。</p></article>
+<article class="flow-item"><span class="flow-kicker" data-i18n="flow2Label">个人关注</span><h3 data-i18n="flow2Title">自己维护 watchlist</h3><p data-i18n="flow2Copy">搜索代码、回车添加、创建分组或移除标的。名单保存在本地数据库，重新打开仍可继续查看。</p></article>
+<article class="flow-item"><span class="flow-kicker" data-i18n="flow3Label">历史参照</span><h3 data-i18n="flow3Title">让当前读数有上下文</h3><p data-i18n="flow3Copy">同时观察单日和滚动窗口，查看历史分位，或选择一种 PCR 与往年同期作双线对照。</p></article>
+</div>
+</section>
+<section aria-labelledby="history-title" class="section history-section">
+<figure><button aria-label="放大历史比较实际界面截图" class="screenshot-button" data-caption="历史比较 · 分位、样本数与同期走势" data-i18n-aria-label="historyZoom" data-i18n-data-caption="historyCaption" data-image="assets/history.png" type="button"><img alt="历史比较界面，展示 PCR 历史中位数、历史分位、实际样本数及趋势图。" class="history-image" data-i18n-alt="historyAlt" height="1000" loading="lazy" src="assets/history.png" width="1440"/></button><figcaption data-i18n="historyFigure">分位、同期与缺失数据都使用明确的计算规则。</figcaption></figure>
+<div class="history-copy"><p class="eyebrow">HISTORICAL CONTEXT</p><h2 data-i18n-html="historyTitle" id="history-title">同一个数值，<br/>放在历史里再看一次。</h2><p data-i18n-html="percentileCopy"><strong>历史分位</strong>分别比较单日、20 日与 60 日 PCR。参考样本取当前统计日之前最多 252 个有效观察值，并显示实际样本数。</p><p data-i18n-html="priorYearCopy"><strong>往年同期</strong>每次选择一个指标，以两条线比较同月同日的记录。缺失数据留空，摘要列出目标日与实际比较日。</p><a class="detail-link" data-i18n="calculationSpec" data-i18n-href="spec" href="https://github.com/Rexmiao/pcr-market-watch/blob/main/docs/PRODUCT_SPEC.md">查看完整计算规则与验收条件</a></div>
+</section>
+<section aria-labelledby="sources-title" class="section principles" id="sources">
+<div class="section-heading"><h2 data-i18n-html="sourcesTitle" id="sources-title">来源、时间与口径<br/>一起呈现。</h2><p data-i18n="sourcesCopy">成交量、未平仓量和价格行情分别标注，让每个读数都有可核查的含义。</p></div>
+<dl class="source-list">
+<div class="source-row"><dt data-i18n="source1Label">成交量 PCR</dt><dd data-i18n="source1Copy">单日 PCR 为 Put 成交量 ÷ Call 成交量；20／60 日使用窗口内合计成交量之比，数据不足时留空。</dd></div>
+<div class="source-row"><dt data-i18n="source2Label">Cboe / OCC</dt><dd data-i18n="source2Copy">Cboe 分类遵循其公布范围；个股与 ETF 的成交量来自 OCC。完整日数据按来源发布日期更新。</dd></div>
+<div class="source-row"><dt data-i18n="source3Label">OI 快照</dt><dd data-i18n="source3Copy">持仓 PCR 单独展示，不随成交量刷新。缺少可靠快照的标的显示为空，不当成零。</dd></div>
+<div class="source-row"><dt data-i18n="source4Label">辅助行情</dt><dd data-i18n="source4Copy">三大指数、原油与黄金提供市场参考。本机可选接入 moomoo 只读行情后端，数据权限以实际账户为准。</dd></div>
+</dl>
+</section>
+<section aria-labelledby="install-title" class="section" id="install">
+<div class="run-box">
+<div class="run-heading"><div><h2 data-i18n="installTitle" id="install-title">在自己的电脑上运行。</h2><p data-i18n="installCopy">安装包保留这一版界面和后端；个人名单在首次运行后由本机创建。</p></div><a class="button primary" data-i18n="installDownload" href="https://github.com/Rexmiao/pcr-market-watch/releases/latest">下载 Windows 运行包</a></div>
+<ol class="steps"><li data-i18n-html="step1"><strong>准备环境</strong>安装 Node.js 22 或更新版本，以及 Python 3。</li><li data-i18n-html="step2"><strong>下载并解压</strong>从 GitHub Releases 下载运行包，完整解压到一个文件夹。</li><li data-i18n-html="step3"><strong>启动后台</strong>双击 <code>start.cmd</code>，使用时保留 CMD 窗口。</li><li data-i18n-html="step4"><strong>打开观察台</strong>浏览器访问 <code>http://127.0.0.1:8765/</code>。</li></ol>
+<p class="run-note" data-i18n="localOnly">这个 GitHub Pages 页面用于介绍项目。完整 PCR 交互、数据库和数据刷新在本地后端中运行。</p>
+</div>
+<div class="technical"><p data-i18n="specCopy">想了解实现细节？Spec 包含功能范围、数据算法、接口契约、数据库结构、运行方式和验收场景。</p><a class="button" data-i18n="readSpec" data-i18n-href="spec" href="https://github.com/Rexmiao/pcr-market-watch/blob/main/docs/PRODUCT_SPEC.md">阅读产品 Spec</a></div>
+</section>
+</main>
+<footer class="footer"><span data-i18n="footer">PCR 观察台 · v0.1.0</span><a href="https://github.com/Rexmiao/pcr-market-watch">Rexmiao / pcr-market-watch</a></footer>
+</div>
+<dialog aria-labelledby="image-caption" id="image-dialog"><div class="dialog-top"><p id="image-caption"></p><button class="dialog-close" data-i18n="close" type="button">关闭</button></div><img alt="" id="dialog-image"/></dialog>
+<script>
     const dialog=document.getElementById('image-dialog'),fullImage=document.getElementById('dialog-image'),caption=document.getElementById('image-caption');
     document.querySelectorAll('[data-image]').forEach(button=>button.addEventListener('click',()=>{fullImage.src=button.dataset.image;fullImage.alt=button.querySelector('img').alt;caption.textContent=button.dataset.caption;dialog.showModal();}));
     dialog.querySelector('button').addEventListener('click',()=>dialog.close());
@@ -72,3 +75,4 @@
   </script>
 </body>
 </html>
+

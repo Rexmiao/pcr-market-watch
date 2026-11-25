@@ -1,5 +1,7 @@
 # Cboe 日报的范围与 EQUITY 历史方法
 
+**简体中文** | [English](CBOE_SOURCE_SCOPE.en.md)
+
 核对日期：2026-11-24。数据入口为 [Cboe Daily Market Statistics](https://www.cboe.com/markets/us/options/market-statistics/daily/?dt=2026-11-23)。
 
 本项目分别保存 TOTAL、INDEX、EXCHANGE TRADED PRODUCTS（ETP）、EQUITY 四类。TOTAL 包含其他三类；不能把 TOTAL 再与 INDEX、ETP 或 EQUITY 相加，也不能直接把各类 PCR 相加。EQUITY 在此分类中为单只股票期权，ETP 包含 ETF 和 ETN 的期权。[官方产品说明](https://www.cboe.com/exchange-traded-stock/)

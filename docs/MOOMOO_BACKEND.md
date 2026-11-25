@@ -1,5 +1,7 @@
 # moomoo 后端接入
 
+**简体中文** | [English](MOOMOO_BACKEND.en.md)
+
 本项目通过本机 Node 后端调用桌面端内置的官方 `moomooapp-cli.exe`。
 网页不需要接触 AppKey，也不需要单独设置连接按钮。
 

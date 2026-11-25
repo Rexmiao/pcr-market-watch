@@ -4,7 +4,7 @@
 
 Explore U.S. options activity through daily Put/Call Ratios, 20- and 60-session trends, historical percentiles, and prior-year comparisons.
 
-[Project homepage](https://rexmiao.github.io/pcr-market-watch/) · [Download](https://github.com/Rexmiao/pcr-market-watch/releases/latest) · [Full product specification (Chinese)](docs/PRODUCT_SPEC.md)
+[Project homepage](https://rexmiao.github.io/pcr-market-watch/) · [Download](https://github.com/Rexmiao/pcr-market-watch/releases/latest) · [Full product specification](docs/PRODUCT_SPEC.en.md)
 
 ![Animated walkthrough: historical percentile and prior-year comparison](site/assets/demo.gif)
 
@@ -63,7 +63,7 @@ node scripts/validate-artifact.mjs
 - Prior-year curves match the same calendar month and day; missing observations remain blank. For the summary only, a closed-market date can use the latest record within the preceding seven calendar days. Both the target date and actual comparison date are shown.
 - When a source has not published a new record, the application retains its last available observation and does not label it as today's data.
 
-Public historical snapshots support display and calculation; their own data dates apply. Publishing the code does not change third-party data rights or terms. See [CBOE_SOURCE_SCOPE.md (Chinese)](docs/CBOE_SOURCE_SCOPE.md) and [PRODUCT_SPEC.md (Chinese)](docs/PRODUCT_SPEC.md) for source coverage and methodology.
+Public historical snapshots support display and calculation; their own data dates apply. Publishing the code does not change third-party data rights or terms. See [CBOE_SOURCE_SCOPE.en.md](docs/CBOE_SOURCE_SCOPE.en.md) and [PRODUCT_SPEC.en.md](docs/PRODUCT_SPEC.en.md) for source coverage and methodology.
 
 ## Project structure and specifications
 
@@ -74,11 +74,10 @@ Public historical snapshots support display and calculation; their own data date
 | `db/`, `drizzle/` | Configuration schemas and versioned migrations |
 | `scripts/` | Build tools, local SQLite service, moomoo adapter, and checks |
 | `data/` | Dated public-market snapshots |
-| `docs/PRODUCT_SPEC.md` | User stories, requirements, APIs, algorithms, database constraints, and acceptance criteria; written in Chinese |
-| `docs/RELEASE_SPEC.md` | Release contents, installation behavior, and release verification; written in Chinese |
+| `docs/PRODUCT_SPEC.en.md` | User stories, requirements, APIs, algorithms, database constraints, and acceptance criteria |
+| `docs/RELEASE_SPEC.en.md` | Release contents, installation behavior, and release verification |
 | `site/` | GitHub Pages project showcase; it does not run the full backend |
 
 The current release runs locally. Cloud D1 storage and identity configuration require a separate deployment. GitHub Pages cannot run the SQLite or desktop moomoo backend.
 
-See [MOOMOO_BACKEND.md (Chinese)](docs/MOOMOO_BACKEND.md) for desktop setup, permissions, and read-only endpoints. Configure the AppKey locally; no key is distributed with the release. There is currently no persistent cloud-to-desktop bridge, AI chat, dealer GEX calculation, or order-entry feature.
-
+See [MOOMOO_BACKEND.en.md](docs/MOOMOO_BACKEND.en.md) for desktop setup, permissions, and read-only endpoints. Configure the AppKey locally; no key is distributed with the release. There is currently no persistent cloud-to-desktop bridge, AI chat, dealer GEX calculation, or order-entry feature.
