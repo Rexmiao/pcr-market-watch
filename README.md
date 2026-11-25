@@ -1,5 +1,7 @@
 # PCR 观察台 · PCR Market Watch
 
+**简体中文** | [English](README.en.md)
+
 观察美股期权的每日成交、20／60 日趋势、历史分位和往年同期水平。
 
 [项目主页](https://rexmiao.github.io/pcr-market-watch/) · [下载安装包](https://github.com/Rexmiao/pcr-market-watch/releases/latest) · [完整产品 Spec](docs/PRODUCT_SPEC.md)
