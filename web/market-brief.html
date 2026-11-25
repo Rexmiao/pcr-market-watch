@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="结合市场价格与已发布 PCR，查看当前关注名单。">
+  <title>市场解读 · PCR 观察台</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/context.css">
+  <link rel="stylesheet" href="/brief.css">
+</head>
+<body>
+  <main data-skip-i18n>
+    <nav class="site-nav" aria-label="网站导航"><a id="brief-nav-dashboard" href="/">PCR 观察台</a><a id="brief-nav-current" href="/market-brief.html" aria-current="page">市场解读</a><a id="brief-nav-charts" href="/charts.html">图表目录</a><button id="page-language" class="button secondary language-toggle" type="button" aria-label="切换到英文">English</button></nav>
+    <header class="page-header"><div><div class="eyebrow" id="brief-eyebrow">价格与 PCR</div><h1 id="brief-title">市场解读</h1><p id="brief-subtitle">看价格强弱，也看 Put 相对 Call 的成交活跃度。</p></div><button id="brief-refresh" class="button primary" type="button" disabled>更新解读数据</button></header>
+    <p id="brief-status" class="status" role="status" aria-live="polite">正在读取数据…</p>
+    <section class="panel brief-facts" aria-labelledby="brief-facts-title">
+      <h2 id="brief-facts-title">已加载数据怎么读</h2>
+      <p id="brief-price-summary" class="brief-fact" aria-live="polite"></p>
+      <p id="brief-pcr-summary" class="brief-fact" aria-live="polite"></p>
+      <p id="brief-source-dates" class="metric-note"></p>
+    </section>
+    <section class="panel" aria-labelledby="brief-watchlist-title">
+      <div class="section-heading"><div><h2 id="brief-watchlist-title">当前关注名单</h2><p id="brief-watchlist-note"></p></div></div>
+      <p id="brief-empty" class="metric-note" hidden></p>
+      <div id="brief-table-region" class="brief-table-region" role="region" aria-label="关注名单 PCR 与报价" tabindex="0">
+        <table class="brief-current-table"><thead><tr><th id="brief-symbol-head" scope="col">标的</th><th id="brief-daily-head" scope="col">单日 PCR／日期</th><th id="brief-p20-head" scope="col">20 日 PCR</th><th id="brief-p60-head" scope="col">60 日 PCR</th><th id="brief-price-head" scope="col">moomoo 价格</th><th id="brief-time-head" scope="col">报价时间</th></tr></thead><tbody id="brief-watchlist-rows"></tbody></table>
+      </div>
+      <p id="brief-moomoo-note" class="metric-note"></p>
+      <p id="brief-quote-check" class="metric-note"></p>
+    </section>
+    <p id="brief-short-note" class="metric-note"></p>
+    <footer><a id="brief-dashboard-link" href="/">返回 PCR 观察台</a> · <a id="brief-archive-link" href="/archive/market-brief-20261123.html">查看 11/23 保存的市场解读</a></footer>
+  </main>
+  <script type="module" src="/pages-i18n.js"></script>
+  <script type="module" src="/market-brief.js"></script>
+  <script type="module" src="/market-overview.js"></script>
+  <script type="module" src="/source-notes.js"></script>
+</body>
+</html>

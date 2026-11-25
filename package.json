@@ -1,0 +1,22 @@
+{
+  "name": "pcr-market-watch",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "validate": "node scripts/validate-artifact.mjs",
+    "db:generate": "drizzle-kit generate",
+    "start": "node scripts/preview.mjs",
+    "test": "node scripts/test-cboe-model.mjs && node scripts/test-search-model.mjs && node scripts/test-model.mjs && node --test scripts/history-context.test.mjs"
+  },
+  "dependencies": {
+    "drizzle-orm": "0.45.2"
+  },
+  "devDependencies": {
+    "drizzle-kit": "0.31.10"
+  },
+  "version": "0.1.0",
+  "engines": {
+    "node": ">=22"
+  }
+}

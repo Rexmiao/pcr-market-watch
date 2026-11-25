@@ -1,0 +1,44 @@
+name: Package Windows release
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: package-release
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+      - run: node scripts/validate-artifact.mjs
+      - run: python scripts/package-release.py
+      - name: Publish new version
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_COMMIT: ${{ github.sha }}
+        run: |
+          VERSION="$(node -p 'require("./package.json").version')"
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            echo "Version v$VERSION already exists; keeping its original assets."
+            exit 0
+          fi
+          gh release create "v$VERSION" \
+            "release/pcr-market-watch-v$VERSION-windows.zip" \
+            "release/SHA256SUMS.txt" \
+            --target "$RELEASE_COMMIT" \
+            --title "PCR Market Watch v$VERSION" \
+            --notes-file docs/RELEASE_SPEC.md

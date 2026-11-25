@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "index-trends",
+      "path": "/archive/index-trends.html",
+      "title": "三指数 PCR 与价格上下文",
+      "description": "SPY、QQQ、DIA 的 PCR 趋势与指数价格上下文，保留原有标的、区间和图表交互。",
+      "snapshotDate": "2026-11-20",
+      "snapshotDates": {
+        "pcr": "2026-11-20",
+        "prices": {
+          "SPY": "2026-11-19",
+          "QQQ": "2026-11-19",
+          "DIA": "2026-11-20"
+        }
+      },
+      "status": "historical",
+      "sourceFile": "us-market-pcr.html",
+      "sourceSha256": "792f8c1a6503b2eb6bf2b7803e9a3a32b8f9eb1de43196986f92b9d29237a300",
+      "sources": [
+        "https://www.theocc.com/market-data/market-data-reports/volume-and-open-interest/volume-query",
+        "https://fred.stlouisfed.org/series/SP500",
+        "https://fred.stlouisfed.org/series/NASDAQ100",
+        "https://fred.stlouisfed.org/series/DJIA"
+      ],
+      "renderer": "Visualize official standalone export",
+      "preservesOriginalData": true
+    },
+    {
+      "id": "seven-watchlist",
+      "path": "/archive/seven-watchlist.html",
+      "title": "关注名单 PCR 历史快照",
+      "description": "保存时关注名单的成交量 PCR、历史分位与 OI 查询快照；保留固定历史数据，不随当前名单或更新按钮改变。",
+      "snapshotDate": "2026-11-20",
+      "snapshotDates": {
+        "pcr": "2026-11-20",
+        "oiQuery": "2026-11-23",
+        "oiSettlement": null
+      },
+      "status": "historical",
+      "sourceFile": "watchlist-pcr.html",
+      "sourceSha256": "012627d9744b3fe1676cf91663f62220eac80d60ab8b94d9b02b9d52122dfb5b",
+      "sources": [
+        "https://www.theocc.com/market-data/market-data-reports/volume-and-open-interest/volume-query",
+        "https://cdn.cboe.com/api/global/delayed_quotes/options/AMD.json",
+        "https://cdn.cboe.com/api/global/delayed_quotes/options/AVGO.json",
+        "https://cdn.cboe.com/api/global/delayed_quotes/options/DIA.json",
+        "https://cdn.cboe.com/api/global/delayed_quotes/options/MU.json",
+        "https://cdn.cboe.com/api/global/delayed_quotes/options/NVDA.json",
+        "https://cdn.cboe.com/api/global/delayed_quotes/options/QQQ.json",
+        "https://cdn.cboe.com/api/global/delayed_quotes/options/SPY.json"
+      ],
+      "renderer": "Visualize official standalone export",
+      "preservesOriginalData": true
+    },
+    {
+      "id": "market-brief-20261123",
+      "path": "/archive/market-brief-20261123.html",
+      "title": "2026-11-23 市场解读历史快照",
+      "description": "保存 11 月 23 日盘中报价、延迟 PCR 与当时可得的空头报告；固定历史记录，不代表当前行情。",
+      "snapshotDate": "2026-11-23",
+      "snapshotDates": {
+        "quotes": "2026-11-23",
+        "quoteTime": "10:45—10:46 ET",
+        "intradayPcrQuery": "10:47 ET",
+        "fullDayPcr": "2026-11-20",
+        "shortInterestSettlement": "2026-10-30"
+      },
+      "status": "historical",
+      "sourceFile": "market-brief-20261123.html",
+      "sources": [
+        "https://www.theocc.com/market-data/market-data-reports/volume-and-open-interest/volume-query",
+        "https://optioncharts.io/",
+        "https://www.finra.org/filing-reporting/regulatory-filing-systems/short-interest"
+      ],
+      "renderer": "Saved HTML market brief",
+      "preservesOriginalData": true,
+      "sourceSha256": "7ea62c0cdbc682d4d97b41f66cfa666af1e5809956cb5bddd5733c1e882400e6"
+    }
+  ]
+}

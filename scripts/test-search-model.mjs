@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {moveSearchSelection,selectedSearchSymbol} from '../web/search-model.js';
+const results=[{symbol:'AAPL'},{symbol:'AMD'},{symbol:'AVGO'}];
+assert.equal(moveSearchSelection(-1,'ArrowDown',3),0);
+assert.equal(moveSearchSelection(-1,'ArrowUp',3),2);
+assert.equal(moveSearchSelection(0,'ArrowDown',3),1);
+assert.equal(moveSearchSelection(2,'ArrowDown',3),0);
+assert.equal(moveSearchSelection(0,'ArrowUp',3),2);
+assert.equal(moveSearchSelection(1,'Home',3),0);
+assert.equal(moveSearchSelection(0,'End',3),2);
+assert.equal(moveSearchSelection(9,'ArrowDown',3),0);
+assert.equal(moveSearchSelection(0,'ArrowDown',0),-1);
+assert.equal(selectedSearchSymbol(results,1),'AMD');
+assert.equal(selectedSearchSymbol(results,-1),null);
+assert.equal(selectedSearchSymbol(results,3),null);
+console.log('PASS search selection, wraparound, invalid indexes and chosen symbols');
