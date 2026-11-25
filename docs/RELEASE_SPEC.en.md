@@ -10,7 +10,7 @@ The table covers both the current `main` repository/showcase and the fixed relea
 | --- | --- | --- |
 | GitHub source | `web/`, `worker/`, `db/`, `drizzle/`, `scripts/`, `data/`, `docs/`, and build configuration | Users install development dependencies and build it themselves |
 | Windows ZIP | Source at the corresponding version tag, `dist/server/index.js`, `start.cmd`, and `start-local.mjs` | A local Windows computer with Node.js 22+ and Python 3 |
-| README | `README.md` and `README.en.md`; English screenshots of the actual interface, an automatically playing GIF, features, installation instructions, and specification links in the matching language | Repository homepage |
+| README | Default English `README.md`, full Chinese `README.zh-CN.md`, and full English compatibility copy `README.en.md`; English screenshots of the actual interface, an automatically playing GIF, features, installation instructions, and specification links in the matching language | Repository homepage defaults to English |
 | Bilingual specifications | Chinese and English versions of the product, Cboe source scope, moomoo backend, and release/installation specifications | `docs/`; related documents link to the same-language version |
 | GitHub Pages | `site/index.html`, `site/locale.js`, styles, and local images/GIF | A Chinese/English project showcase linking to matching-language documentation, the release, and source; it does not host the full backend |
 | SHA256SUMS.txt | Checksum for the Windows ZIP | Release attachment |
@@ -23,11 +23,11 @@ Documentation and GitHub Pages on `main` may continue to change independently; t
 
 - `site/locale.js` provides Chinese/English switching for page copy, navigation, buttons, dialog captions, image alternative text, the page title, and its description.
 - A valid `?lang=zh` or `?lang=en` takes precedence over the browser's saved language. Otherwise, use `pcr-market-watch:site-language:v1`, defaulting to Chinese when neither choice is valid. Switching saves the preference and updates the query while preserving anchors such as `#preview`; switching still works when localStorage is unavailable.
-- The showcase's README and product-specification links select `.md` or `.en.md` according to the current language. Each document offers links between its Chinese and English versions. The GIF and actual interface screenshots remain in English; their captions, alternative text, and dialog text follow the page language.
+- Chinese showcase README links open `README.zh-CN.md`; English opens default `README.md`. Product specifications still select `PRODUCT_SPEC.md`/`PRODUCT_SPEC.en.md`. Keep `README.en.md` as a full English compatibility copy with both English bodies synchronized. Documents offer reciprocal language links. The repository's English default does not change the showcase's Chinese default or application language preferences. The GIF and actual interface screenshots remain in English; their captions, alternative text, and dialog text follow the page language.
 
 | Document responsibility | Simplified Chinese | English |
 | --- | --- | --- |
-| Project overview, features, and usage entry points | [README.md](../README.md) | [README.en.md](../README.en.md) |
+| Project overview, features, and usage entry points | [README.zh-CN.md](../README.zh-CN.md) | [Default README.md](../README.md), [compatibility README.en.md](../README.en.md) |
 | Product behavior, calculation rules, and acceptance criteria | [PRODUCT_SPEC.md](PRODUCT_SPEC.md) | [PRODUCT_SPEC.en.md](PRODUCT_SPEC.en.md) |
 | Cboe statistical coverage and EQUITY history methodology | [CBOE_SOURCE_SCOPE.md](CBOE_SOURCE_SCOPE.md) | [CBOE_SOURCE_SCOPE.en.md](CBOE_SOURCE_SCOPE.en.md) |
 | Local read-only moomoo integration and credential boundaries | [MOOMOO_BACKEND.md](MOOMOO_BACKEND.md) | [MOOMOO_BACKEND.en.md](MOOMOO_BACKEND.en.md) |
@@ -81,10 +81,10 @@ Use the existing GitHub App/native connection first to read, write, check, and p
 
 ## Release verification
 
-- The repository should have `main`, Chinese and English READMEs, English demonstration images/GIF, and the paired Chinese/English specifications listed above. Link targets must exist and use the matching language.
+- The repository should have `main`, default English README.md, full Chinese README.zh-CN.md, full English compatibility README.en.md, English demonstration images/GIF, and the paired Chinese/English specifications listed above. Link targets must exist and use the matching language; keep both English README bodies synchronized.
 - The release should include a version tag, the Windows ZIP, and a SHA-256 checksum file.
 - GitHub Pages should return a successful status, and images/GIF plus `locale.js` should resolve under `/pcr-market-watch/`. The GIF should play, and media should remain in English after language switching.
-- Verify `?lang=zh` / `?lang=en`, reload after saving, invalid parameters, and switching when localStorage is unavailable. Switching must preserve URL anchors, and README/product-specification links must open the corresponding language files.
+- Verify `?lang=zh` / `?lang=en`, reload after saving, invalid parameters, and switching when localStorage is unavailable. Switching must preserve URL anchors; Chinese README opens README.zh-CN.md and English opens README.md, with product specifications still matching the selected language. The showcase's Chinese default and application language preferences remain independent of the repository default.
 - Page titles, descriptions, body copy, buttons, accessibility text, and image dialogs must update in both languages. The layout must not overflow horizontally at 320px, and the language button must remain usable when visiting `#preview` directly.
 - Documentation/Pages-only updates must not replace the `v0.1.0` tag, ZIP, or checksum file. When release behavior changes, verify a new version's tag and attachments.
 - The maintainer's existing local website, personal database, and cloud-site audience remain separate.

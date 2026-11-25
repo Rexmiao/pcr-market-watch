@@ -1,40 +1,40 @@
-# PCR 观察台 · PCR Market Watch
+# PCR Market Watch
 
-**简体中文** | [English](README.en.md)
+**English** | [简体中文](README.zh-CN.md)
 
-观察美股期权的每日成交、20／60 日趋势、历史分位和往年同期水平。
+Explore U.S. options activity through daily Put/Call Ratios, 20- and 60-session trends, historical percentiles, and prior-year comparisons.
 
-[项目主页](https://rexmiao.github.io/pcr-market-watch/) · [下载安装包](https://github.com/Rexmiao/pcr-market-watch/releases/latest) · [完整产品 Spec](docs/PRODUCT_SPEC.md)
+[Project homepage](https://rexmiao.github.io/pcr-market-watch/) · [Download](https://github.com/Rexmiao/pcr-market-watch/releases/latest) · [Full product specification](docs/PRODUCT_SPEC.en.md)
 
 ![Animated walkthrough: historical percentile and prior-year comparison](site/assets/demo.gif)
 
-![PCR 观察台：市场汇总、数据日期和历史趋势](site/assets/dashboard.png)
+![PCR Market Watch: market aggregates, source dates, and historical trends](site/assets/dashboard.png)
 
-## 看什么
+## Features
 
-- **市场参考**：Cboe INDEX、TOTAL、ETF/ETP、EQUITY，以及自行添加的股票或 ETF。初始推荐项可全部删除。
-- **个人自选**：搜索代码、Enter 添加、分类、移除，保存在本地 SQLite；与市场参考名单独立。
-- **历史趋势**：单日、20 日、60 日成交量 PCR；选择具体日期和显示区间。
-- **历史比较**：分别比较三种 PCR 的历史分位、中位数和样本数；往年同期每次对照一个指标。
-- **辅助行情**：三大指数、原油、黄金的报价与源时间；可取消悬浮。
-- **可选 moomoo**：本机只读行情适配器；不接交易或账户操作。
+- **Market references:** Cboe INDEX, TOTAL, ETF/ETP, and EQUITY categories, plus stocks or ETFs you add. Every initial recommendation can be removed.
+- **Personal watchlist:** Search tickers, press Enter to add, organize groups, and remove symbols. The list is stored in local SQLite, independently of market references.
+- **Historical trends:** Daily, 20-session, and 60-session volume PCR, with a date selector and adjustable display range.
+- **Historical context:** Percentiles, medians, and sample counts for each PCR measure. Prior-year comparison shows one selected measure at a time.
+- **Supporting quotes:** Three major U.S. stock indices, crude oil, and gold, with source timestamps. The floating quote strip can be unpinned.
+- **Optional moomoo integration:** A local, read-only market-data adapter. No trading or account operations are exposed.
 
-![历史比较：历史分位、样本数与 PCR 曲线](site/assets/history.png)
+![Historical comparison: percentiles, sample counts, and PCR trends](site/assets/history.png)
 
-## Windows 快速开始
+## Windows quick start
 
-1. 安装 [Node.js 22 或更新版本](https://nodejs.org/en/download) 和 [Python 3](https://www.python.org/downloads/)。Python 安装时可选择加入 PATH。
-2. 从 [Releases](https://github.com/Rexmiao/pcr-market-watch/releases/latest) 下载 Windows ZIP，并**完整解压**。
-3. 双击 `start.cmd`。使用期间保留 CMD 窗口，可最小化。
-4. 打开 **http://127.0.0.1:8765/**。
+1. Install [Node.js 22 or newer](https://nodejs.org/en/download) and [Python 3](https://www.python.org/downloads/). You can select the option to add Python to PATH during installation.
+2. Download the Windows ZIP from [Releases](https://github.com/Rexmiao/pcr-market-watch/releases/latest) and **extract it completely**.
+3. Double-click `start.cmd`. Keep the CMD window open while using the application; minimizing it is fine.
+4. Open **http://127.0.0.1:8765/**.
 
-Windows ZIP 包含已构建的程序。首次运行会创建数据库及默认名单，不附带作者的个人数据库、密钥或浏览器配置。
+The Windows ZIP includes the built application. The first run creates the database and initial lists. It does not contain the author's personal database, credentials, or browser profile.
 
-关闭浏览器不会结束后台；关闭运行后台的 CMD 窗口会结束该次本地服务。再次双击 `start.cmd` 可重新启动。
+Closing the browser does not stop the backend. Closing the CMD window that owns the server stops that local server. Double-click `start.cmd` to start it again.
 
-如 Python 不在 PATH，先设置 `PCR_PYTHON` 为本机 Python 可执行文件路径。`PCR_DB_PATH` 可指定数据库位置；默认在项目目录外一层的 `local-data/pcr.sqlite3`。
+If Python is not on PATH, set `PCR_PYTHON` to its executable path. Set `PCR_DB_PATH` to choose a database location; the default is `local-data/pcr.sqlite3`, one directory above the project.
 
-## 从源码运行
+## Run from source
 
 ```sh
 git clone https://github.com/Rexmiao/pcr-market-watch.git
@@ -44,39 +44,40 @@ npm run build
 npm start
 ```
 
-打开 http://127.0.0.1:8765/。Node.js 及 Python 3 是必需运行环境；`npm ci` 安装的开发依赖用于源码构建与数据库迁移开发。
+Open http://127.0.0.1:8765/. Node.js and Python 3 are required. The development dependencies installed by `npm ci` support source builds and database migration development.
 
 ```sh
 npm test
 node scripts/validate-artifact.mjs
 ```
 
-## 数据和解释
+## Data and interpretation
 
-**PCR = Put 数量 ÷ Call 数量。它不是市场空头人数比例，也不是涨跌概率。**
+**PCR = put quantity ÷ call quantity. It is not the proportion of investors who are short, a capital allocation ratio, or a probability of a price move.**
 
-- 20／60 日成交量 PCR 用窗口内 Put 成交量合计除以 Call 成交量合计，不是每日 PCR 的算术平均。
-- Cboe 和 OCC 的来源范围、发布日期和覆盖区间不同。Cboe TOTAL 指其报告覆盖的产品合计，不代表全部美国交易所。
-- 较早 EQUITY 历史由 TOTAL 减 INDEX、ETP 的成交量分别推导，界面单独标注。
-- OI 是独立保存的未平仓快照，不随成交量刷新。新增标的没有可靠 OI 来源时留空，不能理解为持仓为零。
-- 历史分位使用所选统计日之前最多 252 个有效历史值，排除当前日和未来数据；样本不足明确显示数量。
-- 往年同期曲线按同月同日对齐，缺失不补零；摘要遇休市日最多向前找 7 天，并显示实际日期。
-- 源数据未更新时保留最后一次记录，不把旧数据标成今天。
+- The 20- and 60-session volume PCRs divide total put volume by total call volume over each window. They are not arithmetic averages of daily PCRs.
+- Cboe and OCC have different coverage, publication schedules, and available history. Cboe TOTAL covers the products in its report; it is not an all-U.S.-exchange total.
+- Older EQUITY observations are derived by subtracting INDEX and ETP put and call volumes separately from TOTAL, then calculating the ratio. The interface identifies these derived observations.
+- OI is an independently dated open-interest snapshot and is not refreshed with volume. Symbols without a reliable OI source remain blank; missing data does not mean zero open interest.
+- Historical percentiles use up to 252 valid observations before the selected data date, excluding the current and future observations. Actual sample counts are displayed when history is shorter.
+- Prior-year curves match the same calendar month and day; missing observations remain blank. For the summary only, a closed-market date can use the latest record within the preceding seven calendar days. Both the target date and actual comparison date are shown.
+- When a source has not published a new record, the application retains its last available observation and does not label it as today's data.
 
-公共历史快照用于展示与计算，日期以数据本身为准；代码发布不改变第三方数据的权利与使用条件。来源及口径见 [CBOE_SOURCE_SCOPE.md](docs/CBOE_SOURCE_SCOPE.md) 和 [PRODUCT_SPEC.md](docs/PRODUCT_SPEC.md)。
+Public historical snapshots support display and calculation; their own data dates apply. Publishing the code does not change third-party data rights or terms. See [CBOE_SOURCE_SCOPE.en.md](docs/CBOE_SOURCE_SCOPE.en.md) and [PRODUCT_SPEC.en.md](docs/PRODUCT_SPEC.en.md) for source coverage and methodology.
 
-## 项目结构与具体 Spec
+## Project structure and specifications
 
-| 路径 | 内容 |
+| Path | Purpose |
 | --- | --- |
-| `web/` | 页面、图表、日历、双语、历史比较和自选交互 |
-| `worker/` | Web API 与数据源适配 |
-| `db/`、`drizzle/` | 配置表定义及版本化迁移 |
-| `scripts/` | 构建、SQLite 本机服务、moomoo 适配和检查 |
-| `data/` | 带日期的公共市场快照 |
-| `docs/PRODUCT_SPEC.md` | 用户故事、需求、API、算法、数据库约束及验收规则 |
-| `site/` | GitHub Pages 项目介绍页，不运行完整后端 |
+| `web/` | Pages, charts, calendar, language switching, historical comparisons, and watchlist interactions |
+| `worker/` | Web APIs and data-source adapters |
+| `db/`, `drizzle/` | Configuration schemas and versioned migrations |
+| `scripts/` | Build tools, local SQLite service, moomoo adapter, and checks |
+| `data/` | Dated public-market snapshots |
+| `docs/PRODUCT_SPEC.en.md` | User stories, requirements, APIs, algorithms, database constraints, and acceptance criteria |
+| `docs/RELEASE_SPEC.en.md` | Release contents, installation behavior, and release verification |
+| `site/` | GitHub Pages project showcase; it does not run the full backend |
 
-当前发行包以本地运行方式交付。云端 D1 与身份配置需要单独部署，GitHub Pages 本身不能运行 SQLite / moomoo 后端。
+The current release runs locally. Cloud D1 storage and identity configuration require a separate deployment. GitHub Pages cannot run the SQLite or desktop moomoo backend.
 
-moomoo 的安装、权限与只读接口见 [MOOMOO_BACKEND.md](docs/MOOMOO_BACKEND.md)。AppKey 在本机单独配置，不随发布包分发。当前没有云端访问桌面 moomoo 的常驻桥，也没有 AI chat、dealer GEX 或下单功能。
+See [MOOMOO_BACKEND.en.md](docs/MOOMOO_BACKEND.en.md) for desktop setup, permissions, and read-only endpoints. Configure the AppKey locally; no key is distributed with the release. There is currently no persistent cloud-to-desktop bridge, AI chat, dealer GEX calculation, or order-entry feature.

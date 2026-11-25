@@ -61,6 +61,8 @@ Independent acceptance: remove all seven recommendations and reopen the page; th
 
 Visitors can switch the GitHub Pages showcase between Chinese and English and open the corresponding README and product Spec. Their language preference is retained on return visits; English demonstration images and the GIF keep their original content.
 
+GitHub displays the English `README.md` by default. The full Chinese version is `README.zh-CN.md`; `README.en.md` remains a full English compatibility copy. This repository default does not change the showcase's Chinese default or existing application language preferences.
+
 Independent acceptance: open Chinese and English direct links to `#preview`, switch language, open the demo dialog and documentation links, and return. Check the language, metadata, document targets, and mobile layout.
 
 ## 3. Watchlist and group requirements
@@ -249,14 +251,14 @@ The page order in this iteration is “market reference strip → market PCR →
 | AC-21 Annual comparison | Verify regular sessions, market closures, leap days, limited early history, and empty data. Curves match exact calendar dates only. Summary fallback is limited to 7 days and shows the actual comparison date and coverage count. |
 | AC-22 Showcase language | Body copy, buttons, navigation, image captions and alt text, dialog captions and close button, html lang, page title, and meta description all follow the selected Chinese or English language. |
 | AC-23 Language preference | A valid lang parameter takes precedence. Without one, use a valid saved preference, otherwise Chinese. A reload after switching restores the selection; unavailable storage still allows valid URL selection and switching. Keep #preview when switching. |
-| AC-24 Document language | Chinese and English README/product Spec links open the corresponding .md/.en.md files. Targets exist, and documents link back to the other language. |
+| AC-24 Document language | Default README.md is English, README.zh-CN.md is the full Chinese version, and README.en.md remains a full English compatibility copy. Chinese showcase links open README.zh-CN.md/PRODUCT_SPEC.md; English links open README.md/PRODUCT_SPEC.en.md. Targets exist, documents switch languages, both English bodies stay synchronized, and showcase/application language defaults are unchanged. |
 | AC-25 Demo and mobile | GIF/screenshots remain English while surrounding and dialog copy follows the selected language. At 320px there is no page-wide horizontal overflow; the language control remains visible and usable when entering #preview directly. |
 
 Database behavior is verified by `scripts/test-watchlists.mjs`, `scripts/test-market-settings.mjs`, and `scripts/test-local-db.mjs`. PCR uses the corresponding backend/Cboe tests and independent raw-quantity calculations. The local market-data adapter is verified by `scripts/test-moomoo.mjs`. Interface acceptance must additionally exercise watchlists, groups, date changes, and failures in an actual browser. Do not label this iteration's capabilities as completed online before a successful deployment.
 
 ## 8. Known differences and later choices
 
-- The current specification is based on the database items/groups contract and actual implementation. For startup and local credential configuration, see [README](../README.en.md) and the [moomoo backend guide](MOOMOO_BACKEND.en.md).
+- The current specification is based on the database items/groups contract and actual implementation. For startup and local credential configuration, see the [English README](../README.md) and the [moomoo backend guide](MOOMOO_BACKEND.en.md).
 - Group renaming is currently supported only through complete API updates. A webpage rename control is an optional later feature, not a completed interface capability.
 - Matching Cboe's consecutive-session gap guarantee for OCC would require changing activity-record window rules and validating history separately. The current implementation must not claim these guarantees are already unified.
 - moomoo watchlist synchronization, dedicated quote views, long-term OI history, intraday full-market PCR, a cloud bridge, and cross-environment personal-data migration each require separate requirements and authorization. Their completion cannot be inferred from existing endpoints.
@@ -294,7 +296,7 @@ The showcase entry point is `site/index.html`; `site/locale.js` manages both lan
 | HP-001 | Switching covers visible copy, navigation and buttons, image captions/alt text, dialog content and close button, accessibility labels, html lang, page title, and meta description. |
 | HP-002 | Valid `?lang=zh` or `?lang=en` takes precedence over a saved preference. Without a valid parameter, use a valid saved preference, otherwise default to Chinese. |
 | HP-003 | Clicking the control saves the preference under `pcr-market-watch:site-language:v1` and updates the lang query parameter using history.replaceState, preserving other parameters and anchors such as #preview. If storage is unavailable, URL language selection and the control still work without preventing page access. |
-| HP-004 | Chinese README/Spec entry points open `README.md`/`docs/PRODUCT_SPEC.md`; English opens `README.en.md`/`docs/PRODUCT_SPEC.en.md`. README, product, source-methodology, moomoo, and release documents have paired languages and reciprocal links. |
+| HP-004 | The repository defaults to English `README.md`; the full Chinese version is `README.zh-CN.md`, and `README.en.md` is a full English compatibility copy. Chinese showcase README/Spec entry points open `README.zh-CN.md`/`docs/PRODUCT_SPEC.md`; English opens `README.md`/`docs/PRODUCT_SPEC.en.md`. README and all four specification pairs offer reciprocal language links; keep both English README bodies synchronized. The English repository default does not change the showcase's Chinese default or application language preferences. |
 | HP-005 | Demo GIF and screenshots remain English as requested. Their surrounding captions, alt text, and enlarged-dialog copy follow the selected language. Media records a version snapshot, not live market data. |
 | HP-006 | The header stays reachable and anchor offsets follow its changing height. The language control works at 320px and after direct #preview entry. The showcase presents the product and download, without providing the running PCR application, database, or local moomoo service. |
 

@@ -120,7 +120,7 @@ const translations = {
 };
 const storageKey='pcr-market-watch:site-language:v1';
 const repository='https://github.com/Rexmiao/pcr-market-watch/blob/main/';
-const links={zh:{spec:repository+'docs/PRODUCT_SPEC.md',readme:repository+'README.md'},en:{spec:repository+'docs/PRODUCT_SPEC.en.md',readme:repository+'README.en.md'}};
+const links={zh:{spec:repository+'docs/PRODUCT_SPEC.md',readme:repository+'README.zh-CN.md'},en:{spec:repository+'docs/PRODUCT_SPEC.en.md',readme:repository+'README.md'}};
 let language='zh';
 let parameter=null,saved=null;
 try {parameter=new URL(location.href).searchParams.get('lang');}catch{}

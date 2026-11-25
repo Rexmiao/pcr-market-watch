@@ -10,12 +10,13 @@ Keep implementation and specifications current in the same change. 用户要求�
 | Source coverage, PCR calculations, dates, or missing-data rules | [Cboe source scope](docs/CBOE_SOURCE_SCOPE.md), plus Product Spec | [Cboe source scope](docs/CBOE_SOURCE_SCOPE.en.md), plus Product Spec |
 | moomoo connection, allowed queries, provider permissions, or credential handling | [moomoo backend](docs/MOOMOO_BACKEND.md), plus Product Spec | [moomoo backend](docs/MOOMOO_BACKEND.en.md), plus Product Spec |
 | Installation, packaging, deployment, release contents, or prerequisites | [Release Spec](docs/RELEASE_SPEC.md) | [Release Spec](docs/RELEASE_SPEC.en.md) |
-| User-visible capabilities, setup, or public links | [README](README.md) and homepage translations | [README](README.en.md) and homepage translations |
+| User-visible capabilities, setup, or public links | [README](README.zh-CN.md) and homepage translations | [Default README](README.md), [English compatibility copy](README.en.md), and homepage translations |
 
 - Update affected documents before declaring a change complete. Unaffected technical rules do not need cosmetic rewrites.
 - Keep matching Chinese/English requirement IDs, calculations, limitations, and acceptance criteria in sync. Preserve existing IDs and append new ones.
 - Describe implemented, verified, locally running, and published states separately. Planned capabilities must stay labeled as planned.
 - Maintain language-specific README/Spec links and reciprocal document-language links. The homepage's English recordings and screenshots may stay English; surrounding copy follows the selected language.
+- Keep the repository's canonical `README.md` in English, the complete Chinese version in `README.zh-CN.md`, and the complete English compatibility copy in `README.en.md`. Update both English bodies together. Chinese links select `README.zh-CN.md`; English links select canonical `README.md`. This repository default does not change the showcase's Chinese default or application language preferences.
 - Check relevant documentation links and acceptance criteria. For changed executable behavior, run checks that exercise that behavior; documentation-only changes do not require unrelated application tests.
 - Record what was checked and any remaining limitation in the change description.
 

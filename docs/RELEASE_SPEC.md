@@ -10,7 +10,7 @@
 | --- | --- | --- |
 | GitHub 源码 | `web/`、`worker/`、`db/`、`drizzle/`、`scripts/`、`data/`、`docs/`、构建配置 | 用户自行安装开发依赖并构建 |
 | Windows ZIP | 对应版本标签的源码、`dist/server/index.js`、`start.cmd`、`start-local.mjs` | Windows 本机，Node.js 22+ 与 Python 3 |
-| README | `README.md` 与 `README.en.md`；英文实际界面截图、自动播放 GIF、功能、安装方式及对应语言的 Spec 入口 | 仓库首页 |
+| README | 默认英文 `README.md`、完整中文 `README.zh-CN.md` 及完整英文兼容副本 `README.en.md`；英文实际界面截图、自动播放 GIF、功能、安装方式及对应语言的 Spec 入口 | 仓库首页默认显示英文 |
 | 双语规格 | 产品、Cboe 来源口径、moomoo 后端及发布安装规格的中英文版本 | `docs/`；同语言文档互相连接 |
 | GitHub Pages | `site/index.html`、`site/locale.js`、样式及本地图片/GIF | 中英文介绍页，连接对应语言的文档、Release 和源码；不托管完整后台 |
 | SHA256SUMS.txt | Windows ZIP 校验值 | Release 附件 |
@@ -23,11 +23,11 @@
 
 - `site/locale.js` 提供中英文切换；正文、导航、按钮、弹窗说明、图片替代文本、页面标题和描述随语言同步更新。
 - 有效的 `?lang=zh` 或 `?lang=en` 优先于浏览器已保存的语言；其次读取 `pcr-market-watch:site-language:v1`，没有有效选择时使用中文。切换时保存偏好并更新查询参数，保留 `#preview` 等锚点；无法使用 localStorage 时仍可切换。
-- 介绍页的 README 和产品规格链接随语言分别指向 `.md` 或 `.en.md`；各文档提供中英文互相切换入口。GIF 和实际界面截图保持英文，其说明、替代文本及弹窗文字使用当前页面语言。
+- 介绍页中文 README 链接指向 `README.zh-CN.md`，英文指向默认 `README.md`；产品规格仍分别指向 `PRODUCT_SPEC.md`／`PRODUCT_SPEC.en.md`。`README.en.md` 保留完整英文兼容副本，两份英文正文同步；各文档提供中英文互相切换入口。仓库默认英文不改变介绍页默认中文或应用语言偏好。GIF 和实际界面截图保持英文，其说明、替代文本及弹窗文字使用当前页面语言。
 
 | 文档职责 | 简体中文 | English |
 | --- | --- | --- |
-| 项目介绍、功能与使用入口 | [README.md](../README.md) | [README.en.md](../README.en.md) |
+| 项目介绍、功能与使用入口 | [README.zh-CN.md](../README.zh-CN.md) | [默认 README.md](../README.md)，[兼容 README.en.md](../README.en.md) |
 | 产品行为、计算规则与验收条件 | [PRODUCT_SPEC.md](PRODUCT_SPEC.md) | [PRODUCT_SPEC.en.md](PRODUCT_SPEC.en.md) |
 | Cboe 统计覆盖及 EQUITY 历史口径 | [CBOE_SOURCE_SCOPE.md](CBOE_SOURCE_SCOPE.md) | [CBOE_SOURCE_SCOPE.en.md](CBOE_SOURCE_SCOPE.en.md) |
 | moomoo 本机只读接入与凭证边界 | [MOOMOO_BACKEND.md](MOOMOO_BACKEND.md) | [MOOMOO_BACKEND.en.md](MOOMOO_BACKEND.en.md) |
@@ -81,10 +81,10 @@ GitHub Actions 的 `checks.yml` 在 Node.js 22 下构建与测试。`pages.yml` 
 
 ## 发布验证
 
-- 仓库应有 `main`、中英文 README、英文演示图片/GIF，以及上表列出的成对中英文规格；链接目标应存在且使用对应语言。
+- 仓库应有 `main`、默认英文 README.md、完整中文 README.zh-CN.md、完整英文兼容副本 README.en.md、英文演示图片/GIF，以及上表列出的成对中英文规格；链接目标应存在且使用对应语言，两份英文 README 正文保持同步。
 - Release 应含版本标签、Windows ZIP 和 SHA-256 校验文件。
 - GitHub Pages 应返回成功状态，图片/GIF 与 `locale.js` 在 `/pcr-market-watch/` 下可用；GIF 能播放，切换语言后媒体仍为英文。
-- 验证 `?lang=zh` / `?lang=en`、保存后重载、无效参数和 localStorage 不可用时的切换；URL 切换保留锚点，README/产品规格链接分别进入对应语言文件。
+- 验证 `?lang=zh` / `?lang=en`、保存后重载、无效参数和 localStorage 不可用时的切换；URL 切换保留锚点，中文 README 进入 README.zh-CN.md、英文进入 README.md，产品规格保持对应语言；介绍页默认中文与应用语言偏好不受仓库默认语言影响。
 - 两种语言的页面标题、描述、正文、按钮、无障碍文本及图片弹窗同步更新；手机宽度 320px 无横向溢出，直接访问 `#preview` 时仍可使用语言按钮。
 - 仅文档/Pages 的更新不覆盖 `v0.1.0` 标签、ZIP 或校验文件；发行行为改变时检查新版本的标签及附件。
 - 维护者现有本机网站、个人数据库及云端站点访问范围保持独立。

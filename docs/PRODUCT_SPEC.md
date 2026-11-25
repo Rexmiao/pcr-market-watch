@@ -61,6 +61,8 @@
 
 访客可以在 GitHub Pages 介绍页切换中文与英文，并进入对应语言的 README 和产品 Spec；回访时保留自己的语言偏好，英文演示图片与 GIF 保持原样。
 
+GitHub 仓库默认展示英文 `README.md`；完整中文版保存为 `README.zh-CN.md`，`README.en.md` 保留为完整英文兼容副本。此仓库默认语言不改变介绍页默认中文或应用内已有语言偏好。
+
 独立验收：用中英文直达链接打开 `#preview`，切换语言、打开演示弹窗和文档链接，再次访问；检查语言、元信息、文档目标及手机布局。
 
 ## 3. 名单与分组需求
@@ -250,14 +252,14 @@ PCR 是主要任务，行情及解读只提供辅助事实，不自动生成开�
 | AC-21 年度对照 | 验证普通日、休市日、闰日、早期历史不足、空数据；曲线只精确对齐，摘要回退最多7天，并显示实际比较日与覆盖数。 |
 | AC-22 介绍页语言 | 正文、按钮、导航、图片说明与替代文本、弹窗说明及关闭按钮、html lang、页面标题和 meta description 随中英选择一致切换。 |
 | AC-23 语言偏好 | 有效 lang 参数优先；无有效参数时使用已保存偏好，否则中文。切换后重载能恢复选择；存储不可用仍能读取有效参数及切换；切换保留 #preview。 |
-| AC-24 文档语言 | 中文和英文页面的 README／产品 Spec 链接分别指向对应 .md／.en.md，目标存在，文档内提供返回另一语言的入口。 |
+| AC-24 文档语言 | 仓库默认 README.md 为英文，README.zh-CN.md 为完整中文，README.en.md 保留完整英文兼容副本。中文介绍页链接 README.zh-CN.md／PRODUCT_SPEC.md，英文链接 README.md／PRODUCT_SPEC.en.md；目标存在，文档内可切换语言，两份英文正文同步，介绍页与应用语言默认不受影响。 |
 | AC-25 演示与手机 | GIF／截图保持英文，周边说明与弹窗随语言切换；320px 宽度无整页横向溢出，直接进入 #preview 后语言按钮仍可见、可操作。 |
 
 数据库行为由 `scripts/test-watchlists.mjs`、`scripts/test-market-settings.mjs` 和 `scripts/test-local-db.mjs` 验证；PCR 使用 backend/Cboe 的对应测试及原始数量复算；本机行情适配由 `scripts/test-moomoo.mjs` 验证。界面需补实际浏览器的名单、分组、日期切换和失败状态验收。部署成功前不把本轮能力标为线上已完成。
 
 ## 8. 已知差异与后续选择
 
-- 当前规格以数据库 items/groups 契约及实际实现为基线；启动与本机凭证配置见 [README](../README.md) 和 [moomoo 后端接入说明](MOOMOO_BACKEND.md)。
+- 当前规格以数据库 items/groups 契约及实际实现为基线；启动与本机凭证配置见 [中文 README](../README.zh-CN.md) 和 [moomoo 后端接入说明](MOOMOO_BACKEND.md)。
 - 分组重命名目前仅由 API 整体更新支持；网页重命名入口是可选后续，不属于当前已完成的界面功能。
 - OCC 若需要与 Cboe 完全一致的连续交易日缺口保证，需要另行改变活动记录窗口规则并做历史验证；当前不能宣称已经统一。
 - moomoo 自选同步、专门行情展示、长期 OI 历史、盘中全市场 PCR、云桥及跨环境个人数据迁移，均需独立需求与授权，不由现有接口推定完成。
@@ -295,7 +297,7 @@ PCR 是主要任务，行情及解读只提供辅助事实，不自动生成开�
 | HP-001 | 中英切换覆盖可见文案、导航与按钮、图片说明／alt、弹窗内容与关闭按钮、无障碍标签，以及 html lang、页面标题和 meta description。 |
 | HP-002 | 有效 `?lang=zh` 或 `?lang=en` 优先于已保存偏好；没有有效参数时使用有效的已保存偏好，否则默认中文。 |
 | HP-003 | 用户点击切换时以 `pcr-market-watch:site-language:v1` 保存偏好，并用 history.replaceState 更新 lang 查询参数、保留现有其他参数与 #preview 等锚点。存储不可用时仍可通过 URL 选语言、点击切换，不影响页面浏览。 |
-| HP-004 | 中文的 README／Spec 入口指向 `README.md`／`docs/PRODUCT_SPEC.md`；英文指向 `README.en.md`／`docs/PRODUCT_SPEC.en.md`。README、产品、来源口径、moomoo、发布文档各有中英成对版本与互跳链接。 |
+| HP-004 | 仓库默认英文 `README.md`；完整中文为 `README.zh-CN.md`，`README.en.md` 是完整英文兼容副本。中文介绍页的 README／Spec 入口指向 `README.zh-CN.md`／`docs/PRODUCT_SPEC.md`；英文指向 `README.md`／`docs/PRODUCT_SPEC.en.md`。README 与四类规格提供中英互跳；保持两份英文 README 正文同步。仓库默认英文不改变介绍页默认中文或应用语言偏好。 |
 | HP-005 | 演示 GIF 与截图按用户要求保持英文；其页面说明、替代文本及放大弹窗文案随所选语言变化。媒体记录版本快照，不代表实时市场数据。 |
 | HP-006 | 页首保持可达，滚动锚点偏移随页首高度更新；320px 宽度及直达 #preview 均可操作语言按钮。介绍页只展示产品与下载，不提供运行中的 PCR、数据库或本机 moomoo 服务。 |
 

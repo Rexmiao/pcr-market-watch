@@ -1,6 +1,6 @@
 # PCR Market Watch
 
-[简体中文](README.md) | **English**
+[English (default)](README.md) | [简体中文](README.zh-CN.md)
 
 Explore U.S. options activity through daily Put/Call Ratios, 20- and 60-session trends, historical percentiles, and prior-year comparisons.
 
