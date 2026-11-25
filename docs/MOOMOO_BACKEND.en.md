@@ -35,7 +35,7 @@ Credentials are used only in backend memory and provider authorization environme
 1. Run the website backend and use the launcher's actual loopback URL: port 8765 by default, or an available port such as 8766 if an unrelated program occupies it. Do not stop that program.
 2. Desktop mode requires signed-in moomoo, external program access, and CLI enabled. Host defaults to `http://127.0.0.1:22222`; `OPENAPI_HOST_URL` may specify another loopback port.
 3. WebAPI mode uses independent official read-only OAuth consent and does not need Desktop online. Collection still stops if the computer or local Node backend stops.
-4. Select auto, desktop, or webapi in the panel. Auto selects from available configuration and identifies the actual source. Explicit-source failures never silently fall back. Source and scope are part of cache and OI-comparison identity.
+4. Select auto, desktop, or webapi. In v0.2.1, auto reads actual client `status().configured`, preferring configured WebAPI and otherwise selecting desktop. It identifies the source and never silently falls back after collection failures. Source and scope are part of cache and OI-comparison identity.
 
 `checkedAt` is backend retrieval time. Use actual provider timestamps for market time, keeping absent times unknown rather than using retrieval time as proof of real time. Verify API and desktop-app permissions independently.
 
@@ -73,4 +73,4 @@ Official references: [underlying overview](https://open.moomoo.com/api/quote/der
 
 ### Local verification record (2026-11-25)
 
-Desktop monitoring returned basic quotes for 40 selected contracts; caches and contract OI observations can be saved. Missing volume/OI leaves status partial and PCR blank. Print queries timed out; complete prints and real-time entitlement remain unverified. Independent full snapshots also timed out. WebAPI completed its callback, but authorization validation failed and no credentials were saved; cloud quotes remain unverified.
+Desktop monitoring returned basic quotes for 40 selected contracts; caches and contract OI observations can be saved. Missing volume/OI leaves status partial and PCR blank. Print queries timed out; complete prints and real-time entitlement remain unverified. Independent full snapshots also timed out. WebAPI completed read-only OAuth and saved normalized authorization through DPAPI. Underlying-summary volume/OI PCR and unusual events returned actual responses. Incomplete single-page pagination yields partial status; exact overview market time and OI settlement date remain unknown. Desktop is unnecessary, but the local backend must run. This does not establish hosted Worker integration, a complete tape, or real-time entitlement.

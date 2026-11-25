@@ -1,4 +1,4 @@
-# Release and Installation Specification (v0.2.0)
+# Release and Installation Specification (v0.2.1)
 
 [简体中文](RELEASE_SPEC.md) | **English**
 
@@ -98,7 +98,7 @@ This iteration adds the options activity panel, auto/desktop/webapi selection, s
 
 Verify source/build completion, tests, local installation, provider connectivity, and publication separately. Query desktop Host directly or verify independent WebAPI token/permissions; controlled tests are not live provider responses. WebAPI does not need Desktop but the local computer/Node backend must remain running. Always-on hosting needs separate deployment and a server secret. Existing Sites cloud version 12 is not automatically upgraded by a new local package or GitHub showcase. GitHub Pages remains the introduction/download site.
 
-Changed installation behavior uses a new `v0.2.0` tag, Windows ZIP, and checksum, preserving existing `v0.1.0` tags and attachments. Preserve the personal database and DPAPI configuration outside the project during upgrades. Apply only new versioned migrations; do not replay or rewrite old migrations or restore personal lists to defaults.
+v0.2.0 is the original options-monitor release. The auto-selection fix uses a separate `v0.2.1` tag, Windows ZIP, and checksum, preserving existing `v0.2.0`/`v0.1.0` tags and attachments. Preserve the personal database and DPAPI configuration outside the project during upgrades. Apply only new versioned migrations; do not replay or rewrite old migrations or restore personal lists to defaults.
 
 Additional verification covers real prints versus interval increments, scoped PCR and missing values, unavailable/permission/partial failures, unknown OI settlement dates, first OI observations and cross-date persistence, refresh cooldown and hidden-page pause, unchanged watchlists/revisions, and safe fallback when unrelated services occupy the default port. Public archives must also exclude new monitor caches, per-contract OI observations, and private provider responses.
 
@@ -106,4 +106,9 @@ Additional verification covers real prints versus interval increments, scoped PC
 Additional WebAPI checks cover official OAuth 2.1 PKCE with quote:read only, local callback, a separate DPAPI authorization bundle, refresh from actual expiry information, and reconnection after revocation. Accept valid accid context selectors while rejecting write, trade, and unknown permission capabilities. Save normalized quote:read without outputting actual selectors. Omitted initial scope inherits the bound request only; explicit empty/null scope is rejected. No manual/environment-token mode is provided, and tokens are never persisted to .env. Verify rejection of desktop AppKey as Bearer, redacted failures, isolated provider caches without error failover, truncation notices, and expiry filters that do not alter summary PCR. Add a separate WebAPI per-contract OI table through a new migration without rewriting applied migrations; underlying-summary OI history is not implemented. Exclude authorization bundles, tokens, and private responses from archives.
 
 
-On 2026-11-25, desktop monitoring returned quotes for 40 selected contracts and saved cache/OI observations. Missing fields and print timeouts verified partial availability only; PCR remains blank. Full snapshots still timed out. WebAPI completed its callback but failed authorization, saving no credentials. Complete prints, real-time entitlement, and cloud quotes remain unverified.
+On 2026-11-25, desktop monitoring returned quotes for 40 selected contracts and saved cache/OI observations. Missing fields and print timeouts verified partial availability only; PCR remains blank. Full snapshots still timed out. WebAPI read-only OAuth and DPAPI storage succeeded, and underlying-summary volume/OI PCR plus unusual events returned actual responses. Incomplete pagination yields partial status; exact overview time and OI settlement date remain unknown. Complete prints, real-time entitlement, and hosted Worker integration remain unverified.
+
+
+## v0.2.1 patch
+
+Fix auto incorrectly selecting desktop after reading nonexistent isConfigured: use actual client status().configured and prefer configured WebAPI. Verify that WebAPI-only configuration selects its own cache/refresh; collection failures still never switch source. Preserve the v0.2.0 tag/package. Visible-page polling and data-coverage rules are unchanged.

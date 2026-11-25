@@ -18,7 +18,7 @@ Explore U.S. options activity through daily Put/Call Ratios, 20- and 60-session 
 - **Historical context:** Percentiles, medians, and sample counts for each PCR measure. Prior-year comparison shows one selected measure at a time.
 - **Supporting quotes:** Three major U.S. stock indices, crude oil, and gold, with source timestamps. The floating quote strip can be unpinned.
 - **Optional moomoo integration:** A local, read-only market-data adapter. No trading or account operations are exposed.
-- **Options activity monitor (v0.2.0):** Select a symbol and auto/desktop/webapi. Desktop scans at most 20 nearby strikes/40 contracts. Optional WebAPI works without the desktop client and provides provider summaries/unusual events with separate credentials and permissions.
+- **Options activity monitor (since v0.2.0):** Select a symbol and auto/desktop/webapi. Desktop scans at most 20 nearby strikes/40 contracts. Optional WebAPI works without the desktop client and provides provider summaries/unusual events with separate credentials and permissions.
 
 ![Historical comparison: percentiles, sample counts, and PCR trends](site/assets/history.png)
 
@@ -53,6 +53,8 @@ node scripts/validate-artifact.mjs
 ```
 
 ## Use the options activity monitor
+
+v0.2.1 fixes Auto source selection to prefer a configured WebAPI connection. Explicit desktop/webapi choices remain available; collection errors never silently switch source.
 
 Expand Options activity monitor in the local dashboard and select a current-list stock/ETF and auto, desktop, or webapi. Desktop mode selects an expiration for bounded contract-quote observations/actual prints. WebAPI supplies provider underlying summaries and unusual events; an expiration filter affects events only, not summary PCR.
 

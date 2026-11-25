@@ -8,7 +8,7 @@ export function createOptionsMonitorHandler({client,webApiClient,database,now=()
   const cacheKey=(mode,symbol,expiration)=>mode+'|'+symbol+'|'+(expiration||'auto');
   function connectionMode(requested) {
     if(requested!=='auto')return requested;
-    return webApiClient?.isConfigured?.()?'webapi':'desktop';
+    return webApiClient?.status?.().configured===true?'webapi':'desktop';
   }
   function empty(symbol,mode,status='unavailable') {
     const value=emptyMonitor(symbol,status);
