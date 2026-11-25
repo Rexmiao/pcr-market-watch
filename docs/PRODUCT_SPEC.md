@@ -18,9 +18,10 @@
 | 初始默认标的与新增标的统一管理 | 已实现 | 默认名单只用于首次初始化；没有不能删除的核心标的 |
 | OCC 个股/ETF 成交量 PCR | 已实现 | 完整日来源，不提供盘中实时 PCR；新增标的有独立覆盖范围 |
 | 可编辑的市场 PCR 名单与历史 | 已实现独立配置 API、模型与编辑入口 | 首次推荐四类 Cboe 及 SPY、QQQ、DIA 共七项；推荐项均可删，也可新增支持的 Cboe 类别和合法 OCC 个股／ETF；与原个人名单独立 |
-| OI PCR | 保留已有单次快照 | 不随成交量刷新，实际结算日未知时明确标注；没有来源就留空 |
+| 原历史图 OI PCR | 保留已有单次快照 | 不随原成交量按钮刷新；新监测面板的合约 OI 观察单独保存，实际结算日未知时明确标注 |
 | 历史比较 | 已实现并通过本地验收 | 历史分位与往年同期分别展示；不将历史统计转换成涨跌概率 |
 | moomoo 本机行情后端 | 已实现只读适配接口 | 依赖本机 CLI、行情服务及实际权限；不代表已有完整行情终端界面 |
+| 网页期权异动监测 | v0.2.0 本机后端支持 desktop／可选 webapi 来源 | 桌面有限范围合约报价观察／逐笔与 WebAPI 供应商标的汇总／异动事件分开；需要独立凭证及实际权限，不是完整开平仓流 |
 | GitHub Pages 双语介绍页 | 已发布中英切换、英文 GIF 和按语言匹配的文档链接 | 静态展示与下载入口；完整 PCR、数据库与刷新运行在本机后端 |
 | 云端访问个人电脑上的 moomoo | 未实现，待选后续 | 没有常驻云桥、远程电脑连接或自动凭证同步 |
 | 交易、持仓账户操作 | 不在本产品范围内 | 不查询账户/持仓，不下单、改单、撤单或解锁交易 |
@@ -64,6 +65,12 @@
 GitHub 仓库默认展示英文 `README.md`；完整中文版保存为 `README.zh-CN.md`，`README.en.md` 保留为完整英文兼容副本。此仓库默认语言不改变介绍页默认中文或应用内已有语言偏好。
 
 独立验收：用中英文直达链接打开 `#preview`，切换语言、打开演示弹窗和文档链接，再次访问；检查语言、元信息、文档目标及手机布局。
+
+### US-07：在 PCR 页面监测所选期权范围（P1）
+
+用户在观察台内选择自己的标的和数据来源：桌面模式选择到期日，查看有限行权价范围合约报价观察／真实逐笔；WebAPI 模式查看供应商标的汇总／异动事件，事件可按到期日筛选。界面必须说明扫描范围、来源时间及未知字段，不把局部 PCR、大额成交或 OI 变化解释成全市场净多空。
+
+独立验收：切换标的与到期日，手动刷新并开启自动刷新；确认只在面板展开且页面可见时请求数据。模拟 moomoo 关闭、权限失败、部分缺失和重启，核查旧数据标记、数据库持久及原自选名单不变。
 
 ## 3. 名单与分组需求
 
@@ -185,9 +192,9 @@ Cboe INDEX 不是 SPY/QQQ/DIA 的 ETF PCR。各类别不可互换，个人分组
 
 ### OI 快照
 
-OI PCR 为未平仓 Put 数量 / 未平仓 Call 数量，与成交量 PCR 分开显示。已有 OI 属于单次缓存，quoteTimestamp、fetchedAt 与实际结算日是不同概念。实际 OI 结算日未披露时必须保持未知，不从报价时间推算。
+OI PCR 为未平仓 Put 数量 / 未平仓 Call 数量，与成交量 PCR 分开显示。原历史对比图的 OI 属于单次缓存；新监测面板的逐合约观察单独保存。quoteTimestamp、fetchedAt 与实际结算日是不同概念。实际 OI 结算日未披露时必须保持未知，不从报价时间推算。
 
-成交量更新按钮不更新 OI。没有可信 OI 来源的新 ticker 返回 null；选择历史日期时，不能将最新 OI 快照当作当天历史 OI。股票 short interest 与期货持仓也不由此快照推导。
+原历史对比图的成交量更新按钮不更新该 OI 快照。没有可信 OI 来源的新 ticker 返回 null；选择历史日期时，不能将最新 OI 快照当作当天历史 OI。股票 short interest 与期货持仓也不由此快照推导。
 
 颜色语义按图表分别标注：趋势图浅蓝为单日成交量PCR、深蓝为20日、橘色为60日；对比柱状图蓝色为选定窗口成交量PCR，灰色为独立OI快照。新增SNDK等缺OI时灰柱缺失表示“未取得”，不表示持仓为零。两类PCR不能相减当作新增空头。
 
@@ -195,16 +202,16 @@ OI PCR 为未平仓 Put 数量 / 未平仓 Call 数量，与成交量 PCR 分开
 
 官方 moomoo 文档将“读取自选分组”和“读取某组证券”分成两个接口，本文借鉴这种组与成员分开的组织方式；当前本产品的数据库自选独立维护，尚未接入 moomoo 自选名单同步。[读取分组](https://openapi.moomoo.com/moomoo-api-doc/en/quote/get-user-security-group.html)、[读取组内证券](https://openapi.moomoo.com/moomoo-api-doc/en/quote/get-user-security.html)。
 
-当前本机链路为：浏览器 → 绑定 loopback 的 Node 预览后端 → 固定 CLI 可执行文件 → loopback moomoo 行情服务。云端 Worker 不包含这条本机进程调用链。
+桌面链路为：浏览器 → loopback Node 后端 → 固定 CLI → loopback moomoo 行情服务。可选 WebAPI 链路为：浏览器 → Node 后端 → 固定 moomoo HTTPS 行情接口。直接 API 不需要桌面进程，但需要独立 AccessToken；浏览器不持有凭证。云端 Worker 不包含桌面进程链，另行托管 WebAPI 需要部署与服务端 secret。
 
 | 编号 | 要求与当前限制 |
 | --- | --- |
-| MM-001 | 浏览器只能调用固定 GET 行情接口：status、quotes、kline、expirations、option-chain。 |
-| MM-002 | CLI allowlist 仅有 subscribe、get-basic-qot、get-kline、get-option-expiration-date、get-option-chain；行情订阅只用于取得数据，不提供任意 CLI 命令入口。 |
-| MM-003 | 子进程使用参数数组及 shell:false；用户不能指定命令、任意标志、外部 host 或凭证。行情服务 host 仅接受 loopback。 |
-| MM-004 | 一次最多 20 个美股代码；日 K 最多 1000 根；期权链最多一个日历月的到期范围。该范围的链不等于全到期日 PCR 或全市场 OI。 |
+| MM-001 | 供应商只读 GET 接口为 status、quotes、kline、expirations、option-chain、security-snapshots、option-trades；监测另提供固定 GET 缓存读取及受限 POST 刷新，规则在下方独立列出。完整快照接口保留独立能力与失败状态，不是监测必经路径。 |
+| MM-002 | CLI allowlist 仅有 subscribe、get-basic-qot、get-kline、get-option-expiration-date、get-option-chain、get-security-snapshot、get-ticker；行情订阅只用于取得数据，不提供任意 CLI 命令入口。 |
+| MM-003 | 桌面子进程使用参数数组及 shell:false，Host 仅接受 loopback。WebAPI 只访问固定 HTTPS 主机与只读路径；用户不能指定任意命令、标志、外部 Host 或凭证。 |
+| MM-004 | 基础报价每次最多 20 个美股股票／期权代码；独立完整快照最多 100 个代码，逐笔单合约最多 200 笔。监测只扫最多 40 份合约，使用 get-basic-qot 分最多两批、每批 20 份取得成交量及 option_ex_data 内实际返回的 OI／IV 等字段，再取最多三个合约逐笔。日 K 最多 1000 根；期权链最多一个日历月到期范围，不等于全到期日 PCR 或全市场 OI。 |
 | MM-005 | 供应商行情时间戳与 checkedAt 分别保留。连通、订阅成功或返回数据，不自动证明实时行情权限已核实。 |
-| MM-006 | AppKey 由本机后端环境变量或 Windows DPAPI 加密存储读取；环境变量可覆盖本机存储。配置脚本的输入不回显，DPAPI 文件位于项目与 Dropbox 之外、绑定当前 Windows 用户，换电脑或用户需重新配置。凭证不放进浏览器、URL、源码、数据库配置文档、Git 提交或发布归档；错误信息需脱敏。 |
+| MM-006 | 桌面 AppKey 由后端环境变量或 Windows DPAPI 读取；WebAPI 经独立 OAuth PKCE 授权及 DPAPI 加密包加载，并按供应商到期信息刷新，不能复用桌面凭证。桌面配置输入不回显；授权包位于项目／Dropbox 外，不进入网页、URL、源码、日志、Git 或发行包。WebAPI 不接受手动 token 或持久化环境变量配置。 |
 | MM-007 | 本机数据库、账户资料、持仓截图、私人行情响应和凭证文件不作为公开源码或公共种子数据。测试使用虚构身份与临时数据库。 |
 | MM-008 | 不开放账户、持仓、订单、交易解锁、下单、改单、撤单等命令。 |
 
@@ -212,9 +219,31 @@ OI PCR 为未平仓 Put 数量 / 未平仓 Call 数量，与成交量 PCR 分开
 
 受控云桥、用户主动上传脱敏快照或其他远程同步方案属于待选后续，当前未选型、未实现，也不纳入本轮已完成功能。
 
+### 网页期权异动监测（v0.2.0）
+
+监测提供 desktop 与可选 webapi 两条只读来源，并以 auto／desktop／webapi 选择。桌面路径采集有限范围的期权链、合约基础报价观察和真实逐笔；合约字段优先来自 get-basic-qot，不能保证完整 get-security-snapshot 可用；直接 WebAPI 路径请求供应商标的汇总与异动事件，不依赖桌面进程。两者鉴权、覆盖和缓存分开；源码完成不证明真实权限、实时性或云端已发布。没有真实响应时只显示不可用状态，不生成演示成交。
+
+| 编号 | 需求与边界 |
+| --- | --- |
+| MON-001 | 标的来自当前个人／市场股票或 ETF 名单，不固定七项。选择 auto／desktop／webapi 来源。desktop 选择一个到期日，默认最近可用日，只扫现价附近最多 20 个行权价／40 份合约；webapi 的标的汇总和异动事件覆盖另列，不能套用桌面扫描范围。 |
+| MON-002 | 保留实际来源命令、成交量、OI、IV、价格及供应商实际提供的观察时间。desktop 优先通过 get-basic-qot 读取所选合约，最多两批、每批 20 份；不依赖完整快照接口成功，也不保证所有字段齐全。查询时间 checkedAt 不替代行情时间；未知值为空，缺数据不是零。缺乏明确源时间或延迟保证时不能标成实时。 |
+| MON-003 | desktop 范围 PCR 按所扫 Put 成交量 ÷ Call 成交量或 Put OI ÷ Call OI 计算。webapi 标的汇总 PCR 为 put_volume ÷ call_volume，OI PCR 为 put_open_interest ÷ call_open_interest，标为“供应商标的汇总 PCR”。必要值缺失或 Call 分母为零时留空；两种结果不得互换或替代 Cboe／OCC 口径。 |
+| MON-004 | WebAPI 的 OI 字段标为 T−1，桌面 OI 也一般对应上一清算期；供应商未明确具体结算日则 oiAsOf 保持未知。查询日、报价日或 T−1 说明不能冒充已核实的具体 OI 结算日。 |
+| MON-005 | desktop 真实逐笔只取 get-ticker：最多三个活跃合约、每个 200 笔、合计 600 笔。webapi 使用供应商异动事件接口，按标的过滤并标示分页／截断，单批最多 300 条，不称为完整成交带。BUY/SELL 仅为供应商成交方向分类；openClose 保持 unknown，无数据不生成成交。 |
+| MON-006 | 累计成交量只在同一来源、同一合约及可比较范围的两次检查间计算增量，另列为“检查区间成交量增量”，不能伪装成一笔大单。重置、跨交易日、来源或范围切换不产生虚假增量／提醒。 |
+| MON-007 | 用户可调整筛选门槛，默认张数 500、Volume/OI 2 倍。张数筛选用于真实成交／供应商异动事件及单列区间增量；Volume/OI 用于合约活跃度。门槛只是筛选规则，不是多空方向或盈利信号。 |
+| MON-008 | 自动刷新可选 30／60／120 秒，只在监测面板展开且页面可见时运行，不重叠请求。折叠、隐藏或关闭即暂停，没有闭页后台监测、邮件或推送。浏览器仅保存查看偏好，不保存任何 AppKey 或 WebAPI token。 |
+| MON-009 | 本地 SQLite 缓存按实际来源隔离。desktop 与 webapi 的逐合约 OI 分别存储，只比较同一来源、同一合约／范围及至少两个可比较观察日；WebAPI 标的汇总 OI 历史尚未实现。无历史留空，变化不确认开平仓，也不能排除行权、到期和合约调整。 |
+| MON-010 | GET /api/options-monitor?symbol=AMD&provider=auto&expiration=可选ISO日期 仅读取对应来源缓存；provider 可选 auto、desktop、webapi。POST /api/options-monitor/refresh 使用相同查询参数和空 JSON 对象触发受限采集，冷却至少 30 秒。校验参数、同源、方法、体积并合并重叠采集。 |
+| MON-011 | 配置缺失、鉴权、权限、超时或部分采集失败均返回明确状态；保留已有已核实数据时标过期／部分可用，保留原成功观察时间。采集失败不静默切换来源，不改变原个人／市场名单。 |
+| MON-012 | 本机 Node 的 WebAPI 模式不依赖 moomoo 桌面端，但仍需电脑／后端运行及有效独立授权。本版托管 Worker 仍返回 LOCAL_BACKEND_REQUIRED，尚无 WebAPI 服务端采集路径；持续云端采集需另行部署与服务端 secret。GitHub Pages 不能运行后端，Sites 第 12 版不自动升级。 |
+| MON-013 | WebAPI 使用 scripts/connect-moomoo-webapi.mjs 的 OAuth 2.1 PKCE 官方授权，仅请求 quote:read 行情读取能力；本机临时 loopback 回调接收结果。显式范围必须恰含一次 quote:read，可另含 accid:* 或 accid: 后接 1–32 位数字的上下文选择器，不视为账户读取权限；写入、trade 及未知能力、显式空／null 范围仍拒绝。首次 scope 省略仅继承绑定请求；刷新省略则继承上次已验证的范围。授权包的 scope 规范化为 quote:read，上下文仅保留存在与否的布尔值，真实选择器值不进日志、网页或源码。DPAPI 文件为 %LOCALAPPDATA%/PcrMarketWatch/moomoo-webapi-oauth.dpapi，按实际到期信息刷新，失效时重连。桌面 AppKey 不充当 Bearer；configure-moomoo-webapi.mjs 为同一 OAuth 入口别名，不提供手动／环境变量 token 模式，凭证不进入项目或发布包。 |
+| MON-014 | WebAPI 只请求固定 HTTPS 的 option-underlying-overview 与 option-event 只读行情端点。标的汇总的具体交易所／到期聚合边界未披露时标未知；expiry 筛选仅作用于异动事件，不改变标的汇总 PCR。事件列表分页不完整或被截断必须说明。 |
+| MON-015 | auto 根据可用配置选择实际来源并明确返回所用来源；缓存、冷却和 OI 比较按实际来源隔离。用户指定 desktop／webapi 后不能混入另一源缓存，错误后不自动换源。源配置成功不等于权限、实时性或实际查询已验证。 |
+
 ## 7. 验收场景与成功标准
 
-本轮页面采用“行情参考条 → 市场 PCR → 自选标的 PCR → 来源说明”的顺序。
+本轮页面以行情参考条、市场 PCR、期权异动监测、自选标的 PCR 及来源说明组织；监测为独立面板，不改变历史图的口径。
 PCR 是主要任务，行情及解读只提供辅助事实，不自动生成开仓、止损或涨跌概率结论。
 
 - 市场选择器首次推荐四类 Cboe 汇总及 SPY、QQQ、DIA 三个 OCC ETF 参考，所有推荐项均可删，并可加入支持的 Cboe 类别或合法 OCC 个股／ETF；同一历史图沿用各自来源、日期和缺失值，不能把 ETF PCR 称为直接指数期权 PCR。
@@ -239,7 +268,7 @@ PCR 是主要任务，行情及解读只提供辅助事实，不自动生成开�
 | AC-08 PCR 合计 | 用原始 P/C 独立复算 daily/20/60；确认 pooled ratio 与每日 ratio 平均不同，零分母及预热不足留空。 |
 | AC-09 Cboe 缺口 | 删去一个预期交易日后，所有包含该日的 20/60 窗口留空；移出窗口后恢复计算，不补零或插值。 |
 | AC-10 日期与失败 | 未发布日卡片为空，历史截止实际记录；检查失败不抹去最后好数据，不把 checkedAt 写成活动日期。 |
-| AC-11 OI 区分 | 历史日期不展示最新快照为历史 OI；新 ticker 无 OI 来源时为空；刷新成交量不会改变 OI。 |
+| AC-11 OI 区分 | 原历史对比柱不把最新快照当作历史 OI；新 ticker 无 OI 来源时为空，原成交量刷新不更新该灰色快照。新监测面板遵循独立的 OI 日期与观察规则，不能覆盖原图口径。 |
 | AC-12 本机持久 | 关闭并重开本机预览后，SQLite 名单/分组保留；本机配置不会冒充已写入云端。 |
 | AC-13 moomoo 限制 | 测试覆盖 allowlist、参数校验、loopback、超时、权限失败及凭证脱敏；无交易命令路径。 |
 | AC-14 云端说明 | 页面或文档不宣称云端已经连接个人电脑，不将尚未实现的云桥写成已完成。 |
@@ -254,10 +283,23 @@ PCR 是主要任务，行情及解读只提供辅助事实，不自动生成开�
 | AC-23 语言偏好 | 有效 lang 参数优先；无有效参数时使用已保存偏好，否则中文。切换后重载能恢复选择；存储不可用仍能读取有效参数及切换；切换保留 #preview。 |
 | AC-24 文档语言 | 仓库默认 README.md 为英文，README.zh-CN.md 为完整中文，README.en.md 保留完整英文兼容副本。中文介绍页链接 README.zh-CN.md／PRODUCT_SPEC.md，英文链接 README.md／PRODUCT_SPEC.en.md；目标存在，文档内可切换语言，两份英文正文同步，介绍页与应用语言默认不受影响。 |
 | AC-25 演示与手机 | GIF／截图保持英文，周边说明与弹窗随语言切换；320px 宽度无整页横向溢出，直接进入 #preview 后语言按钮仍可见、可操作。 |
+| AC-26 监测覆盖 | 切换当前名单标的与来源。desktop 最多 20 行权价／40 合约，以基础报价每批最多 20 合约取得观察值并标明 get-basic-qot 来源；完整快照超时不妨碍该路径，缺失字段仍为空。WebAPI 标明供应商汇总和异动事件分页范围，两种覆盖不可等同。 |
+| AC-27 真实成交与增量 | desktop 逐笔及 webapi 异动必须来自真实响应并分别标注；累计增量单列，跨日／重置／换源不误报，BUY/SELL 不显示为已确认开平仓。 |
+| AC-28 监测比值 | 分别复算桌面范围 PCR 与 WebAPI 标的汇总 PCR；缺失和零分母留空，事件 expiry 筛选不改变 WebAPI 汇总 PCR。 |
+| AC-29 OI 观察持久 | 同源、同合约／范围的可比较观察持久保存，首次无变化值；未知结算日不推断，不混用跨源 OI 或标为确定新增空头／平仓。 |
+| AC-30 自动刷新边界 | 30／60／120 秒可选，展开且可见才刷新；折叠／隐藏暂停，无重叠采集；筛选阈值可改，提醒不当作交易信号。 |
+| AC-31 监测 API 与失败 | GET 不启动采集；POST 校验来源、空 JSON、同源和参数并执行冷却。无配置、鉴权／权限、超时、关闭桌面 Host 等失败如实显示，旧成功时间保留并标过期，不自动换源。 |
+| AC-32 环境与配置保护 | 本机 WebAPI 可在桌面端关闭时使用，但须有效独立凭证和运行中的后端；未配置托管后端明确不可用。监测不更改名单／组／revision 或暴露凭证；发布包不含缓存／观察和 token。 |
+| AC-33 启动端口 | 8765 为其他程序占用时不终止该程序；启动器选择可用本机端口，例如 8766，打印并打开实际地址。 |
+| AC-34 来源隔离 | auto 显示实际来源；显式来源只读自身缓存，来源失败不静默回退。切换来源不继承另一源的累计增量或 OI 变化。 |
+| AC-35 WebAPI 凭证 | 验证 PKCE 只申请 quote:read 行情能力，接受合法 accid 上下文但拒绝写入、trade、未知能力及非法选择器；不能据此查询账户／持仓。首次 scope 省略仅继承绑定请求，刷新省略继承已验证范围；显式空／null、重复 quote:read 拒绝。保存规范化 scope 和上下文存在布尔值，真实选择器不输出。验证本机回调、DPAPI、实际有效期刷新、失效重连及错误脱敏；AppKey 不当 Bearer，凭证不写 .env、网页或公开归档，无手动 token 模式。 |
+| AC-36 WebAPI 覆盖 | 汇总使用真实 call/put 字段，OI 标 T−1但不编造结算日；到期筛选只影响异动事件，300 条上限／未完成分页明确，不宣称完整逐笔或全交易所覆盖。 |
 
 数据库行为由 `scripts/test-watchlists.mjs`、`scripts/test-market-settings.mjs` 和 `scripts/test-local-db.mjs` 验证；PCR 使用 backend/Cboe 的对应测试及原始数量复算；本机行情适配由 `scripts/test-moomoo.mjs` 验证。界面需补实际浏览器的名单、分组、日期切换和失败状态验收。部署成功前不把本轮能力标为线上已完成。
 
 ## 8. 已知差异与后续选择
+
+- desktop 监测依赖桌面 Host；webapi 依赖独立 AccessToken、权限及网络，当前缺少 token 时明确未配置。两种路径均须实际查询，不能因文件或配置存在就声称已取得实时数据。
 
 - 当前规格以数据库 items/groups 契约及实际实现为基线；启动与本机凭证配置见 [中文 README](../README.zh-CN.md) 和 [moomoo 后端接入说明](MOOMOO_BACKEND.md)。
 - 分组重命名目前仅由 API 整体更新支持；网页重命名入口是可选后续，不属于当前已完成的界面功能。
@@ -278,7 +320,7 @@ PCR 是主要任务，行情及解读只提供辅助事实，不自动生成开�
 | `site/` | GitHub Pages 静态双语介绍页、`locale.js` 翻译与语言文档链接、英文演示媒体；不运行 PCR 后端。 |
 | `AGENTS.md` | 开发维护规则及中英文文档同步要求。 |
 
-本地运行依赖Node.js与Python 3：`node scripts/build.mjs`构建，`node scripts/preview.mjs`启动；默认绑定`http://127.0.0.1:8765/`。`PCR_DB_PATH`、`PCR_PREVIEW_PORT`、`PCR_PYTHON`可分别指定数据库、端口和Python。启动时应用受控迁移；关闭网页与停止后台是两件事。发行 ZIP 使用根目录的 `start.cmd`；既有本地部署也可使用外层的中文 CMD 启动器。两者都是本机便捷启动方式，不是云端服务。
+本地运行依赖Node.js与Python 3：`node scripts/build.mjs`构建，`node scripts/preview.mjs`启动；默认端口为 8765；发行启动器遇到其他程序占用时选择可用 loopback 端口，例如 `http://127.0.0.1:8766/`，以控制台实际地址为准；不终止占用端口的无关程序。`PCR_DB_PATH`、`PCR_PREVIEW_PORT`、`PCR_PYTHON`可分别指定数据库、端口和Python。启动时应用受控迁移；关闭网页与停止后台是两件事。发行 ZIP 使用根目录的 `start.cmd`；既有本地部署也可使用外层的中文 CMD 启动器。两者都是本机便捷启动方式，不是云端服务。
 
 ## 10. GitHub发布与公开范围
 

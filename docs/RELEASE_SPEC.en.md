@@ -1,4 +1,4 @@
-# Release and Installation Specification (v0.1.0 baseline)
+# Release and Installation Specification (v0.2.0)
 
 [简体中文](RELEASE_SPEC.md) | **English**
 
@@ -38,7 +38,7 @@ Documentation and GitHub Pages on `main` may continue to change independently; t
 1. The user extracts the ZIP completely and double-clicks `start.cmd` in its root directory.
 2. The launcher checks for Node.js and starts `start-local.mjs`. It reuses an existing compatible backend when one is available; otherwise, it starts `scripts/preview.mjs` from the current project directory.
 3. Versioned migrations are applied through the SQLite adapter built on Python's standard library. The default database location is `../local-data/pcr.sqlite3`; `PCR_DB_PATH` can override it.
-4. The backend listens only on `127.0.0.1:8765`. The console displays the address, which can be opened manually if automatic browser launch fails.
+4. The backend listens only on loopback, using `127.0.0.1:8765` by default. If another program occupies it, the release launcher selects an available port such as `127.0.0.1:8766` without stopping that program. The console displays the actual address, which can be opened manually if automatic browser launch fails.
 5. CMD does not close automatically. Closing the browser does not stop the backend; ending the backend process stops that instance of the service.
 6. When no user database exists, the web interface initializes the recommended lists once according to the product specification. Subsequent visits read the database, and intentionally empty lists do not restore defaults.
 
@@ -90,3 +90,20 @@ Use the existing GitHub App/native connection first to read, write, check, and p
 - The maintainer's existing local website, personal database, and cloud-site audience remain separate.
 
 Related methodology: [Cboe source coverage and EQUITY history](CBOE_SOURCE_SCOPE.en.md).
+
+
+## v0.2.0 options-monitor deliverables
+
+This iteration adds the options activity panel, auto/desktop/webapi selection, source-isolated caches/OI observations, browser screening, and visible-page refresh. Desktop scans one symbol/expiration, at most 20 nearby strikes/40 contracts. Contract fields use get-basic-qot in at most two batches of 20; full snapshots stay independent. Prints cover three contracts with 200 each. Optional WebAPI supplies provider underlying summaries and up to 300 unusual events, requiring an independent AccessToken. See the [Product Spec](PRODUCT_SPEC.en.md) and [moomoo backend guide](MOOMOO_BACKEND.en.md) for rules and acceptance criteria.
+
+Verify source/build completion, tests, local installation, provider connectivity, and publication separately. Query desktop Host directly or verify independent WebAPI token/permissions; controlled tests are not live provider responses. WebAPI does not need Desktop but the local computer/Node backend must remain running. Always-on hosting needs separate deployment and a server secret. Existing Sites cloud version 12 is not automatically upgraded by a new local package or GitHub showcase. GitHub Pages remains the introduction/download site.
+
+Changed installation behavior uses a new `v0.2.0` tag, Windows ZIP, and checksum, preserving existing `v0.1.0` tags and attachments. Preserve the personal database and DPAPI configuration outside the project during upgrades. Apply only new versioned migrations; do not replay or rewrite old migrations or restore personal lists to defaults.
+
+Additional verification covers real prints versus interval increments, scoped PCR and missing values, unavailable/permission/partial failures, unknown OI settlement dates, first OI observations and cross-date persistence, refresh cooldown and hidden-page pause, unchanged watchlists/revisions, and safe fallback when unrelated services occupy the default port. Public archives must also exclude new monitor caches, per-contract OI observations, and private provider responses.
+
+
+Additional WebAPI checks cover official OAuth 2.1 PKCE with quote:read only, local callback, a separate DPAPI authorization bundle, refresh from actual expiry information, and reconnection after revocation. Accept valid accid context selectors while rejecting write, trade, and unknown permission capabilities. Save normalized quote:read without outputting actual selectors. Omitted initial scope inherits the bound request only; explicit empty/null scope is rejected. No manual/environment-token mode is provided, and tokens are never persisted to .env. Verify rejection of desktop AppKey as Bearer, redacted failures, isolated provider caches without error failover, truncation notices, and expiry filters that do not alter summary PCR. Add a separate WebAPI per-contract OI table through a new migration without rewriting applied migrations; underlying-summary OI history is not implemented. Exclude authorization bundles, tokens, and private responses from archives.
+
+
+On 2026-11-25, desktop monitoring returned quotes for 40 selected contracts and saved cache/OI observations. Missing fields and print timeouts verified partial availability only; PCR remains blank. Full snapshots still timed out. WebAPI completed its callback but failed authorization, saving no credentials. Complete prints, real-time entitlement, and cloud quotes remain unverified.

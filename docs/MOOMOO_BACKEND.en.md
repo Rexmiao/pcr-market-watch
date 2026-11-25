@@ -2,44 +2,75 @@
 
 [简体中文](MOOMOO_BACKEND.md) | **English**
 
-The local Node.js backend calls the official `moomooapp-cli.exe` bundled with the desktop application. The webpage does not need access to the AppKey or a separate connection button.
+PCR Market Watch offers two optional read-only paths: **desktop** calls the local moomoo CLI; **webapi** requests moomoo HTTPS market-data endpoints through the backend. WebAPI mode does not need the desktop client, but it still needs a running website backend, a separate AccessToken, and appropriate API permissions. Browsers hold neither credential.
 
-## Available read-only capabilities
+## Desktop market-data endpoints
 
 | Local HTTP API | Example parameters | Purpose |
 | --- | --- | --- |
-| `/api/providers/moomoo/status` | None | Configuration, CLI availability, last successful query time, and connection status |
-| `/api/providers/moomoo/quotes` | `?symbols=AMD,NVDA` | Basic quotes and any pre-market, post-market, or overnight fields actually returned by the interface |
-| `/api/providers/moomoo/kline` | `?symbol=AMD&count=60` | Recent daily candles; subscribes as needed, with a maximum of 1,000 candles |
+| `/api/providers/moomoo/status` | None | Desktop configuration, CLI availability, last success, and connection state |
+| `/api/providers/moomoo/quotes` | `?symbols=AMD,NVDA` | At most 20 stock/option codes per batch; basic quotes and actually returned option-extension, pre-/post-market, or overnight fields |
+| `/api/providers/moomoo/kline` | `?symbol=AMD&count=60` | Recent daily candles, up to 1000 |
 | `/api/providers/moomoo/expirations` | `?symbol=AMD` | Option expiration dates |
-| `/api/providers/moomoo/option-chain` | `?symbol=AMD&begin=2026-11-27&end=2026-11-27` | Option chains for a selected expiration range, limited to one month per request |
+| `/api/providers/moomoo/option-chain` | `?symbol=AMD&begin=2026-11-27&end=2026-11-27` | A selected chain range, at most one calendar month |
+| `/api/providers/moomoo/security-snapshots` | `?symbols=AMD` | Independent full snapshot endpoint, at most 100 codes; may time out or be unavailable separately |
+| `/api/providers/moomoo/option-trades` | `?symbol=AMD261127C500000&count=200` | Actual prints for one option contract, at most 200 |
 
-Responses include `provider`, `kind`, `checkedAt`, and `data`. `checkedAt` is the time this backend queried the provider. The actual quote time comes from original fields such as `update_time` or `update_timestamp`.
+Desktop allowlists subscribe, get-basic-qot, get-kline, get-option-expiration-date, get-option-chain, get-security-snapshot, and get-ticker. There is no arbitrary-command proxy or account, position, order, or trading-unlock interface. Child processes use argument arrays and shell:false; desktop AppKey passes only through environment variables, and the Host must be loopback.
 
-The `configured` field in `status` only indicates that configuration exists. A connection is marked successful only after the first successful query. Quote timeliness and field coverage depend on moomoo permissions and the specific interface. A working connection does not imply real-time access to every market or option. Static option-chain contract information is also not equivalent to an all-expirations PCR.
+## Separate credentials
 
-## Local setup
+Desktop mode continues to use `node scripts/configure-moomoo.mjs` or backend `OPENAPI_HOST_APPKEY`, with `moomoo-appkey.dpapi` in PcrMarketWatch under the current user's LocalAppData. It is for the desktop Host and cannot act as a WebAPI Bearer token.
 
-1. Keep the moomoo desktop application signed in. Allow external program access and enable its CLI interface.
-2. The default local address is `http://127.0.0.1:22222`. If the desktop application specifies another port, set `OPENAPI_HOST_URL`. Only local loopback addresses are accepted.
-3. On an already configured machine, use the local website launcher (`start.cmd` in the release ZIP, or `启动本地网站.cmd` in the existing local installation). To replace the key, run `node scripts/configure-moomoo.mjs` from the project directory and enter the new AppKey. Input is not echoed.
-4. The key is encrypted with Windows DPAPI and saved in the `PcrMarketWatch` directory under the current user's LocalAppData, outside the project and Dropbox. The same Windows user can read it after a restart. Another computer or Windows user must configure it again. The backend environment variable `OPENAPI_HOST_APPKEY` can override this stored configuration.
-5. Open the local endpoint `/api/providers/moomoo/quotes?symbols=AMD,NVDA` to verify quotes.
+WebAPI defaults to `node scripts/connect-moomoo-webapi.mjs`: OAuth 2.1 PKCE opens moomoo's official consent page, requests only `quote:read`, and receives authorization through a local callback. Access/refresh credentials and expiry information are saved in `%LOCALAPPDATA%/PcrMarketWatch/moomoo-webapi-oauth.dpapi`, a separate Windows DPAPI-encrypted authorization bundle outside the project, Dropbox, and browser. Users are not asked to paste tokens into chat.
 
-The backend calls only five CLI command categories: subscriptions, basic quotes, daily candles, option expiration dates, and option chains. It does not provide an arbitrary-command proxy. The AppKey is passed only through the child process environment, never through command-line arguments, webpage content, source code, or logs.
+If the initial token response omits `scope`, inherit only the `quote:read` explicitly requested by that bound PKCE flow. Explicit scope must contain `quote:read` exactly once; omitted refresh scope inherits only the previous validated scope. Returned `accid:*` or `accid:` followed by 1–32 digits is an account-context selector, accepted only with valid syntax. It does not grant account/position reads, which need the rejected `trade:read` capability. Reject explicit empty/null scope, write, trade, unknown capabilities, and invalid selectors. Save canonical `quote:read` and a context-present boolean; actual selector values never enter logs, browsers, or source.
 
-There is no account query, position query, order placement, order cancellation, or trading-unlock integration.
+The backend refreshes AccessToken using actual provider expiry information. Providers can revoke grants and refresh credentials expire, so this is not a permanent-connection guarantee. Reconnect through official consent after expiry/revocation. Another computer or Windows user needs separate setup. `scripts/configure-moomoo-webapi.mjs` is a compatibility entry for the same OAuth connection flow. There is no manual or environment-token mode; tokens are never written to `.env`, source, or startup scripts. Additional permission capabilities are rejected; valid account-context selectors are not extra capabilities.
 
-## Cloud boundaries
+Credentials are used only in backend memory and provider authorization environments/headers. They never enter webpages, URLs, command lines, database configuration, logs, Git, or release archives. WebAPI uses only fixed official HTTPS hosts and two read-only market-data paths, never a caller-selected external address. Configured does not establish a successful connection or real-time entitlement.
 
-The hosted website stores user lists in cloud D1. The local website uses SQLite. These stores remain separate and do not synchronize automatically. A cloud Worker cannot directly access `127.0.0.1:22222` on the user's computer, so the cloud moomoo API returns `LOCAL_BACKEND_REQUIRED` instead of presenting unavailable live data as real.
+## Startup and source selection
 
-A future cloud-to-desktop bridge could use a local collector that uploads only selected market-data snapshots, or a private tunnel restricted to read-only routes. This bridge has not been implemented. Do not expose the entire brokerage Host interface to the public internet. Once the desktop application is closed or the local computer is shut down, new quotes cannot continue to be retrieved from that desktop application.
+1. Run the website backend and use the launcher's actual loopback URL: port 8765 by default, or an available port such as 8766 if an unrelated program occupies it. Do not stop that program.
+2. Desktop mode requires signed-in moomoo, external program access, and CLI enabled. Host defaults to `http://127.0.0.1:22222`; `OPENAPI_HOST_URL` may specify another loopback port.
+3. WebAPI mode uses independent official read-only OAuth consent and does not need Desktop online. Collection still stops if the computer or local Node backend stops.
+4. Select auto, desktop, or webapi in the panel. Auto selects from available configuration and identifies the actual source. Explicit-source failures never silently fall back. Source and scope are part of cache and OI-comparison identity.
 
-## PCR methodology
+`checkedAt` is backend retrieval time. Use actual provider timestamps for market time, keeping absent times unknown rather than using retrieval time as proof of real time. Verify API and desktop-app permissions independently.
 
-Daily, 20-session, and 60-session volume PCR still comes from OCC / Cboe. `PCR = put contract volume / call contract volume`; multi-session windows divide the aggregated put volume by the aggregated call volume.
+## Options activity monitoring (v0.2.0)
 
-Open-interest PCR is a separate snapshot calculated from outstanding contracts. Neither measure represents the number of short sellers or the percentage of market capital held short.
+| HTTP API | Behavior |
+| --- | --- |
+| `GET /api/options-monitor?symbol=AMD&provider=auto` | Read the actual selected source's saved cache only; optional `expiration=2026-11-27` |
+| `POST /api/options-monitor/refresh?symbol=AMD&provider=webapi` | An empty JSON object triggers bounded collection, at least 30 seconds of cooldown, and coalescing |
 
-The moomoo quote integration remains separate from historical PCR, so a partial-expiration option chain is not substituted for broader market statistics. See the [product specification](PRODUCT_SPEC.en.md) and [Cboe source scope](CBOE_SOURCE_SCOPE.en.md) for related definitions.
+**Desktop coverage:** one symbol and expiration, at most 20 strikes near the underlying price and 40 Call/Put contracts. After reading the chain, obtain contract-quote observations through `get-basic-qot` in at most two batches of 20, using volume and actually returned `option_ex_data` fields such as OI/IV. The full `get-security-snapshot` endpoint remains independently available but is not required by monitoring and does not guarantee complete fields. Read actual prints for at most three active contracts, 200 each and 600 total. Display the expiration, strike range, and coverage count; label local ratios scoped PCR.
+
+**WebAPI coverage:** backend POST to fixed `option-underlying-overview` obtains selected-underlying call_volume, put_volume, and T−1 call/put OI. GET to fixed `option-event` filters provider unusual events by `US_SECURITY` and underlying code, at most 300 rows per batch. Disclose incomplete pagination/truncation; unusual events are not a complete trade tape. Label ratios provider underlying-summary PCR. Undisclosed exchange/expiration aggregation remains unknown. Expiration selection filters events only; it **does not change the underlying-summary PCR scope**.
+
+Provider BUY/SELL is a side classification, not an opening/closing flag. Cumulative-volume changes between comparable checks are separately labeled interval volume growth, never one large trade. Source/session/scope changes and resets do not cause false alerts. Missing required data and zero call denominators leave PCR blank.
+
+T−1 does not establish an exact verified OI settlement date; keep an undisclosed date unknown. Local SQLite isolates caches by actual source. Desktop per-contract observations use option_monitor_oi; deduplicated contracts returned in WebAPI events use separate option_monitor_webapi_oi. Compare only the same source and contract/scope using actual observation dates. WebAPI underlying-summary OI history is not implemented. Missing history stays blank. Changes do not establish opens/closes, exercises, or investor counts. The original historical grey snapshot remains separate.
+
+Initial screening thresholds are 500 contracts and Volume/OI of 2, editable filters rather than trading signals. Optional 30/60/120-second refresh runs only while expanded and visible, pausing when hidden/closed without closed-page notifications. Configuration/authentication/permission/timeout failures remain explicit; retained data keeps its original success time with a stale label. Errors do not switch source or fabricate trades.
+
+## Cloud and publication boundaries
+
+Local SQLite and cloud D1 lists remain independent without automatic synchronization. Cloud localhost cannot access a personal desktop Host. Direct WebAPI can run on a separately hosted backend with deployed collection routes and a server secret. This version's hosted Worker has no WebAPI collection path and monitoring returns `LOCAL_BACKEND_REQUIRED`; adding a token alone does not create cloud collection capability. A new local package does not automatically update existing Sites version 12.
+
+GitHub Pages is a static introduction/download site, without Node, SQLite, or private tokens. Always-on cloud monitoring requires separate deployment and verification. A desktop bridge is not implemented; never expose the whole brokerage Host to the public internet.
+
+## PCR methodology and acceptance
+
+Original daily/20-/60-session volume PCR continues to use OCC/Cboe and pooled put/call totals. Desktop scoped ratios and WebAPI provider summaries do not replace those historical series. None represents the number of short sellers, capital allocation, or a price-move probability.
+
+See the [Product Spec](PRODUCT_SPEC.en.md) for complete requirements and acceptance. Source and controlled-test success do not verify provider credentials, permissions, or live data; confirm runtime through actual read-only queries.
+
+Official references: [underlying overview](https://open.moomoo.com/api/quote/derivatives/option-underlying-overview), [unusual events](https://open.moomoo.com/api/quote/derivatives/option-event), [setup/authentication](https://open.moomoo.com/api/overview/getting-started), and [permissions](https://open.moomoo.com/api/overview/api-authority).
+
+
+### Local verification record (2026-11-25)
+
+Desktop monitoring returned basic quotes for 40 selected contracts; caches and contract OI observations can be saved. Missing volume/OI leaves status partial and PCR blank. Print queries timed out; complete prints and real-time entitlement remain unverified. Independent full snapshots also timed out. WebAPI completed its callback, but authorization validation failed and no credentials were saved; cloud quotes remain unverified.

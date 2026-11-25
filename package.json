@@ -7,7 +7,7 @@
     "validate": "node scripts/validate-artifact.mjs",
     "db:generate": "drizzle-kit generate",
     "start": "node scripts/preview.mjs",
-    "test": "node scripts/test-cboe-model.mjs && node scripts/test-search-model.mjs && node scripts/test-model.mjs && node --test scripts/history-context.test.mjs"
+    "test": "node scripts/test-cboe-model.mjs && node scripts/test-search-model.mjs && node scripts/test-model.mjs && node --test scripts/history-context.test.mjs && node scripts/test-moomoo.mjs && node scripts/test-moomoo-monitor-provider.mjs && node scripts/test-options-monitor.mjs && node scripts/test-start-port.mjs && node scripts/test-monitor-webapi-normalize.mjs && node scripts/test-moomoo-webapi.mjs && node scripts/test-monitor-modes.mjs"
   },
   "dependencies": {
     "drizzle-orm": "0.45.2"
@@ -15,7 +15,7 @@
   "devDependencies": {
     "drizzle-kit": "0.31.10"
   },
-  "version": "0.1.0",
+  "version": "0.2.0",
   "engines": {
     "node": ">=22"
   }

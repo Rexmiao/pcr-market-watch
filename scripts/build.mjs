@@ -34,7 +34,9 @@ if(/^\s*import\s/m.test(market))throw Error('Market backend must use only Web st
 const marketStripped=market.replace(/^export\s+(?=(?:async\s+)?function\b|const\b|let\b|class\b)/gm,'').replace(/^export\s*\{[^}]*\};?\s*$/gm,'');
 const marketModule='\nconst handleMarketApi=(()=>{\n'+marketStripped+'\nreturn handleMarketApi;\n})();\n';
 const entry=(await readFile(resolve(root,'worker/index.js'),'utf8')).replace(/^import[^\n]*\n/gm,'');
-const combined=generated.replace(/^export /gm,'')+'\n'+stripped+cboeModule+watchlistsModule+marketSettingsModule+marketModule+'\n'+providers+'\n'+entry;
+const monitor=(await readFile(resolve(root,'worker/option-monitor.js'),'utf8')).replace(/^export /gm,'');
+const monitorModule='\nconst handleOptionsMonitorApi=(()=>{\n'+monitor+'\nreturn handleOptionsMonitorApi;\n})();\n';
+const combined=generated.replace(/^export /gm,'')+'\n'+stripped+cboeModule+watchlistsModule+marketSettingsModule+marketModule+monitorModule+'\n'+providers+'\n'+entry;
 await mkdir(resolve(root,'dist/server'),{recursive:true});await mkdir(resolve(root,'dist/.openai'),{recursive:true});
 await writeFile(resolve(root,'dist/server/index.js'),combined);
 await writeFile(resolve(root,'dist/.openai/hosting.json'),await readFile(resolve(root,'.openai/hosting.json')));

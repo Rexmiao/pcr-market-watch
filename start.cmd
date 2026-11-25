@@ -8,6 +8,6 @@ if errorlevel 1 (
 )
 node "%~dp0start-local.mjs"
 echo.
-echo Local URL: http://127.0.0.1:8765/
+echo Use the Local URL printed above. The port may change if another app is using it.
 pause
 endlocal

@@ -7,6 +7,7 @@
   <title>PCR 观察台 · 美股期权</title>
   <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="/context.css">
+  <link rel="stylesheet" href="/option-monitor.css">
 </head>
 <body data-page="dashboard">
   <main>
@@ -19,6 +20,7 @@
     <div id="source-status" class="source-status" aria-live="polite"></div>
     <div id="status" class="status" role="status" aria-live="polite" hidden></div>
     <section id="cboe-panel" class="panel" aria-label="Cboe aggregate put/call ratios"></section>
+    <section id="options-monitor" class="panel options-monitor" aria-labelledby="options-monitor-title"></section>
     <section class="panel watchlist-panel" aria-labelledby="watchlist-heading">
       <div class="section-heading"><div><h2 id="watchlist-heading" data-i18n="symbol">关注标的</h2><p data-i18n="searchScope">名称搜索覆盖常用名单；其他标的请直接输入代码。</p></div></div>
       <form id="search-form" class="search-form" role="search">
@@ -87,5 +89,6 @@
   <script type="module" src="/cboe.js"></script>
   <script type="module" src="/market-overview.js"></script>
   <script type="module" src="/source-notes.js"></script>
+  <script type="module" src="/option-monitor.js"></script>
 </body>
 </html>

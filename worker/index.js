@@ -4,11 +4,13 @@ import {handleWatchlistsApi} from './watchlists.js';
 import {handleMarketSettingsApi} from './market-settings.js';
 import {handleProviderApi} from './providers.js';
 import {handleMarketApi} from './market.js';
+import {handleOptionsMonitorApi} from './option-monitor.js';
 import {ASSETS,SEED,CBOE_SEED} from './assets.generated.js';
 
 export default {
   async fetch(request,env,ctx){
     const url=new URL(request.url);
+    if(url.pathname.startsWith('/api/options-monitor'))return handleOptionsMonitorApi(request)||new Response('Not found',{status:404});
     if(url.pathname==='/api/market'||url.pathname==='/api/market/refresh')return handleMarketApi(request,env,ctx);
     if(url.pathname==='/api/watchlist-settings')return await handleWatchlistsApi(request,env)||new Response('Not found',{status:404});
     if(url.pathname==='/api/market-pcr-settings')return await handleMarketSettingsApi(request,env)||new Response('Not found',{status:404});
