@@ -4,14 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="按交易日观察美股每日 Put/Call Ratio、20日与60日趋势，以及独立标注的持仓快照。">
+  <script>if(location.hash==='#options-monitor')location.replace('/options-monitor.html'+location.search);</script>
   <title>PCR 观察台 · 美股期权</title>
   <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="/context.css">
-  <link rel="stylesheet" href="/option-monitor.css">
 </head>
 <body data-page="dashboard">
   <main>
-    <nav class="site-nav" data-i18n-aria="navLabel" aria-label="网站导航"><a href="/" aria-current="page" data-i18n="navHome">PCR 观察台</a><a href="/market-brief.html" data-i18n="navBrief">市场解读</a><a href="/charts.html" data-i18n="navCharts">图表目录</a><button id="language-toggle" class="button secondary language-toggle" type="button" aria-label="Switch to English">English</button></nav>
+    <nav class="site-nav" data-i18n-aria="navLabel" aria-label="网站导航"><a href="/" aria-current="page" data-i18n="navHome">PCR 观察台</a><a href="/options-monitor.html" data-i18n="navOptions">期权异动</a><a href="/market-brief.html" data-i18n="navBrief">市场解读</a><a href="/charts.html" data-i18n="navCharts">图表目录</a><button id="language-toggle" class="button secondary language-toggle" type="button" aria-label="Switch to English">English</button></nav>
     <header class="page-header">
       <div><div id="eyebrow" class="eyebrow">美股期权 · 自选名单</div><h1 data-i18n="title">PCR 观察台</h1><p data-i18n="subtitle">看清每日交易、阶段变化与持仓构成。</p></div>
       <button id="refresh" class="button primary" type="button" data-i18n="refresh" disabled>更新数据</button>
@@ -20,7 +20,6 @@
     <div id="source-status" class="source-status" aria-live="polite"></div>
     <div id="status" class="status" role="status" aria-live="polite" hidden></div>
     <section id="cboe-panel" class="panel" aria-label="Cboe aggregate put/call ratios"></section>
-    <section id="options-monitor" class="panel options-monitor" aria-labelledby="options-monitor-title"></section>
     <section class="panel watchlist-panel" aria-labelledby="watchlist-heading">
       <div class="section-heading"><div><h2 id="watchlist-heading" data-i18n="symbol">关注标的</h2><p data-i18n="searchScope">名称搜索覆盖常用名单；其他标的请直接输入代码。</p></div></div>
       <form id="search-form" class="search-form" role="search">
@@ -42,6 +41,7 @@
       <div class="controls">
         <label><span data-i18n="dateLabel">选择日期</span><input id="date" type="date" disabled></label>
         <label><span data-i18n="windowLabel">成交量窗口</span><select id="volume" disabled><option value="day" data-i18n="windowDay">所选交易日 · 当日 PCR</option><option value="week" data-i18n="windowWeek">所选周截至该日</option><option value="20" data-i18n="window20">截至该日 · 20 个交易日</option><option value="60" data-i18n="window60">截至该日 · 60 个交易日</option></select></label>
+        <label><span data-i18n="oiSourceLabel">灰色持仓柱来源</span><select id="oi-source"><option value="moomoo" data-i18n="oiSourceMoomoo">moomoo 标的汇总</option><option value="saved" data-i18n="oiSourceSaved">已保存 Cboe 快照</option></select></label>
         <button id="latest" class="button secondary" type="button" data-i18n="latest" disabled>最新完整数据日</button>
         <button id="today" class="button secondary" type="button" data-i18n="today" disabled>今天</button>
       </div>
@@ -59,7 +59,7 @@
       </details>
       <div id="overview" class="chart-host" aria-label="Watched symbols’ volume and open-interest PCR"></div>
       <p id="category-empty" class="empty-state" data-i18n="categoryEmpty" hidden>这个分类暂时没有已加载的标的。请添加标的或切换分类。</p>
-      <p id="oi-note" class="metric-note"></p><p id="extra-freshness" class="metric-note"></p>
+      <p id="oi-note" class="metric-note"></p><p id="oi-source-status" class="metric-note" role="status" aria-live="polite"></p><p id="extra-freshness" class="metric-note"></p>
     </section>
     <section class="panel" aria-labelledby="history-heading">
       <div class="section-heading"><div><h2 id="history-heading" data-i18n="historyHeading">每日 PCR 与趋势</h2><p data-i18n="historySubtitle">每日线显示当时成交；20／60 日线平滑观察阶段变化。</p></div></div>
@@ -80,7 +80,7 @@
       <h2 id="definitions-heading" data-i18n="definitionsHeading">两种 PCR，分开理解</h2>
       <div class="definition-grid"><div><h3 data-i18n="volumeDefinitionHeading">成交量 PCR</h3><p data-i18n="volumeDefinition">选定期间成交的 Put 数量 ÷ Call 数量。日期和窗口改变时重新计算。</p></div><div><h3 data-i18n="oiDefinitionHeading">持仓 PCR · 灰色柱</h3><p data-i18n="oiDefinition">快照中未平仓 Put 数量 ÷ Call 数量。1.52 表示每 100 张 Call，约有 152 张 Put；合约构成不等于多空资金比例。</p></div></div>
       <p class="metric-note" data-i18n="rankDefinition">历史分位只比较同一标的此前 252 个有效交易日。99.6% 不是看空资金占比，也不是涨跌概率。</p>
-      <details><summary data-i18n="sourceHeading">数据来源、日期与刷新范围</summary><div id="source-details"></div><p data-i18n="proxyDefinition">QQQ 是纳指 100 ETF 期权参考，不是 NQ 期货期权 PCR；DIA 是道指 ETF。没有历史持仓数据的日期留空。</p><p data-i18n="refreshDefinition">“更新数据”检查 OCC 完整日成交量。OI 是独立快照，不随成交量刷新。源没有发布新记录时，数据日期保持不变。</p><p><a href="https://www.theocc.com/market-data/market-data-reports/volume-and-open-interest/volume-query" target="_blank" rel="noopener noreferrer" data-i18n="occLink">OCC 成交量查询</a> · <a href="https://www.optionseducation.org/referencelibrary/faq/general-information" target="_blank" rel="noopener noreferrer" data-i18n="unitsLink">合约侧数口径</a></p></details>
+      <details><summary data-i18n="sourceHeading">数据来源、日期与刷新范围</summary><div id="source-details"></div><p data-i18n="proxyDefinition">QQQ 是纳指 100 ETF 期权参考，不是 NQ 期货期权 PCR；DIA 是道指 ETF。没有历史持仓数据的日期留空。</p><p data-i18n="refreshDefinition">“更新数据”分别检查 OCC 完整日成交量和 moomoo OI 汇总；一项失败不阻塞另一项。原来保存的 Cboe OI 快照不会刷新。查询时间不等于 OI 结算日；源未发布新成交记录时，完整日 PCR 日期保持不变。</p><p><a href="https://www.theocc.com/market-data/market-data-reports/volume-and-open-interest/volume-query" target="_blank" rel="noopener noreferrer" data-i18n="occLink">OCC 成交量查询</a> · <a href="https://www.optionseducation.org/referencelibrary/faq/general-information" target="_blank" rel="noopener noreferrer" data-i18n="unitsLink">合约侧数口径</a></p></details>
     </section>
     <footer data-i18n="footer">以数据日期为准 · PCR 是交易结构指标，价格方向需要结合行情确认。</footer>
   </main>
@@ -89,6 +89,5 @@
   <script type="module" src="/cboe.js"></script>
   <script type="module" src="/market-overview.js"></script>
   <script type="module" src="/source-notes.js"></script>
-  <script type="module" src="/option-monitor.js"></script>
 </body>
 </html>

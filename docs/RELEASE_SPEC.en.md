@@ -1,4 +1,4 @@
-# Release and Installation Specification (v0.2.1)
+# Release and Installation Specification (v0.2.2)
 
 [简体中文](RELEASE_SPEC.md) | **English**
 
@@ -112,3 +112,13 @@ On 2026-11-25, desktop monitoring returned quotes for 40 selected contracts and 
 ## v0.2.1 patch
 
 Fix auto incorrectly selecting desktop after reading nonexistent isConfigured: use actual client status().configured and prefer configured WebAPI. Verify that WebAPI-only configuration selects its own cache/refresh; collection failures still never switch source. Preserve the v0.2.0 tag/package. Visible-page polling and data-coverage rules are unchanged.
+
+
+## v0.2.2 dedicated page and homepage OI refresh
+
+Move monitoring to `/options-monitor.html`, with navigation between PCR and Market brief. Current main pages share bilingual navigation and active-page indicators; legacy `/#options-monitor` forwards here. Remove the homepage panel and its requests. Enter the dedicated page expanded, retaining preferences and SQLite/API; polling still requires a visible, expanded page. Add bilingual explanations of orange rule hits, contract fields, side/open-close distinctions, and repeated alerts.
+
+Use a separate v0.2.2 tag, ZIP, and checksum, preserving v0.2.0/v0.2.1 tags and attachments. Include the new HTML and migration 0004 for the latest OI summary cache, preserving personal databases. Reuse read-only authorization without adding account/trading capabilities. All 23 dedicated-page and 16 homepage OI browser checks passed, including navigation/redirects, 320px bilingual display, old collapsed preferences, list reuse, no homepage activity polling, blank historical OI, and independent update states. Pure-model and full existing tests passed; verify installed-database preservation and publication separately.
+
+
+Also fix homepage gray bars remaining on an old snapshot: add manual Moomoo OI summary refresh/source selection, independently of OCC updates, preserving Cboe seeds. GET reads cache; POST caps 40 symbols/two concurrent summary requests, without events/homepage polling. Verify unknown T−1 settlement dates, preserved original times, no side mixing, blank historical gray bars, latest-view gating, and unchanged lists after migration. The cache stores latest values only, not OI history. Actual manual refresh on 2026-11-25 returned complete put/call OI for all requested symbols without source errors; exact settlement dates remain null. Migration 0004 added the cache table. Public materials exclude actual responses and credentials.

@@ -10,6 +10,7 @@ import {ASSETS,SEED,CBOE_SEED} from './assets.generated.js';
 export default {
   async fetch(request,env,ctx){
     const url=new URL(request.url);
+    if(['/api/oi-summaries','/api/oi-summaries/refresh'].includes(url.pathname))return new Response(JSON.stringify({schemaVersion:1,provider:'moomoo_webapi',status:'local_backend_required',checkedAt:null,items:[],errors:[{code:'LOCAL_BACKEND_REQUIRED',message:'Use the local backend for authorized OI summary queries.'}]}),{status:503,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}});
     if(url.pathname.startsWith('/api/options-monitor'))return handleOptionsMonitorApi(request)||new Response('Not found',{status:404});
     if(url.pathname==='/api/market'||url.pathname==='/api/market/refresh')return handleMarketApi(request,env,ctx);
     if(url.pathname==='/api/watchlist-settings')return await handleWatchlistsApi(request,env)||new Response('Not found',{status:404});

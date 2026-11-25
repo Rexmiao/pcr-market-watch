@@ -2,7 +2,7 @@ import {getLanguage, setLanguage} from './i18n.js';
 
 // Translate text nodes so links, data tables and their saved dates stay intact.
 const english = {
-  'PCR 观察台':'PCR Dashboard', '市场解读':'Market brief', '图表目录':'Chart library',
+  'PCR 观察台':'PCR Dashboard', '期权异动':'Options activity', '市场解读':'Market brief', '图表目录':'Chart library',
   '图表目录 · PCR 观察台':'Chart library · PCR Dashboard',
   '市场解读 · PCR 观察台':'Market brief · PCR Dashboard',
   '2026-11-23 市场解读历史快照':'Saved Nov 23, 2026 market brief',

@@ -35,11 +35,11 @@ WebAPI 默认使用 `node scripts/connect-moomoo-webapi.mjs`：通过 OAuth 2.1 
 1. 运行网站后端，使用启动器打印的实际 loopback 地址：默认 8765；无关程序占用时可选 8766，不终止那个程序。
 2. 使用 desktop 时保持 moomoo 已登录、允许外部访问并开启 CLI，默认 Host 为 `http://127.0.0.1:22222`，可用 `OPENAPI_HOST_URL` 指定其他 loopback 端口。
 3. 使用 webapi 时运行独立的官方 OAuth 只读授权；此模式不依赖桌面应用在线。电脑或本机 Node 后端停止，网页仍不能继续采集。
-4. 选择 auto、desktop 或 webapi。v0.2.1 的 auto 读取实际客户端 `status().configured`，优先选择已配置 WebAPI，否则选择 desktop，并返回实际来源；采集失败不静默回退。来源和范围纳入缓存及 OI 比较身份。
+4. 从顶部 PCR 与市场解读之间的“期权异动”进入 `/options-monitor.html`，再选择 auto、desktop 或 webapi。v0.2.1 的 auto 读取实际客户端 `status().configured`，优先选择已配置 WebAPI，否则选择 desktop，并返回实际来源；采集失败不静默回退。来源和范围纳入缓存及 OI 比较身份。
 
 `checkedAt` 是后端查询时间；行情时间使用供应商实际返回的时间戳。时间未提供就明确未知，不能以抓取时间证明实时。API 权限与桌面 App 权限分别核实。
 
-## 网页期权异动监测（v0.2.0）
+## 独立期权异动页面（v0.2.2）
 
 | HTTP API | 行为 |
 | --- | --- |
@@ -52,9 +52,23 @@ WebAPI 默认使用 `node scripts/connect-moomoo-webapi.mjs`：通过 OAuth 2.1 
 
 供应商 BUY/SELL 只是方向分类，开平仓仍未知。两次可比较检查之间的累计量增加另列“检查区间成交量增量”，不伪装成单笔大单。换源、跨交易日、范围变化或计数重置不误报。必要值缺失或 Call 分母为零，PCR 留空。
 
-OI 的 T−1 说明不是已核实的具体结算日；实际结算日未披露就保持未知。本地 SQLite 缓存按实际来源隔离；desktop 逐合约 OI 使用 option_monitor_oi，WebAPI 返回事件中去重后的逐合约 OI 使用独立 option_monitor_webapi_oi。只比较同源、同合约／范围的实际观察日期；WebAPI 标的汇总 OI 历史尚未实现。缺历史留空，增减不确定证明开仓／平仓、行权或多空人数变化，原历史图灰色快照保持独立。
+OI 的 T−1 说明不是已核实的具体结算日；实际结算日未披露就保持未知。本地 SQLite 缓存按实际来源隔离；desktop 逐合约 OI 使用 option_monitor_oi，WebAPI 返回事件中去重后的逐合约 OI 使用独立 option_monitor_webapi_oi。只比较同源、同合约／范围的实际观察日期；WebAPI 标的汇总 OI 历史尚未实现。缺历史留空，增减不确定证明开仓／平仓、行权或多空人数变化，首页最新 OI 汇总与原 Cboe 快照可明确切换，均与这里的逐合约观察分开。
 
 默认筛选张数 500、Volume/OI 2 倍，可修改；它们不是买卖信号。自动刷新可选 30／60／120 秒，仅面板展开且页面可见时运行；隐藏或关闭即暂停，没有闭页通知。无配置、鉴权失败、无权限或超时需明确显示；保留旧成功数据时注明原观察时间及过期状态，不自动换源或生成假成交。
+
+### 页面与提示
+
+新页默认展开，保留原偏好、名单和同一 SQLite/API；旧 `/#options-monitor` 转到新页。首页不挂载监测或发起监测请求。手动／可见页轮询规则不变，离开、隐藏或折叠即停。
+
+橘色是阈值命中，不能当作多空信号。结合到期日、行权价、Call/Put 阅读合约；BUY/SELL 不等于开平仓。同一合约可多次出现或命中多规则，提示数不代表独立开仓或投资者人数。
+
+## 首页 OI 手动刷新（v0.2.2）
+
+首页默认“最新 Moomoo”，可明确切到“已保存 Cboe”。初次 `GET /api/oi-summaries?symbols=NVDA,MU` 只读缓存；“更新数据”以同一查询参数和空 JSON `POST /api/oi-summaries/refresh`，与 OCC 成交量独立更新。最多 40 标的、2 个并发汇总请求，只读 `option-underlying-overview`，不取事件、不启动首页轮询。托管 Worker 返回 503；本机 Node 和授权仍须可用。
+
+返回逐标的 Put／Call OI、PCR、checkedAt、status／stale；OI 为 previous_session 口径，未提供具体结算日时 oiAsOf 为 null。失败保留原完整缓存与原时间并标 stale；新响应缺一侧不能拼旧侧，否则 PCR 空。新 `oi_summary_cache`（0004 迁移）按 symbol 保存最新 payload_json／checked_at，不是历史序列，原 Cboe 种子与异动合约观察不改。
+
+只在现有 `view.isLatest`（actualDate === data.asof）时显示灰柱；这是最新成交量视图，不能当作 OI 日期。历史灰柱空，所选来源和时间始终分开，缺 Moomoo 不静默换 Cboe。
 
 ## 云端与发布边界
 
@@ -74,3 +88,6 @@ GitHub Pages 是静态介绍和下载页，不能运行 Node、SQLite 或持有�
 ### 本机验证记录（2026-11-25）
 
 桌面监测已返回 40 份所选合约的基础报价，缓存及合约 OI 观察可保存。部分成交量／OI 缺失，因此状态为 partial，PCR 留空；逐笔查询超时，完整逐笔及实时权限尚未核实。独立完整快照仍超时。WebAPI 已完成只读 OAuth 并将规范化授权存入 DPAPI；标的汇总成交量／OI PCR 和异动事件已有真实响应。单页分页未完导致 partial，汇总精确行情时点及 OI 结算日仍未知；无需桌面端，但本机后端仍需运行。这不代表托管 Worker 已接入或完整成交带／实时权限已验证。
+
+
+v0.2.2 独立页与首页 OI 浏览器验收已通过，覆盖 320px 中英、偏好／名单复用、历史无 OI、来源标签及独立 OCC／OI 状态。2026-11-25 手动汇总刷新为全部请求标的返回完整 Put／Call OI，0004 新缓存表已应用；具体 OI 结算日仍为 null。不因此新增实时性、完整成交带、OI 历史序列或覆盖保证；安装／发布另行核实。

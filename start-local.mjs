@@ -5,7 +5,7 @@ import {join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 const project = fileURLToPath(new URL('./', import.meta.url));
-const pagePaths=['', 'charts.html', 'archive/index-trends.html', 'archive/seven-watchlist.html'];
+const pagePaths=['', 'options-monitor.html', 'charts.html', 'archive/index-trends.html', 'archive/seven-watchlist.html'];
 
 export function launcherPorts(preferred=process.env.PCR_PREVIEW_PORT) {
   const text=preferred===undefined?'8765':String(preferred).trim();

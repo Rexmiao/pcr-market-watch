@@ -35,11 +35,11 @@ Credentials are used only in backend memory and provider authorization environme
 1. Run the website backend and use the launcher's actual loopback URL: port 8765 by default, or an available port such as 8766 if an unrelated program occupies it. Do not stop that program.
 2. Desktop mode requires signed-in moomoo, external program access, and CLI enabled. Host defaults to `http://127.0.0.1:22222`; `OPENAPI_HOST_URL` may specify another loopback port.
 3. WebAPI mode uses independent official read-only OAuth consent and does not need Desktop online. Collection still stops if the computer or local Node backend stops.
-4. Select auto, desktop, or webapi. In v0.2.1, auto reads actual client `status().configured`, preferring configured WebAPI and otherwise selecting desktop. It identifies the source and never silently falls back after collection failures. Source and scope are part of cache and OI-comparison identity.
+4. Open `/options-monitor.html` through Options activity between PCR and Market brief, then select auto, desktop, or webapi. In v0.2.1, auto reads actual client `status().configured`, preferring configured WebAPI and otherwise selecting desktop. It identifies the source and never silently falls back after collection failures. Source and scope are part of cache and OI-comparison identity.
 
 `checkedAt` is backend retrieval time. Use actual provider timestamps for market time, keeping absent times unknown rather than using retrieval time as proof of real time. Verify API and desktop-app permissions independently.
 
-## Options activity monitoring (v0.2.0)
+## Dedicated options activity page (v0.2.2)
 
 | HTTP API | Behavior |
 | --- | --- |
@@ -52,9 +52,23 @@ Credentials are used only in backend memory and provider authorization environme
 
 Provider BUY/SELL is a side classification, not an opening/closing flag. Cumulative-volume changes between comparable checks are separately labeled interval volume growth, never one large trade. Source/session/scope changes and resets do not cause false alerts. Missing required data and zero call denominators leave PCR blank.
 
-T−1 does not establish an exact verified OI settlement date; keep an undisclosed date unknown. Local SQLite isolates caches by actual source. Desktop per-contract observations use option_monitor_oi; deduplicated contracts returned in WebAPI events use separate option_monitor_webapi_oi. Compare only the same source and contract/scope using actual observation dates. WebAPI underlying-summary OI history is not implemented. Missing history stays blank. Changes do not establish opens/closes, exercises, or investor counts. The original historical grey snapshot remains separate.
+T−1 does not establish an exact verified OI settlement date; keep an undisclosed date unknown. Local SQLite isolates caches by actual source. Desktop per-contract observations use option_monitor_oi; deduplicated contracts returned in WebAPI events use separate option_monitor_webapi_oi. Compare only the same source and contract/scope using actual observation dates. WebAPI underlying-summary OI history is not implemented. Missing history stays blank. Changes do not establish opens/closes, exercises, or investor counts. The homepage explicitly selects latest OI summaries or the saved Cboe snapshot, both separate from these per-contract observations.
 
 Initial screening thresholds are 500 contracts and Volume/OI of 2, editable filters rather than trading signals. Optional 30/60/120-second refresh runs only while expanded and visible, pausing when hidden/closed without closed-page notifications. Configuration/authentication/permission/timeout failures remain explicit; retained data keeps its original success time with a stale label. Errors do not switch source or fabricate trades.
+
+### Page and interpretation
+
+The page starts expanded, retaining preferences, lists, and shared SQLite/API. Legacy `/#options-monitor` forwards here. The homepage mounts no monitor and makes no monitor requests. Manual/visible-page refresh rules remain unchanged; leaving, hiding, or collapsing stops polling.
+
+Orange means a threshold was met, not bullish/bearish. Read expiration, strike, and Call/Put with each contract. BUY/SELL is not open/close. A contract can repeat or meet several rules; alert counts are not unique openings or investor counts.
+
+## Manual homepage OI refresh (v0.2.2)
+
+The homepage defaults to Latest Moomoo, with explicit Saved Cboe selection. Initial `GET /api/oi-summaries?symbols=NVDA,MU` reads cache only. Update data sends an empty JSON `POST /api/oi-summaries/refresh` with the same query, independently of OCC volume. Cap at 40 symbols/two concurrent summary requests; use only `option-underlying-overview`, with no events or homepage polling. Hosted Worker returns 503; local Node and authorization are still required.
+
+Return per-symbol put/call OI, PCR, checkedAt, and status/stale. OI is previous_session; an undisclosed settlement date keeps oiAsOf null. Failure retains a complete cached pair and original time as stale. Never mix a new side with an old side; otherwise PCR is null. New `oi_summary_cache` (migration 0004) stores latest payload_json/checked_at by symbol, not a time series. Preserve Cboe seeds and activity contract observations.
+
+Show gray bars only for existing `view.isLatest` (actualDate === data.asof), which identifies the latest volume view rather than OI date. Historical gray bars remain blank. Label the selected source/time separately; missing Moomoo does not silently fall back to Cboe.
 
 ## Cloud and publication boundaries
 
@@ -74,3 +88,6 @@ Official references: [underlying overview](https://open.moomoo.com/api/quote/der
 ### Local verification record (2026-11-25)
 
 Desktop monitoring returned basic quotes for 40 selected contracts; caches and contract OI observations can be saved. Missing volume/OI leaves status partial and PCR blank. Print queries timed out; complete prints and real-time entitlement remain unverified. Independent full snapshots also timed out. WebAPI completed read-only OAuth and saved normalized authorization through DPAPI. Underlying-summary volume/OI PCR and unusual events returned actual responses. Incomplete single-page pagination yields partial status; exact overview market time and OI settlement date remain unknown. Desktop is unnecessary, but the local backend must run. This does not establish hosted Worker integration, a complete tape, or real-time entitlement.
+
+
+v0.2.2 dedicated-page and homepage OI browser checks passed, covering 320px Chinese/English, preference/list reuse, no historical OI, source labels, and independent OCC/OI states. Actual manual summary refresh on 2026-11-25 returned complete put/call OI for all requested symbols, and migration 0004 added the cache table. Exact OI settlement dates remain null. This adds no real-time, complete-tape, OI-history, or coverage guarantee; installation/publication require separate verification.

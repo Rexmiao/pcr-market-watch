@@ -25,7 +25,7 @@ const CATALOG = [
   ["IWM","iShares Russell 2000 ETF","罗素2000"],["SMH","VanEck Semiconductor ETF","半导体ETF"],
   ["SOXX","iShares Semiconductor ETF","半导体ETF"],["XLK","Technology Select Sector ETF","科技ETF"],
 ];
-const OI_NOTICE = "OI仅为原有单次缓存，实际结算日未披露；更新按钮只更新OCC成交量，不更新OI或股票空头持仓。";
+const OI_NOTICE = "本完整日成交量接口附带的OI为原有Cboe快照，实际结算日未披露；它不刷新这份快照。首页moomoo OI通过独立接口检查，查询时间与结算日分别标注。";
 
 function nyParts(now = new Date()) {
   const p = Object.fromEntries(new Intl.DateTimeFormat("en-CA", {timeZone:"America/New_York",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(now).map(x=>[x.type,x.value]));
@@ -283,7 +283,7 @@ async function saveSymbolState(request,state) {
 function symbolPayload(state,now=new Date(),refresh={status:"cached",message:"使用该标的最近一次完整缓存。"}) {
   const symbol=state.symbol,catalog=CATALOG.find(x=>x[0]===symbol),label=catalog?.[2]?`${symbol} · ${catalog[2]}`:symbol;
   const instrument=makeInstrument(symbol,state.rows,{instruments:{[symbol]:{label}}},now,state.coverage||{});
-  return {symbol,instrument,asof:state.rows.at(-1).date,checkedAt:state.checkedAt,calendarDate:nyParts(now).date,source:SOURCE,units:"contract sides",coverage:instrument.coverage,freshness:instrument.freshness,refresh:{...refresh,checkedAt:state.checkedAt},oiNotice:"该标的没有可核实OI来源，OI不提供；更新仅检查OCC完整日成交量。"};
+  return {symbol,instrument,asof:state.rows.at(-1).date,checkedAt:state.checkedAt,calendarDate:nyParts(now).date,source:SOURCE,units:"contract sides",coverage:instrument.coverage,freshness:instrument.freshness,refresh:{...refresh,checkedAt:state.checkedAt},oiNotice:"本接口仅提供该标的OCC完整日成交量，不附带OI；首页moomoo OI使用独立来源及刷新接口。"};
 }
 async function refreshSymbolRows(symbol,previous,now,fetcher=fetch) {
   const current=monthOf(nyParts(now).date),floor=monthShift(current,1-SYMBOL_HISTORY_MONTHS),upTo=completedSession(now);

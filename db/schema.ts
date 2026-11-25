@@ -50,3 +50,9 @@ export const optionMonitorWebapiOi = sqliteTable('option_monitor_webapi_oi', {
   primaryKey({columns:[table.contract,table.observedDate]}),
   index('option_monitor_webapi_oi_lookup').on(table.symbol,table.expiration,table.observedDate),
 ]);
+
+export const oiSummaryCache = sqliteTable('oi_summary_cache', {
+  symbol: text('symbol').primaryKey().notNull(),
+  payloadJson: text('payload_json').notNull(),
+  checkedAt: text('checked_at').notNull(),
+});

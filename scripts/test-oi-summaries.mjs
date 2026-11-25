@@ -1,0 +1,45 @@
+import assert from 'node:assert/strict';
+import {mkdtemp,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join,resolve,dirname,basename} from 'node:path';
+import {createLocalD1} from './local-db.mjs';
+import {createOiSummaryHandler} from './oi-summaries.mjs';
+
+const directory=await mkdtemp(join(tmpdir(),'pcr-oi-summaries-'));
+try{
+  const database=await createLocalD1({databasePath:join(directory,'test.sqlite3')});
+  let clock=Date.parse('2026-11-27T15:00:00Z'),calls=0,running=0,maxRunning=0,fail=false,partial=false,zero=false,zeroCall=false,configured=true;
+  const client={status:()=>({configured}),overview:async symbol=>{calls++;running++;maxRunning=Math.max(maxRunning,running);try{await new Promise(accept=>setTimeout(accept,12));if(fail)throw Object.assign(Error('secret-token-must-not-escape'),{code:'PROVIDER_UNAVAILABLE'});return {provider:'moomoo_webapi',checkedAt:new Date(clock-1000).toISOString(),data:{items:[{code:'US.'+symbol,put_open_interest:zero?0:200,call_open_interest:partial?null:zeroCall?0:100}]}};}finally{running--;}}};
+  const handler=createOiSummaryHandler({webApiClient:client,database,now:()=>clock});
+  const request=(symbols='NVDA,MU',post=false,extra={})=>new Request('http://127.0.0.1:8765/api/oi-summaries'+(post?'/refresh':'')+'?symbols='+symbols,post?{method:'POST',headers:{'content-type':'application/json',...extra.headers},body:extra.body||'{}'}:extra);
+  let data=await (await handler(request())).json();assert.equal(calls,0);assert.equal(data.checkedAt,null);assert(data.items.every(i=>i.status==='unavailable'));
+  data=await (await handler(request('NVDA,MU',true))).json();assert.equal(calls,2);assert.equal(data.provider,'moomoo_webapi');assert(data.items.every(i=>i.oiPcr===2&&i.oiAsOf===null&&i.oiBasis==='previous_session'&&i.checkedAt===new Date(clock-1000).toISOString()));
+  const first=data.items[0].checkedAt;
+  await handler(request());assert.equal(calls,2,'GET must not perform upstream requests');
+  data=await (await handler(request('NVDA,MU',true))).json();assert.equal(data.refreshStatus,'cooldown');assert.equal(calls,2);
+  clock+=31000;
+  const both=await Promise.all([handler(request('NVDA,MU',true)),handler(request('MU,NVDA',true))]);
+  const bodies=await Promise.all(both.map(r=>r.json()));assert.equal(calls,4);assert(bodies.some(i=>i.coalesced));
+  const lastGood=bodies[0].items[0].checkedAt;assert.notEqual(first,lastGood);
+  clock+=31000;fail=true;data=await (await handler(request('NVDA,MU',true))).json();assert(data.items.every(i=>i.stale&&i.checkedAt===lastGood&&i.oiPcr===2));assert(!JSON.stringify(data).includes('secret-token'));
+  const restarted=createOiSummaryHandler({webApiClient:client,database,now:()=>clock});
+  const beforeRead=calls;data=await (await restarted(request())).json();assert.equal(calls,beforeRead);assert(data.items.every(i=>i.stale&&i.checkedAt===lastGood));
+  clock+=31000;fail=false;partial=true;data=await (await handler(request('NVDA',true))).json();assert.equal(data.items[0].checkedAt,lastGood);assert.equal(data.items[0].stale,true);assert.equal(data.items[0].errors[0].code,'PARTIAL_OI');
+  data=await (await handler(request('AMD',true))).json();assert.equal(data.items[0].putOi,200);assert.equal(data.items[0].callOi,null);assert.equal(data.items[0].oiPcr,null);
+  clock+=31000;partial=false;zero=true;data=await (await handler(request('AMD',true))).json();assert.equal(data.items[0].putOi,0);assert.equal(data.items[0].oiPcr,0);
+  clock+=31000;zero=false;zeroCall=true;data=await (await handler(request('AMD',true))).json();assert.equal(data.items[0].callOi,0);assert.equal(data.items[0].oiPcr,null);assert.equal(data.items[0].errors[0].code,'ZERO_CALL_OI');zeroCall=false;
+  clock+=31000;zero=false;await handler(request('AAPL,SPY,QQQ,DIA,AVGO',true));assert.equal(maxRunning,2,'At most two overview queries may run concurrently');
+  configured=false;data=await (await handler(request('SNDK',true))).json();assert.equal(data.items[0].errors[0].code,'NOT_CONFIGURED');
+  const spyPrior=(await (await handler(request('SPY'))).json()).items[0],beforeUnconfigured=calls;clock+=31000;
+  data=await (await handler(request('SPY',true))).json();assert.equal(data.items[0].errors[0].code,'NOT_CONFIGURED');assert.equal(data.items[0].checkedAt,spyPrior.checkedAt);
+  data=await (await handler(request('SPY'))).json();assert.equal(data.items[0].stale,true);assert.equal(data.items[0].checkedAt,spyPrior.checkedAt);
+  const afterLoss=createOiSummaryHandler({webApiClient:client,database,now:()=>clock});data=await (await afterLoss(request('SPY'))).json();assert.equal(data.items[0].stale,true);assert.equal(data.items[0].checkedAt,spyPrior.checkedAt);assert.equal(calls,beforeUnconfigured,'Credential loss preserves stale data without querying a provider');
+  assert.equal((await handler(request('NVDA',true,{headers:{origin:'https://evil.test'}}))).status,403);
+  for(const symbols of ['','NVDA,NVDA','NVDA;bad','nvda','US.NVDA','HK.00700','BRK..B','NVDA.','NVDA&symbols=MU','NVDA&command=orders',Array.from({length:41},(_,i)=>'A'+i).join(',')])assert.equal((await handler(request(symbols))).status,400);
+  assert.equal((await handler(request('NVDA',true,{body:'{"command":"orders"}'}))).status,400);
+  assert.equal((await handler(new Request('http://127.0.0.1:8765/api/oi-summaries?symbols=NVDA',{method:'POST'}))).status,405);
+  assert.equal(await handler(new Request('http://127.0.0.1:8765/unrelated')),null);
+  await database.prepare('INSERT INTO oi_summary_cache(symbol,payload_json,checked_at) VALUES(?,?,?)').bind('BAD',JSON.stringify({...bodies[0].items[0],symbol:'BAD',provider:'cboe'}),lastGood).run();
+  data=await (await restarted(request('BAD'))).json();assert.equal(data.items[0].putOi,null,'A legacy/different source must not enter the cloud summary cache');
+  console.log('PASS OI summaries: cache-only GET, cloud-only overview, source timestamps, T-1 unknown dates, valid zeros, missing-side isolation, stale retention, real SQLite persistence, cooldown/coalescing, two-query bound and strict safe inputs.');
+}finally{assert.equal(dirname(resolve(directory)),resolve(tmpdir()));assert(basename(directory).startsWith('pcr-oi-summaries-'));await rm(directory,{recursive:true,force:true});}

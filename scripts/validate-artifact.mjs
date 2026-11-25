@@ -22,4 +22,12 @@ assert.equal(
   `${pathToFileURL(workerPath)} must export default.fetch`,
 );
 
-console.log("Artifact is valid ESM and exports default.fetch");
+const monitorPage=await workerModule.default.fetch(new Request('https://pcr.example/options-monitor.html'),{},{});
+assert.equal(monitorPage.status,200,'The independent options page must be packaged and routed.');
+assert((await monitorPage.text()).includes('/options-monitor-page.js'));
+const home=await workerModule.default.fetch(new Request('https://pcr.example/'),{},{});
+assert(!(await home.text()).includes('src="/option-monitor.js"'),'The homepage must not start options monitoring.');
+const cloudOi=await workerModule.default.fetch(new Request('https://pcr.example/api/oi-summaries?symbols=NVDA'),{},{});
+assert.equal(cloudOi.status,503);
+assert.equal((await cloudOi.json()).status,'local_backend_required');
+console.log("Artifact is valid ESM, serves the independent monitor, keeps homepage monitoring off and preserves the local-only OI boundary");
