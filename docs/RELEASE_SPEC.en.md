@@ -1,4 +1,4 @@
-# Release and Installation Specification (v0.2.2)
+# Release and Installation Specification (v0.2.3)
 
 [简体中文](RELEASE_SPEC.md) | **English**
 
@@ -122,3 +122,10 @@ Use a separate v0.2.2 tag, ZIP, and checksum, preserving v0.2.0/v0.2.1 tags and 
 
 
 Also fix homepage gray bars remaining on an old snapshot: add manual Moomoo OI summary refresh/source selection, independently of OCC updates, preserving Cboe seeds. GET reads cache; POST caps 40 symbols/two concurrent summary requests, without events/homepage polling. Verify unknown T−1 settlement dates, preserved original times, no side mixing, blank historical gray bars, latest-view gating, and unchanged lists after migration. The cache stores latest values only, not OI history. Actual manual refresh on 2026-11-25 returned complete put/call OI for all requested symbols without source errors; exact settlement dates remain null. Migration 0004 added the cache table. Public materials exclude actual responses and credentials.
+
+
+## v0.2.3 card side and time
+
+Activity/print alert cards add provider BUY/SELL/NEUTRAL, undisclosed open/close, and New York ET record date/time to the second, linked by eventId. Keep microsecond fill_timestamp distinct from observation/check times; snapshot and interval alerts never impersonate fills. Missing data stays unknown without inferring open/close or net positioning from Put/side/OI.
+
+Use a separate v0.2.3 tag, ZIP, and checksum, preserving v0.2.0/v0.2.1/v0.2.2. Add no APIs, account/trading capabilities, or collection coverage. Before publication verify repeated contracts/opposite sides, unknown fields, microseconds/daylight saving, card-table consistency, both languages, and narrow layouts. Actual read-only records verified event association, side, and record time, with open/close unknown. All 10 v0.2.3 identity/time checks and 14 bilingual browser checks passed, covering 320px, multiple sides/unknowns on one contract, UTC midnight, New York spring/fall daylight saving, and ignoring undocumented raw OPEN flags. Exclude actual private activity responses and runtime credentials from public archives.

@@ -1,5 +1,5 @@
 import {getLanguage} from './i18n.js';
-import {MONITOR_PREFERENCES_KEY,readMonitorPreferences,monitorConnectionMode,monitorNumber,monitorExpiration,monitorWatchSymbols,monitorOptionType,monitorTypeMatches,monitorVolumeOi,monitorEventKey,monitorActivity} from './option-monitor-model.js';
+import {MONITOR_PREFERENCES_KEY,readMonitorPreferences,monitorConnectionMode,monitorNumber,monitorExpiration,monitorWatchSymbols,monitorOptionType,monitorTypeMatches,monitorVolumeOi,monitorEventKey,monitorActivity,monitorAlertDetails,formatMonitorTime} from './option-monitor-model.js';
 
 const root=document.getElementById('options-monitor');
 const words={
@@ -14,16 +14,20 @@ const words={
 
 Object.assign(words.zh,{
   readingTitle:'橙色提示怎么读？',
+  alertFillTime:'成交记录时间：{time}',alertObservationTime:'快照时间：{time}',alertCheckedTime:'本次检查：{time}',alertCheckInterval:'检查区间：{start}—{end}',alertSide:'供应商方向：{side}',alertBuy:'买入（分类）',alertSell:'卖出（分类）',alertNeutral:'中性（分类）',alertOpenClose:'开平仓：未披露',
+  buy:'买入（供应商分类）',sell:'卖出（供应商分类）',cloudBuy:'买入（供应商分类）',cloudSell:'卖出（供应商分类）',
   readingThresholds:'橙色表示达到你设置的阈值：数量提示看记录张数；“累计成交增量”看两次检查间增加了多少张；“成交量／OI”比较当日累计成交与 OI。三种含义不同，成交增量不是单笔大单，云端异动记录也可能经过筛选或聚合。',
   readingContract:'先核对标的、Call／Put、到期日及行权价。合约代码中的日期是到期日，C／P 表示 Call／Put；下方会把可取得的合约字段单独列出。Call 和 Put 是合约类型，不能单凭类型判断买卖意图。',
-  readingLimits:'Put 活跃可能来自买入保护、卖出 Put，或多腿策略中的一腿。供应商方向分类不能确认开仓／平仓，也不能确定新增空头、净多空头寸或多腿策略整体方向。OI 为独立观察值，具体结算日缺失时仍标为未知。',
+  readingLimits:'当前接口提供 BUY／SELL／NEUTRAL 方向分类，没有开仓／平仓字段。买入 Put 可能是新开保护仓，也可能是买回先前卖出的 Put；卖出 Put 可能是卖出开仓或卖出平仓，也可能只是多腿策略的一腿。方向分类不能证明主动买卖方、实际交易意图或新增空头；不能由 Put、Delta 或 OI 推断开平仓及净多空。OI 的具体结算日缺失时仍标为未知。',
   decodedContract:'{symbol} · {type} · {expiration} 到期 · 行权价 {strike}',
 });
 Object.assign(words.en,{
   readingTitle:'How to read the orange alerts',
+  alertFillTime:'Activity execution time: {time}',alertObservationTime:'Snapshot time: {time}',alertCheckedTime:'This check: {time}',alertCheckInterval:'Check interval: {start}—{end}',alertSide:'Provider side: {side}',alertBuy:'Buy (classified)',alertSell:'Sell (classified)',alertNeutral:'Neutral (classified)',alertOpenClose:'Open / close: not disclosed',
+  buy:'Buy (provider-classified)',sell:'Sell (provider-classified)',cloudBuy:'Buy (provider-classified)',cloudSell:'Sell (provider-classified)',
   readingThresholds:'Orange marks your threshold matches. A size alert uses a record’s contract count; cumulative-volume change measures the increase between checks; volume/OI compares cumulative daily volume with OI. These are different measures. An increase is not one large trade, and cloud activity records may be filtered or aggregated.',
   readingContract:'Check the symbol, Call/Put, expiration and strike first. The date in a standard contract code is its expiration; C/P identifies Call/Put. Available decoded fields are shown below each alert. Call/Put is a contract type and does not establish trading intent.',
-  readingLimits:'Put activity may reflect protection buying, put selling, or one leg of a multi-leg strategy. Provider side classifications do not confirm opening/closing activity, newly added shorts, net long/short positions or the direction of a complete multi-leg strategy. OI is a separate observation; undisclosed settlement dates stay unknown.',
+  readingLimits:'The current API provides BUY/SELL/NEUTRAL side classifications, without an open/close field. Buying puts may open protection or buy back previously sold puts; selling puts may open or close a position, or be one leg of a multi-leg strategy. Side classifications do not establish the aggressor, trading intent or newly added shorts. Put type, Delta and OI cannot establish open/close or net directional positions. Undisclosed OI settlement dates stay unknown.',
   decodedContract:'{symbol} · {type} · expires {expiration} · strike {strike}',
 });
 
@@ -114,10 +118,20 @@ if(root){
     node('monitor-matches-label').textContent=say(payload?.stale?'retainedHits':'hits');node('monitor-matches-value').textContent=hasData?number(matches.length):'—';
     const alerts=matches.slice(0,8).map(alert=>{
       const item=make('li','',say(alert.type==='large_trade'?(cloud?'cloudLargeActivity':'largeTrade'):alert.type==='interval_volume'?'intervalVolume':'volumeOi',{contract:alert.contract||say('unknownContract'),count:number(alert.contracts),ratio:number(alert.ratio,2)}));
-      const contract=(alert.eventId?events().find(event=>monitorEventKey(event)===alert.eventId):null)||contracts().find(value=>value.contract===alert.contract)||events().find(value=>value.contract===alert.contract);
-      if(contract&&monitorExpiration(contract.expiration)&&monitorNumber(contract.strike)!==null){
-        const type=monitorOptionType(contract.optionType);
+      const detail=monitorAlertDetails(alert,contracts(),events(),{checkedAt:payload?.checkedAt}),contract=detail.contract;
+      if(contract&&contract.expiration&&contract.strike!==null){
+        const type=contract.optionType;
         item.append(make('small','monitor-alert-contract',say('decodedContract',{symbol:textValue(contract.root||payload?.symbol),type:type==='unknown'?'—':type==='call'?'Call':'Put',expiration:contract.expiration,strike:number(contract.strike,2)})));
+      }
+      const stamp=value=>formatMonitorTime(value)||say('unknownTime');
+      if(detail.kind==='activity'){
+        item.append(make('small','monitor-alert-time',say('alertFillTime',{time:stamp(detail.fillTime)})));
+        item.append(make('small','monitor-alert-side',say('alertSide',{side:say(detail.side==='buy'?'alertBuy':detail.side==='sell'?'alertSell':detail.side==='neutral'?'alertNeutral':'unknown')})));
+        item.append(make('small','monitor-alert-open-close',say('alertOpenClose')));
+      }else{
+        if(detail.kind==='interval')item.append(make('small','monitor-alert-time',say('alertCheckInterval',{start:stamp(detail.previousCheckTime),end:stamp(detail.checkedAt)})));
+        item.append(make('small','monitor-alert-time',say('alertObservationTime',{time:stamp(detail.observationTime)})));
+        if(detail.kind!=='interval')item.append(make('small','monitor-alert-time',say('alertCheckedTime',{time:stamp(detail.checkedAt)})));
       }
       return item;
     });

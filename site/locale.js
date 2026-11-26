@@ -53,7 +53,7 @@ const translations = {
     "localOnly": "这个 GitHub Pages 页面用于介绍项目。完整 PCR 交互、数据库和数据刷新在本地后端中运行。",
     "specCopy": "想了解实现细节？Spec 包含功能范围、数据算法、接口契约、数据库结构、运行方式和验收场景。",
     "readSpec": "阅读产品 Spec",
-    "footer": "PCR 观察台 · v0.2.2",
+    "footer": "PCR 观察台 · v0.2.3",
     "close": "关闭",
     "title": "PCR 观察台 · 项目主页",
     "description": "PCR 观察台：查看美股期权单日、20日和60日 Put/Call Ratio，比较历史分位与往年同期，维护自己的关注名单。"
@@ -112,7 +112,7 @@ const translations = {
     "localOnly": "This GitHub Pages site introduces the project. The full PCR interface, database and data refresh run on the local backend.",
     "specCopy": "Explore the implementation: the Spec covers features, data algorithms, API contracts, database structure, setup and acceptance scenarios.",
     "readSpec": "Read the product Spec",
-    "footer": "PCR Market Watch · v0.2.2",
+    "footer": "PCR Market Watch · v0.2.3",
     "close": "Close",
     "title": "PCR Market Watch · Project homepage",
     "description": "Explore daily, 20-session and 60-session U.S. options Put/Call Ratios, historical percentiles, prior-year comparisons and your own watchlist."

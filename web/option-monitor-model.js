@@ -38,6 +38,33 @@ export function monitorVolumeOi(contract){
 export function monitorEventKey(event){
   return String(event?.id??[event?.contract,event?.fillTime,event?.contracts,event?.price,event?.side].join('|'));
 }
+export function monitorTradeSide(value){
+  const side=typeof value==='string'?value.toLowerCase():'';
+  return ['buy','sell','neutral'].includes(side)?side:'unknown';
+}
+export function formatMonitorTime(value){
+  if(typeof value!=='string'||!/^\d{4}-\d{2}-\d{2}T/.test(value)||!/(?:Z|[+-]\d\d:\d\d)$/.test(value)||!monitorExpiration(value.slice(0,10)))return null;
+  const instant=new Date(value);if(!Number.isFinite(instant.valueOf()))return null;
+  const parts=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23',timeZoneName:'short'}).formatToParts(instant).map(part=>[part.type,part.value]));
+  return `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:${parts.minute}:${parts.second} ET (${parts.timeZoneName})`;
+}
+// Activity metadata must follow its event ID. Contract-level snapshots have different clocks.
+export function monitorAlertDetails(alert,contracts,events,{checkedAt=null}={}){
+  const activity=alert?.type==='large_trade';
+  const event=activity&&typeof alert.eventId==='string'?(Array.isArray(events)?events:[]).find(item=>monitorEventKey(item)===alert.eventId):null;
+  const snapshot=!activity?(Array.isArray(contracts)?contracts:[]).find(item=>item?.contract===alert?.contract):null;
+  const source=activity?event:snapshot;
+  const validTime=value=>formatMonitorTime(value)?value:null;
+  return {
+    kind:activity?'activity':alert?.type==='interval_volume'?'interval':'snapshot',
+    contract:source?{root:monitorSymbol(source.root||source.symbol),optionType:monitorOptionType(source.optionType),expiration:monitorExpiration(source.expiration),strike:monitorNumber(source.strike)}:null,
+    side:activity?monitorTradeSide(event?.side):'unknown',sideBasis:'provider_classification',openClose:'unknown',
+    fillTime:activity?validTime(event?.fillTime):null,
+    observationTime:activity?null:validTime(snapshot?.observationTime),
+    previousCheckTime:activity?null:validTime(snapshot?.previousCheckTime),
+    checkedAt:activity?null:validTime(checkedAt),
+  };
+}
 export function monitorActivity(contracts,events,preferences){
   const prefs=readMonitorPreferences(preferences),seen=new Set(),alerts=[];
   const append=value=>{if(!seen.has(value.id)){seen.add(value.id);alerts.push(value);}};

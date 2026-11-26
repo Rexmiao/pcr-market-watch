@@ -64,6 +64,8 @@ Desktop requires signed-in moomoo, external access, and options permissions, sca
 
 Initial 500-contract and Volume/OI-of-2 thresholds are editable screening rules. Optional 30/60/120-second refresh runs only while expanded and visible, pausing when hidden/closed without closed-page notifications. Provider BUY/SELL is not an opening/closing flag. Cumulative-volume increments are not one large trade; OI-observation changes do not confirm new shorts or closing trades. Failures remain explicit, retain original data times, never fabricate trades, and do not automatically switch source.
 
+v0.2.3 cards show provider BUY/SELL/NEUTRAL classification and record date/time to the second in New York ET; open/close remains **undisclosed**. Activity cards match their original event; snapshot and interval cards label observation/check times instead. Missing times stay unknown. Put type, side, and OI do not establish net long/short positioning or opening/closing.
+
 Orange highlights mean a screening threshold was met, not bullish/bearish. Read the displayed expiration, strike, and Call/Put. A contract can repeat or meet multiple rules; alert counts are not unique openings or trader counts.
 
 The local Node backend and computer must remain running. Always-on cloud collection needs a separately deployed backend and server secret. GitHub Pages only introduces the project/download and cannot run collection or hold private tokens. This version's hosted Worker has no WebAPI collection path. Existing Sites cloud versions are not automatically updated by local packages.

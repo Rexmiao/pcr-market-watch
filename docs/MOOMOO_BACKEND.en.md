@@ -50,7 +50,7 @@ Credentials are used only in backend memory and provider authorization environme
 
 **WebAPI coverage:** backend POST to fixed `option-underlying-overview` obtains selected-underlying call_volume, put_volume, and T−1 call/put OI. GET to fixed `option-event` filters provider unusual events by `US_SECURITY` and underlying code, at most 300 rows per batch. Disclose incomplete pagination/truncation; unusual events are not a complete trade tape. Label ratios provider underlying-summary PCR. Undisclosed exchange/expiration aggregation remains unknown. Expiration selection filters events only; it **does not change the underlying-summary PCR scope**.
 
-Provider BUY/SELL is a side classification, not an opening/closing flag. Cumulative-volume changes between comparable checks are separately labeled interval volume growth, never one large trade. Source/session/scope changes and resets do not cause false alerts. Missing required data and zero call denominators leave PCR blank.
+Provider BUY/SELL/NEUTRAL is side classification. The current quote API has no open/close flag, so open/close is explicitly undisclosed. Cumulative-volume changes between comparable checks are separately labeled interval volume growth, never one large trade. Source/session/scope changes and resets do not cause false alerts. Missing required data and zero call denominators leave PCR blank.
 
 T−1 does not establish an exact verified OI settlement date; keep an undisclosed date unknown. Local SQLite isolates caches by actual source. Desktop per-contract observations use option_monitor_oi; deduplicated contracts returned in WebAPI events use separate option_monitor_webapi_oi. Compare only the same source and contract/scope using actual observation dates. WebAPI underlying-summary OI history is not implemented. Missing history stays blank. Changes do not establish opens/closes, exercises, or investor counts. The homepage explicitly selects latest OI summaries or the saved Cboe snapshot, both separate from these per-contract observations.
 
@@ -61,6 +61,12 @@ Initial screening thresholds are 500 contracts and Volume/OI of 2, editable filt
 The page starts expanded, retaining preferences, lists, and shared SQLite/API. Legacy `/#options-monitor` forwards here. The homepage mounts no monitor and makes no monitor requests. Manual/visible-page refresh rules remain unchanged; leaving, hiding, or collapsing stops polling.
 
 Orange means a threshold was met, not bullish/bearish. Read expiration, strike, and Call/Put with each contract. BUY/SELL is not open/close. A contract can repeat or meet several rules; alert counts are not unique openings or investor counts.
+
+### Card side and time (v0.2.3)
+
+Activity/print cards match original records by eventId and show provider side with undisclosed open/close, never borrowing another record on the same contract. WebAPI fill_timestamp is microseconds, converted to America/New_York date and HH:mm:ss ET, not fixed EST. Check time cannot replace missing record time. Snapshot-ratio and interval-growth alerts show their own observation/check times. Put type, OI, and BUY/SELL/NEUTRAL alone cannot establish net positioning or open/close; cards and tables share these limits.
+
+Actual read-only records verified event association, provider side, and record time, with open/close unknown; actual activity payloads are not public. APIs, data units, and read-only permissions are unchanged. All 10 card identity/time and 14 bilingual browser checks passed, including 320px, different sides on one contract, unknown fields, UTC midnight, and New York spring/fall daylight saving. Undocumented raw OPEN is not open/close evidence.
 
 ## Manual homepage OI refresh (v0.2.2)
 
