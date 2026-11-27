@@ -5,6 +5,7 @@ const MARKET_QUOTES = Object.freeze([
   {id:'dow',symbol:'^DJI',name:'Dow Jones Industrial Average'},
   {id:'oil',symbol:'CL=F',name:'WTI Crude Oil'},
   {id:'gold',symbol:'GC=F',name:'Gold'},
+  {id:'bitcoin',symbol:'BTC-USD',name:'Bitcoin / U.S. dollar'},
 ]);
 const MARKET_TTL = 60000;
 const MARKET_COOLDOWN = 30000;
@@ -29,6 +30,8 @@ function parseMarketQuote(payload,definition,checkedAt) {
   if(typeof meta.symbol==='string'&&meta.symbol!==definition.symbol)throw Error('Yahoo Finance returned a different symbol.');
   const price=meta.regularMarketPrice;
   if(!Number.isFinite(price))throw Error('The provider market price is missing or invalid.');
+  if(definition.id==='bitcoin'&&(meta.symbol!=='BTC-USD'||meta.currency!=='USD'||price<=0))throw Error('The Bitcoin USD quote is missing its verified symbol, currency or positive price.');
+  if(definition.id==='bitcoin'){try{if(typeof meta.exchangeTimezoneName!=='string'||!meta.exchangeTimezoneName)throw Error();new Intl.DateTimeFormat('en-US',{timeZone:meta.exchangeTimezoneName});}catch{throw Error('The Bitcoin source timezone is missing or invalid.');}}
   // The endpoint is fixed to range=1d; only this range permits the chart baseline fallback.
   const previousCloseField=Number.isFinite(meta.previousClose)&&meta.previousClose>0?'previousClose':'chartPreviousClose';
   const previousClose=meta[previousCloseField];
@@ -41,6 +44,7 @@ function parseMarketQuote(payload,definition,checkedAt) {
   const text=value=>typeof value==='string'&&value.trim()&&value.length<=200?value.trim():null;
   const contractName=['oil','gold'].includes(definition.id)?text(meta.shortName)||text(meta.longName):null;
   return {...definition,price,previousClose,previousCloseField,change,changePercent,
+    changeBasis:'provider_previous_close',...(definition.id==='bitcoin'?{tradingSchedule:'continuous_24_7',rolling24HourChange:false}:{}),
     marketTime:new Date(stamp).toISOString(),...marketSessionDate(stamp,meta.exchangeTimezoneName),
     currency:text(meta.currency),instrumentType:text(meta.instrumentType),
     ...(contractName?{contractName}:{}),sourceUrl:'https://finance.yahoo.com/quote/'+encodeURIComponent(definition.symbol),
@@ -49,6 +53,7 @@ function parseMarketQuote(payload,definition,checkedAt) {
 
 function missingMarketQuote(definition,at,error) {
   return {...definition,price:null,previousClose:null,previousCloseField:null,change:null,changePercent:null,
+    changeBasis:'provider_previous_close',...(definition.id==='bitcoin'?{tradingSchedule:'continuous_24_7',rolling24HourChange:false}:{}),
     marketTime:null,sourceSessionDate:null,exchangeTimezoneName:null,currency:null,instrumentType:null,
     sourceUrl:'https://finance.yahoo.com/quote/'+encodeURIComponent(definition.symbol),checkedAt:null,lastAttemptAt:at,stale:true,error};
 }
@@ -62,7 +67,7 @@ function createMarketHandler({fetcher=(...args)=>fetch(...args),now=()=>Date.now
     const current=values.filter(quote=>!quote.stale&&Number.isFinite(quote.price)).length;
     return {provider:'Yahoo Finance',checkedAt:lastCheck===null?null:new Date(lastCheck).toISOString(),quotes:values,
       status:current===MARKET_QUOTES.length?'current':current?'partial':'failed',
-      notice:'Provider snapshots, not a guarantee of real-time quotes. Market time is separate from checkedAt. Changes use the provider previous close; futures may use a settlement-related baseline, not calendar midnight.',
+      notice:'Provider snapshots, not a guarantee of real-time quotes. Market time is separate from checkedAt. Changes use the provider previous close; futures may use a settlement-related baseline, not calendar midnight. Bitcoin is BTC/USD and trades continuously; its displayed change is not a rolling 24-hour return.',
       cacheSeconds:MARKET_TTL/1000,...extras};
   }
   async function refresh() {
@@ -91,7 +96,7 @@ function createMarketHandler({fetcher=(...args)=>fetch(...args),now=()=>Date.now
     if(origin&&origin!==url.origin)return marketJson({error:'Only same-origin requests are accepted.'},403);
     const force=url.pathname==='/api/market/refresh';
     if(request.method!==(force?'POST':'GET'))return marketJson({error:'Method not allowed.'},405,{allow:force?'POST':'GET'});
-    if([...url.searchParams].length)return marketJson({error:'This endpoint has a fixed five-symbol allowlist and accepts no query parameters.'},400);
+    if([...url.searchParams].length)return marketJson({error:'This endpoint has a fixed six-symbol allowlist and accepts no query parameters.'},400);
     if(active)return marketJson({...await active,coalesced:true});
     const elapsed=lastAttempt===null?Infinity:now()-lastAttempt;
     if(force&&elapsed<MARKET_COOLDOWN)return marketJson(body({cached:true,refreshStatus:'cooldown',retryAfterSeconds:Math.ceil((MARKET_COOLDOWN-elapsed)/1000)}));

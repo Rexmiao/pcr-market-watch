@@ -75,5 +75,10 @@ export function createLocalMoomooWebApiTokenProvider({readBundle=readLocalMoomoo
     })();
     try{return await current.promise;}finally{if(pending===current)pending=null;}
   }
-  return Object.freeze({isConfigured,getAccessToken});
+  async function getAuthorizationStatus(){
+    const {authorizationHealth,authorizationUnavailable}=await import('./auth-health.mjs');
+    if(!isConfigured())return authorizationHealth(null,{now});
+    try{return authorizationHealth(await readBundle(),{now});}catch{return authorizationUnavailable();}
+  }
+  return Object.freeze({isConfigured,getAccessToken,getAuthorizationStatus});
 }

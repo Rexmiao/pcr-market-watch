@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const project = existsSync(resolve('web/model.js')) ? process.cwd() : resolve('pcr-dashboard-site');
-const source = readFileSync(resolve(project, 'web/model.js'), 'utf8');
-const model = await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
+const model = await import(pathToFileURL(resolve(project, 'web/model.js')).href);
 const data = JSON.parse(readFileSync(resolve(project, 'data/seed.json'), 'utf8'));
 const baseState = { symbol: 'NVDA', range: 'all', volumeWindow: 'day', date: '2026-11-20' };
 const near = (actual, expected) => assert.ok(Math.abs(actual - expected) < 1e-12, `${actual} != ${expected}`);
@@ -35,7 +35,7 @@ test('A selected Monday includes only Monday in its calendar-week volume', () =>
 test('Historical rolling volumes agree with independent prefix sums for all seven symbols', () => {
   for (const instrument of Object.values(data.instruments)) {
     const prefix = instrument.rows.filter(row => row.date <= '2026-11-13');
-    for (const size of [20, 60]) {
+    for (const size of [5, 20, 60]) {
       const expected = prefix.slice(-size);
       const actual = model.volumeAt(instrument, '2026-11-13', String(size));
       assert.equal(actual.p, expected.reduce((sum, row) => sum + row.p, 0));
@@ -55,10 +55,11 @@ test('20/60-day windows remain null before enough observations exist', () => {
   }
   const first = model.buildConfigs(data, { ...baseState, date: '2024-12-02', volumeWindow: '20' });
   assert.ok(first[0].rows.every(row => row[2] === null));
-  assert.equal(first[1].rows.length, 3);
+  assert.equal(first[1].rows.length, 4);
   assert.ok(first[1].rows[0][2] > 0);
   assert.equal(first[1].rows[1][2], null);
   assert.equal(first[1].rows[2][2], null);
+  assert.equal(first[1].rows[3][2], null);
 });
 
 test('Historical percentile is not created during warmup and is independent of visible range', () => {
@@ -85,19 +86,19 @@ test('Latest view preserves independent OI snapshot labels', () => {
   assert.ok(oi.every(row => row[6].includes('OI')));
 });
 
-test('Daily, 20-day and 60-day series stop on the selected day without exceeding chart limits', () => {
+test('Daily, 5-day, 20-day and 60-day series stop on the selected day without exceeding chart limits', () => {
   for (const symbol of Object.keys(data.instruments)) {
     for (const range of ['126', '252', 'all']) {
       const config = model.buildConfigs(data, { ...baseState, symbol, range, date: '2026-11-13' })[1];
-      assert.ok(config.rows.length <= 2000);
-      assert.deepEqual([...new Set(config.rows.map(row => row[1]))], ['每日成交量 PCR', '20 日成交量 PCR', '60 日成交量 PCR']);
+      assert.ok(config.rows.length <= 3000);
+      assert.deepEqual([...new Set(config.rows.map(row => row[1]))], ['每日成交量 PCR', '5 日成交量 PCR', '20 日成交量 PCR', '60 日成交量 PCR']);
       assert.ok(config.rows.every(row => row[0] <= '2026-11-13'));
-      for (const series of ['每日成交量 PCR', '20 日成交量 PCR', '60 日成交量 PCR']) {
+      for (const series of ['每日成交量 PCR', '5 日成交量 PCR', '20 日成交量 PCR', '60 日成交量 PCR']) {
         assert.equal(config.rows.filter(row => row[1] === series).at(-1)[0], '2026-11-13');
       }
     }
   }
-  assert.equal(model.buildConfigs(data, baseState)[1].rows.length, 1485);
+  assert.equal(model.buildConfigs(data, baseState)[1].rows.length, 1980);
 });
 
 test('An in-range weekend resolves to Friday while preserving the requested date', () => {

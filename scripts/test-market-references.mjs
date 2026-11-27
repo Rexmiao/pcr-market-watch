@@ -11,8 +11,8 @@ for(const metric of REFERENCE_METRICS){
   assert.equal(payload.asof,'2026-11-24','Reference activity date comes from that ETF, not Cboe or the core envelope');
   assert.equal(payload.sourceType,'occ');assert.ok(payload.sourceUrl.startsWith('https://www.theocc.com/'));
   assert.equal(payload.checkedAt,core.checkedAt);
-  assert.equal(config.rows.length,3);assert.equal(config.rows[1][2],.95);assert.equal(config.rows[2][2],.8);
-  assert.equal(config.rows[1][3],1900,'20-session volume metadata is passed through without averaging daily PCR');
+  assert.equal(config.rows.length,4);assert.equal(config.rows.find(row=>row[1]==='5-session volume PCR')[2],null,'Insufficient five-session history stays blank');assert.equal(config.rows.find(row=>row[1]==='20-session volume PCR')[2],.95);assert.equal(config.rows.find(row=>row[1]==='60-session volume PCR')[2],.8);
+  assert.equal(config.rows.find(row=>row[1]==='20-session volume PCR')[3],1900,'20-session volume metadata is passed through without averaging daily PCR');
   assert.ok(config.title.startsWith('OCC '));assert.ok(config.title.includes('ETF PCR'));
   assert.equal(cboeHistoryView(payload,{metric,date:'2026-11-23'}).actualEnd,null,'A Cboe date cannot create an earlier ETF observation');
   assert.equal(isReferenceMetric(metric),true);
@@ -25,6 +25,6 @@ assert.equal(referenceHistoryPayload({},'spy').rows.length,0,'Missing reference 
 assert.throws(()=>referenceHistoryPayload(core,'index'));
 const equity={rows:[{date:'2026-11-24',equity:{daily:.7,p:700,c:1000,r20:.8,p20:16000,c20:20000,r60:.9,p60:54000,c60:60000,derived:true}}]};
 assert.equal(cboeChartConfig(equity,{metric:'equity',range:'all'}).rows[0][2],.7);
-assert.equal(cboeChartConfig(equity,{metric:'equity',range:'all'}).rows[1][2],.8);
+assert.equal(cboeChartConfig(equity,{metric:'equity',range:'all'}).rows.find(row=>row[1]==='20 日成交量 PCR')[2],.8);
 assert.equal(JSON.stringify(core),before);
 console.log('PASS four Cboe measures and three independent OCC ETF references, dates, source, quantities and missing values');

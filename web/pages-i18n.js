@@ -2,9 +2,9 @@ import {getLanguage, setLanguage} from './i18n.js';
 
 // Translate text nodes so links, data tables and their saved dates stay intact.
 const english = {
-  'PCR 观察台':'PCR Dashboard', '期权异动':'Options activity', '市场解读':'Market brief', '图表目录':'Chart library',
-  '图表目录 · PCR 观察台':'Chart library · PCR Dashboard',
-  '市场解读 · PCR 观察台':'Market brief · PCR Dashboard',
+  'PCR 观察台':'PCR Dashboard', '期权异动':'Options activity', '定时复核':'Scheduled reviews', '市场解读':'Market brief', '图表目录':'Chart library',
+  '图表目录 · PCR 观察台':'Chart library · PCR Watch',
+  '市场解读 · PCR 观察台':'Market brief · PCR Watch',
   '2026-11-23 市场解读历史快照':'Saved Nov 23, 2026 market brief',
   '保存 11 月 23 日盘中报价、延迟 PCR 与当时可得的空头报告；固定历史记录，不代表当前行情。':'Saved Nov 23 intraday quotes, delayed PCR and the short-interest reports available then. This fixed historical record does not represent current conditions.',
   '统一入口':'All charts in one place',
@@ -82,14 +82,15 @@ const english = {
   '· 所有时间以美东和各项数据日期为准':'· Times are Eastern; refer to each dataset’s date',
 };
 
+const englishToChinese = new Map(Object.entries(english).map(([zh,en])=>[en,zh]));
 const walker = document.createTreeWalker(document.documentElement, NodeFilter.SHOW_TEXT);
 const nodes = [];
 while (walker.nextNode()) {
   const node = walker.currentNode;
   if (node.parentElement?.closest('script,style,[data-skip-i18n]')) continue;
   const original = node.nodeValue;
-  const translated = english[original.trim()];
-  if (translated) nodes.push({node, original, translated:original.replace(original.trim(), translated)});
+  const trimmed = original.trim(), chinese = Object.hasOwn(english,trimmed) ? trimmed : englishToChinese.get(trimmed);
+  if (chinese) nodes.push({node, original:original.replace(trimmed,chinese), translated:original.replace(trimmed,english[chinese])});
 }
 const toggle = document.getElementById('page-language');
 if (toggle) { toggle.className = 'button secondary language-toggle'; toggle.style.marginLeft = 'auto'; }

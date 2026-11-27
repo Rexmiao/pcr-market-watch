@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Review local task status and saved quote observations.">
+  <title>Scheduled reviews · PCR Watch</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/quote-reviews.css">
+</head>
+<body data-page="quote-reviews">
+  <main>
+    <nav class="site-nav" data-i18n-aria="navLabel" aria-label="网站导航"><a href="/" data-i18n="navHome">PCR 观察台</a><a href="/option-structure.html" data-i18n="navStructure">伽马 / 最大痛苦</a><a href="/options-monitor.html" data-i18n="navOptions">期权异动</a><a href="/quote-reviews.html" aria-current="page" data-i18n="navReviews">定时复核</a><a href="/market-brief.html" data-i18n="navBrief">市场解读</a><a href="/charts.html" data-i18n="navCharts">图表目录</a><button id="language-toggle" class="button secondary language-toggle" type="button" aria-label="Switch to English">English</button></nav>
+    <header class="page-header"><div><div class="eyebrow" data-i18n="reviewEyebrow">本机任务与报价归档</div><h1 data-i18n="reviewTitle">定时复核</h1><p data-i18n="reviewSubtitle">查看下一次运行和每次保存的报价，回来人工复核。</p></div><button id="reviews-refresh" class="button primary" type="button" data-i18n="reviewRefresh">刷新状态</button></header>
+    <p class="review-intro" data-i18n="reviewReadOnly">刷新只读取任务状态与已有文件，不触发行情抓取、不运行任务，也不下单。</p>
+    <section id="oi-daily-card" class="panel review-job" aria-labelledby="oi-daily-heading"><div class="review-section-heading"><h2 id="oi-daily-heading" data-i18n="oiDailyTitle">每日 OI 归档</h2><a class="button secondary" href="/#overview-heading" data-i18n="oiDailyOpen">选择历史日期</a></div><p id="oi-daily-status" class="review-note" role="status" aria-live="polite"></p><p id="oi-daily-health" class="review-status" role="status" aria-live="polite"></p><dl id="oi-daily-details"></dl><p class="review-note" data-i18n="oiDailyNote">美东查询日与结算日分开记录；未知结算日不会按 T−1 推算。本机任务需开机并登录，云端任务需服务保持运行和可持久保存。</p><p class="review-note" data-i18n="oiDailyHealthNote">“就绪”和手动抓取不代表定时成功。只依据实际定时报告核验；未保存的过去 OI 不会反填。休眠、停机或网络都可能影响采集，无记录时不猜原因。</p></section>
+    <div id="reviews-status" class="review-status" role="status" aria-live="polite"></div>
+    <p id="reviews-checked" class="review-meta"></p>
+    <div id="reviews-content" hidden>
+      <section class="review-storage" aria-label="归档存储" data-i18n-aria="reviewStorageAria"><div><span data-i18n="reviewJobCount">已配置任务</span><strong id="reviews-job-count">—</strong></div><div><span data-i18n="reviewRunCount">已保存归档</span><strong id="reviews-run-count">—</strong></div><div><span data-i18n="reviewStorage">归档占用</span><strong id="reviews-storage">—</strong></div></section>
+      <section aria-labelledby="reviews-jobs-heading"><div class="review-section-heading"><h2 id="reviews-jobs-heading" data-i18n="reviewJobs">任务状态</h2><span data-i18n="reviewAuto">页面可见时，每60秒读取一次状态。</span></div><p class="review-note" data-i18n="reviewSchedulerNote">“就绪”不代表报价成功；进程退出码与归档中的报价结果分别显示。关机、未登录或错过窗口可能影响任务执行。</p><div id="reviews-jobs" class="review-job-grid"></div><p id="reviews-jobs-empty" class="review-empty" data-i18n="reviewNoJobs" hidden>本机尚未配置报价复核任务。</p></section>
+      <section class="panel review-archive" aria-labelledby="reviews-archive-heading"><div class="review-section-heading"><h2 id="reviews-archive-heading" data-i18n="reviewArchive">每次报价归档</h2></div><form id="reviews-filters" class="controls"><label><span data-i18n="reviewFilterJob">任务</span><select id="reviews-job-filter"></select></label><label><span data-i18n="reviewFilterDate">执行日期 · 美东</span><input id="reviews-date-filter" type="date"></label><label><span data-i18n="reviewFilterMode">执行方式</span><select id="reviews-mode-filter"><option value="" data-i18n="reviewAllModes">全部方式</option><option value="scheduled" data-i18n="reviewScheduled">定时运行</option><option value="manual" data-i18n="reviewManual">手动抓取</option></select></label><button id="reviews-clear" class="button secondary" type="button" data-i18n="reviewClear">清除筛选</button></form><p class="review-note" data-i18n="reviewFilterNote">筛选只影响下方归档；任务列表与存储统计保持整体范围。</p><div id="reviews-runs"></div><p id="reviews-runs-empty" class="review-empty" data-i18n="reviewNoRuns" hidden>没有符合筛选条件的已保存结果。</p><div class="review-pagination"><span id="reviews-page-count"></span><div><button id="reviews-prev" class="button secondary" type="button" data-i18n="reviewPrevious" disabled>上一页</button><button id="reviews-next" class="button secondary" type="button" data-i18n="reviewNext" disabled>下一页</button></div></div></section>
+    </div>
+    <section id="reviews-detail" class="panel review-detail" aria-labelledby="reviews-detail-heading" hidden><div class="review-section-heading"><div><h2 id="reviews-detail-heading" data-i18n="reviewDetail">报价结果</h2><p id="reviews-detail-label" class="review-note"></p></div><button id="reviews-detail-close" class="button secondary" type="button" data-i18n="reviewClose">关闭结果</button></div><div id="reviews-detail-status" class="review-status" role="status" aria-live="polite"></div><div id="reviews-detail-body"></div></section>
+    <footer data-i18n="reviewFooter">本机只读记录 · 报价时间与任务执行时间分开显示 · 请人工复核后再作交易决定。</footer>
+  </main>
+  <noscript data-i18n="reviewNoscript">请启用 JavaScript，以读取本机任务状态与报价归档。</noscript>
+  <script type="module" src="/quote-reviews.js"></script>
+  <script type="module" src="/oi-daily-status.js"></script>
+</body>
+</html>

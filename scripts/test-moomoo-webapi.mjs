@@ -49,6 +49,28 @@ await assert.rejects(createMoomooWebApiClient({accessToken:access,fetcher:async(
 await assert.rejects(createMoomooWebApiClient({accessToken:access,timeoutMs:15,fetcher:()=>new Promise(()=>{})}).overview('NVDA'),e=>e.code==='TIMEOUT');
 assert.throws(()=>createMoomooWebApiClient({accessToken:'token\r\nInjected: value'}),e=>e.code==='AUTH_FAILED');
 
+// Lightweight stock quotes use only the fixed public quote endpoint and an
+// explicit price/time allowlist, including honest missing session timestamps.
+const stockCalls=[],regularTime=1795630800123;
+const stockPayload={ret_code:0,ret_msg:access,data:{quote_list:[{code:'US.NVDA',last_price:'170.5',prev_close_price:168,data_time:regularTime,data_date:'2026-11-25',open_price:169,high_price:172,low_price:167,volume:'12345',turnover:2100000,name:access,account_id:access,after_market:{price:171,update_timestamp:regularTime,access_token:access},overnight:{price:0}}]}};
+const stocks=createMoomooWebApiClient({accessToken:access,fetcher:async(url,options)=>{stockCalls.push({url,options});return reply(stockPayload);}});
+const stockResult=await stocks.stockQuotes(['NVDA','AMD']);
+assert.equal(stockCalls[0].url,'https://webapi.moomoo.com/api/v1.0/quote/stock-quote');assert.equal(stockCalls[0].options.method,'POST');
+assert.equal(stockCalls[0].options.redirect,'manual');assert.equal(stockCalls[0].options.headers.authorization,'Bearer '+access);
+assert.deepEqual(JSON.parse(stockCalls[0].options.body),{code_list:['US.AMD','US.NVDA']});
+assert.equal(stockResult.data.quote_list[0].last_price,170.5);assert.equal(stockResult.data.quote_list[0].data_time,regularTime);
+assert.deepEqual(stockResult.data.quote_list[0].after_market,{price:171});assert.deepEqual(stockResult.data.quote_list[0].overnight,{price:null});
+assert(!JSON.stringify(stockResult).includes(access));assert.equal(stockResult.data.quote_list.length,1,'Missing requested symbols are not fabricated');
+assert(stocks.status().capabilities.includes('stock_quotes'));
+for(const input of [[],Array(21).fill('NVDA'),['NVDA','US.NVDA'],['HK.00700'],['US.HK.00700'],['NVDA;echo'],['nvda'],[' NVDA'],['NVDA261127C165000'],'NVDA'])await assert.rejects(stocks.stockQuotes(input),e=>e.code==='INVALID_SYMBOL');
+assert.equal(stockCalls.length,1,'Invalid stock requests do not reach the API');
+for(const rows of [[{code:'US.AMD'}],[{code:'US.NVDA'},{code:'US.NVDA'}],null])await assert.rejects(createMoomooWebApiClient({accessToken:access,fetcher:async()=>reply({ret_code:0,data:{quote_list:rows}})}).stockQuotes(['NVDA']),e=>e.code==='INVALID_RESPONSE');
+const emptyStocks=await createMoomooWebApiClient({accessToken:access,fetcher:async()=>reply({ret_code:0,data:{quote_list:[]}})}).stockQuotes(['NVDA']);assert.deepEqual(emptyStocks.data.quote_list,[]);
+await assert.rejects(createMoomooWebApiClient({accessToken:access,timeoutMs:10,fetcher:()=>new Promise(()=>{})}).stockQuotes(['NVDA']),e=>e.code==='TIMEOUT');
+await assert.rejects(createMoomooWebApiClient({accessToken:access,fetcher:async()=>{throw Error(access);}}).stockQuotes(['NVDA']),e=>e.code==='PROVIDER_UNAVAILABLE'&&!e.message.includes(access));
+let stockRetry=0,stockForced=0;
+await createMoomooWebApiClient({isConfigured:()=>true,accessTokenProvider:async({forceRefresh})=>{if(forceRefresh)stockForced++;return access;},fetcher:async()=>++stockRetry===1?reply({},401):reply(stockPayload)}).stockQuotes(['NVDA']);assert.equal(stockRetry,2);assert.equal(stockForced,1);
+
 let memory={clientId:'test-client',accessToken:access,refreshToken:refresh,scope:'quote:read',expiresAt:1000};
 let refreshCalls=0,saved=0;
 const auth=createLocalMoomooWebApiTokenProvider({readBundle:async()=>memory,saveBundle:async bundle=>{memory=bundle;saved++;},hasCredentials:()=>true,now:()=>100000,fetcher:async(url,options)=>{

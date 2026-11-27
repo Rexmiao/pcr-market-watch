@@ -329,6 +329,13 @@ async function handleSymbol(request,seed) {
     return json({symbol,instrument,asof:instrument.rows.at(-1).date,checkedAt:view.checkedAt,calendarDate:view.calendarDate,source:SOURCE,coverage:instrument.coverage,freshness:instrument.freshness,refresh:{status:"cached",message:"核心关注标的使用完整缓存；请用首页更新按钮统一检查。"}});
   }
   const previous=await readSymbolState(request,symbol),force=url.searchParams.get("refresh")==="1",attempt=symbolAttempts.get(key);
+  // Summary/date navigation must never turn a missing or old cache into an
+  // upstream load. This read-only hint takes priority over refresh=1 as well.
+  if(request.headers.get('x-pcr-cache-only')==='1') {
+    if(previous)return json(symbolPayload(previous,now));
+    return json({symbol,instrument:null,asof:null,checkedAt:null,source:SOURCE,coverage:null,
+      refresh:{status:'cache_miss',message:'尚无已保存的该标的成交记录；请通过对应图表更新数据。'}});
+  }
   if(!force&&previous&&nowMs-Date.parse(previous.checkedAt)<SYMBOL_CACHE_TTL)return json(symbolPayload(previous,now));
   // Concurrent requests for the same ticker share the same load, including force-refresh.
   if(symbolLoads.has(key)){const result=await symbolLoads.get(key);return json(result.body,result.httpStatus,result.headers);}

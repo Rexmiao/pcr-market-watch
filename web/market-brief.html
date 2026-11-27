@@ -1,19 +1,20 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="结合市场价格与已发布 PCR，查看当前关注名单。">
-  <title>市场解读 · PCR 观察台</title>
+  <meta name="description" content="Read market prices alongside published PCR observations and your watchlist.">
+  <title>Market brief · PCR Watch</title>
   <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="/context.css">
   <link rel="stylesheet" href="/brief.css">
 </head>
 <body>
   <main data-skip-i18n>
-    <nav class="site-nav" aria-label="网站导航"><a id="brief-nav-dashboard" href="/">PCR 观察台</a><a id="brief-nav-options" href="/options-monitor.html">期权异动</a><a id="brief-nav-current" href="/market-brief.html" aria-current="page">市场解读</a><a id="brief-nav-charts" href="/charts.html">图表目录</a><button id="page-language" class="button secondary language-toggle" type="button" aria-label="切换到英文">English</button></nav>
+    <nav class="site-nav" aria-label="网站导航"><a id="brief-nav-dashboard" href="/">PCR 观察台</a><a href="/option-structure.html">Gamma / Max Pain</a><a id="brief-nav-options" href="/options-monitor.html">期权异动</a><a id="brief-nav-reviews" href="/quote-reviews.html">定时复核</a><a id="brief-nav-current" href="/market-brief.html" aria-current="page">市场解读</a><a id="brief-nav-charts" href="/charts.html">图表目录</a><button id="page-language" class="button secondary language-toggle" type="button" aria-label="切换到英文">English</button></nav>
     <header class="page-header"><div><div class="eyebrow" id="brief-eyebrow">价格与 PCR</div><h1 id="brief-title">市场解读</h1><p id="brief-subtitle">看价格强弱，也看 Put 相对 Call 的成交活跃度。</p></div><button id="brief-refresh" class="button primary" type="button" disabled>更新解读数据</button></header>
     <p id="brief-status" class="status" role="status" aria-live="polite">正在读取数据…</p>
+    <details id="brief-source-details" class="brief-source-details"><summary id="brief-source-status-heading">来源状态与日期</summary><ul id="brief-source-status" class="brief-source-list" aria-live="polite"></ul></details>
     <section class="panel brief-facts" aria-labelledby="brief-facts-title">
       <h2 id="brief-facts-title">已加载数据怎么读</h2>
       <p id="brief-price-summary" class="brief-fact" aria-live="polite"></p>

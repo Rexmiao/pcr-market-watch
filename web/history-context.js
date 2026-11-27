@@ -1,6 +1,6 @@
 // Historical context for normalized PCR observations. All comparisons are
 // anchored to an actually recorded date; this module never fills missing days.
-export const HISTORY_FIELDS = ['daily', 'r20', 'r60'];
+export const HISTORY_FIELDS = ['daily', 'r5', 'r20', 'r60'];
 const DAY_MS = 86400000;
 const PRIOR_SAMPLES = 252;
 

@@ -43,6 +43,8 @@ const translations = {
     "source3Copy": "持仓 PCR 单独展示，不随成交量刷新。缺少可靠快照的标的显示为空，不当成零。",
     "source4Label": "辅助行情",
     "source4Copy": "三大指数、原油与黄金提供市场参考。期权监测可选本机 moomoo 或另行授权的云端 API，分别标注局部扫描、供应商标的汇总及异动记录的覆盖范围。",
+    "source5Label": "Gamma / Max Pain",
+    "source5Copy": "当前源码提供伽马与最大痛苦参考、未来30天逐期归档及历史对比。范围、查询时间与源时间独立标注；模型值不是已确认的做市商库存或目标价。既有 v0.2.3 安装包不包含这些新增功能。",
     "installTitle": "在自己的电脑上运行。",
     "installCopy": "安装包保留这一版界面和后端；个人名单在首次运行后由本机创建。",
     "installDownload": "下载 Windows 运行包",
@@ -50,7 +52,7 @@ const translations = {
     "step2": "<strong>下载并解压</strong>从 GitHub Releases 下载运行包，完整解压到一个文件夹。",
     "step3": "<strong>启动后台</strong>双击 <code>start.cmd</code>，使用时保留 CMD 窗口。",
     "step4": "<strong>打开观察台</strong>浏览器访问 <code>http://127.0.0.1:8765/</code>。",
-    "localOnly": "这个 GitHub Pages 页面用于介绍项目。完整 PCR 交互、数据库和数据刷新在本地后端中运行。",
+    "localOnly": "这个 GitHub Pages 页面用于介绍项目；完整 PCR 交互、数据库与数据更新由另行部署的本地或云端后端提供。",
     "specCopy": "想了解实现细节？Spec 包含功能范围、数据算法、接口契约、数据库结构、运行方式和验收场景。",
     "readSpec": "阅读产品 Spec",
     "footer": "PCR 观察台 · v0.2.3",
@@ -102,6 +104,8 @@ const translations = {
     "source3Copy": "Open-interest PCR is displayed separately and does not refresh with volume. Symbols without a reliable snapshot remain blank, never zero.",
     "source4Label": "Supporting quotes",
     "source4Copy": "Three major U.S. stock indices, crude oil and gold provide market context. Optional monitoring uses local moomoo or separately authorized WebAPI, with distinct coverage for partial scans, provider summaries and unusual activity records.",
+    "source5Label": "Gamma / Max Pain",
+    "source5Copy": "Current source adds Gamma and Max Pain references, per-expiry archives within 30 days and historical comparison. Scope, query time and source time are labeled separately. Model estimates are not observed dealer inventory or price targets. The existing v0.2.3 download does not include these additions.",
     "installTitle": "Run it on your own computer.",
     "installCopy": "The ZIP includes this version’s interface and backend. Your personal lists are created locally on first use.",
     "installDownload": "Download Windows ZIP",
@@ -109,7 +113,7 @@ const translations = {
     "step2": "<strong>Download and extract</strong>Get the Windows ZIP from GitHub Releases and extract it completely.",
     "step3": "<strong>Start the backend</strong>Double-click <code>start.cmd</code> and keep its CMD window open.",
     "step4": "<strong>Open the dashboard</strong>Visit <code>http://127.0.0.1:8765/</code> in your browser.",
-    "localOnly": "This GitHub Pages site introduces the project. The full PCR interface, database and data refresh run on the local backend.",
+    "localOnly": "This GitHub Pages site introduces the project. Full PCR interactions, storage and data refresh use a separately deployed local or cloud backend.",
     "specCopy": "Explore the implementation: the Spec covers features, data algorithms, API contracts, database structure, setup and acceptance scenarios.",
     "readSpec": "Read the product Spec",
     "footer": "PCR Market Watch · v0.2.3",
@@ -121,11 +125,12 @@ const translations = {
 const storageKey='pcr-market-watch:site-language:v1';
 const repository='https://github.com/Rexmiao/pcr-market-watch/blob/main/';
 const links={zh:{spec:repository+'docs/PRODUCT_SPEC.md',readme:repository+'README.zh-CN.md'},en:{spec:repository+'docs/PRODUCT_SPEC.en.md',readme:repository+'README.md'}};
-let language='zh';
+let language='en';
 let parameter=null,saved=null;
 try {parameter=new URL(location.href).searchParams.get('lang');}catch{}
 try {saved=localStorage.getItem(storageKey);}catch{}
-language=['zh','en'].includes(parameter)?parameter:['zh','en'].includes(saved)?saved:'zh';
+language=['zh','en'].includes(parameter)?parameter:['zh','en'].includes(saved)?saved:'en';
+try {if(['zh','en'].includes(parameter))localStorage.setItem(storageKey,language);}catch{}
 const languageToggle=document.getElementById('language-toggle');
 function renderLanguage(){
   const copy=translations[language];

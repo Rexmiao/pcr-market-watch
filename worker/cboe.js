@@ -395,6 +395,12 @@ export async function handleCboeApi(request, env, ctx, seed = {}) {
   const cached = await cboeReadCache(request, day);
   const saved = cboeSeedSnapshot(seed, day);
   const fallback = cboeNewerRecord(cached, saved ? {schemaVersion: 1, snapshot: saved, checkedAt: seed.checkedAt} : null);
+  if(!refresh&&request.headers.get('x-pcr-cache-only')==='1'){
+    const history=await cboeReadHistory(request,seed);
+    const historical=day?history.get(day):[...history.values()].reduce((latest,record)=>cboeNewerRecord(record,latest),null);
+    const retained=cboeNewerRecord(fallback,historical);
+    return cboeJson(cboeBody(retained||{snapshot:null,checkedAt:null},seed,day,{cached:true,cacheOnly:true,refreshStatus:retained?'cache_only':'refresh_required'}));
+  }
   const fresh = fallback && Date.now() - Date.parse(fallback.checkedAt) < CBOE_TTL;
   const seedFresh = saved && fallback?.snapshot.date === saved.date && Date.now() - Date.parse(seed.checkedAt) < CBOE_TTL;
   if (!refresh && (fresh || (saved && day) || seedFresh)) return cboeJson(cboeBody(fallback, seed, day, {cached: true}));

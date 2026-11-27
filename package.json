@@ -7,7 +7,10 @@
     "validate": "node scripts/validate-artifact.mjs",
     "db:generate": "drizzle-kit generate",
     "start": "node scripts/preview.mjs",
-    "test": "node --test scripts/i18n-default.test.mjs && node scripts/test-cboe-model.mjs && node scripts/test-search-model.mjs && node scripts/test-model.mjs && node --test scripts/history-context.test.mjs && node scripts/test-moomoo.mjs && node scripts/test-moomoo-monitor-provider.mjs && node scripts/test-options-monitor.mjs && node scripts/test-start-port.mjs && node scripts/test-monitor-webapi-normalize.mjs && node scripts/test-moomoo-webapi.mjs && node scripts/test-monitor-modes.mjs && node scripts/test-oi-summaries.mjs && node scripts/test-oi-summary-model.mjs && node scripts/test-monitor-alert-details.mjs"
+    "start:cloud": "node scripts/start-cloud.mjs",
+    "oi:capture": "node scripts/oi-daily.mjs",
+    "hf:prepare": "node scripts/hf-prepare.mjs",
+    "test": "node --test scripts/i18n-default.test.mjs && node scripts/test-cboe.mjs && node scripts/test-cboe-model.mjs && node scripts/test-market-references.mjs && node scripts/test-market-pcr-settings.mjs && node scripts/test-search-model.mjs && node scripts/test-model.mjs && node --test scripts/option-structure-cache.test.mjs scripts/option-structure.test.mjs scripts/option-structure-ui.test.mjs scripts/structure-archive.test.mjs scripts/structure-public.test.mjs scripts/history-context.test.mjs scripts/five-day-pcr.test.mjs scripts/pcr-interpretation.test.mjs && node scripts/test-moomoo.mjs && node scripts/test-moomoo-monitor-provider.mjs && node scripts/test-options-monitor.mjs && node scripts/test-start-port.mjs && node scripts/test-monitor-webapi-normalize.mjs && node scripts/test-moomoo-webapi.mjs && node scripts/test-monitor-modes.mjs && node scripts/test-oi-summaries.mjs && node scripts/test-oi-history.mjs && node scripts/test-oi-summary-model.mjs && node scripts/test-oi-history-ui.mjs && node scripts/test-monitor-alert-details.mjs && node --test scripts/quote-review.test.mjs scripts/quote-review-archive.test.mjs scripts/calendar-coverage.test.mjs scripts/brief-quotes.test.mjs scripts/oi-daily.test.mjs scripts/cloud-gateway.test.mjs scripts/cloud-auth.test.mjs scripts/hf-storage.test.mjs scripts/local-db-change.test.mjs scripts/public-frontend.test.mjs scripts/public-access.test.mjs scripts/worker-cache-boundary.test.mjs scripts/worker-cache.test.mjs scripts/symbol-cache-read.test.mjs scripts/pcr-summary.test.mjs scripts/oi-daily-health.test.mjs && node scripts/test-market-brief.mjs && node scripts/test-market-brief-status.mjs"
   },
   "dependencies": {
     "drizzle-orm": "0.45.2"
@@ -15,7 +18,7 @@
   "devDependencies": {
     "drizzle-kit": "0.31.10"
   },
-  "version": "0.2.3",
+  "version": "0.2.18",
   "engines": {
     "node": ">=22"
   }

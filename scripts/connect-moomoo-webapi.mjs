@@ -17,8 +17,9 @@ async function openAuthorizationBrowser(url){
 }
 const document=(complete,failed)=>`<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PCR Market Watch · moomoo</title><body><h1>${failed?'授权未完成':complete?'moomoo 行情授权已保存':'等待 moomoo 行情授权'}</h1><p>${failed?'请回到本地启动窗口重新连接。':complete?'已仅申请 quote:read 行情读取权限。可以关闭本页，返回 PCR 观察台刷新监测。':'请在 moomoo 官方授权页完成确认。'}</p></body></html>`;
 
-export async function connectMoomooWebApi({fetcher,saveBundle=saveLocalMoomooWebApiBundle,openBrowser=openAuthorizationBrowser,onProgress=()=>{},timeoutMs=300000}={}){
+export async function connectMoomooWebApi({fetcher,saveBundle=saveLocalMoomooWebApiBundle,openBrowser=openAuthorizationBrowser,onProgress=()=>{},timeoutMs=300000,clientName='PCR Market Watch'}={}){
   if(!Number.isInteger(timeoutMs)||timeoutMs<100||timeoutMs>600000)throw new MoomooOAuthError('INVALID_TIMEOUT','Choose a bounded authorization timeout.');
+  if(typeof clientName!=='string'||!/^[A-Za-z0-9 ._-]{1,80}$/.test(clientName))throw new MoomooOAuthError('INVALID_RESPONSE','Choose a valid application name.');
   const state=randomBytes(32).toString('base64url'),verifier=randomBytes(32).toString('base64url'),challenge=createHash('sha256').update(verifier).digest('base64url');
   let port,redirectUri,clientId,exchanging=false,complete=false,failed=false,timer,closeTimer;
   let acceptCompletion,rejectCompletion;
@@ -58,7 +59,7 @@ export async function connectMoomooWebApi({fetcher,saveBundle=saveLocalMoomooWeb
   port=server.address().port;redirectUri=`http://127.0.0.1:${port}/callback`;
   try{
     onProgress('registration_starting');
-    const registration=await postMoomooOAuth('/oauth2/register',{redirect_uris:[redirectUri],token_endpoint_auth_method:'none',grant_types:['authorization_code','refresh_token'],response_types:['code'],client_name:'PCR Market Watch',scope:'quote:read'},{fetcher});
+    const registration=await postMoomooOAuth('/oauth2/register',{redirect_uris:[redirectUri],token_endpoint_auth_method:'none',grant_types:['authorization_code','refresh_token'],response_types:['code'],client_name:clientName,scope:'quote:read'},{fetcher});
     if(typeof registration.client_id!=='string'||!/^[A-Za-z0-9._-]{1,256}$/.test(registration.client_id))throw new MoomooOAuthError('INVALID_RESPONSE','The moomoo OAuth client registration response was invalid.');
     clientId=registration.client_id;
     onProgress('registration_succeeded');

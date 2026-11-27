@@ -1,17 +1,18 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="按交易日观察美股每日 Put/Call Ratio、20日与60日趋势，以及独立标注的持仓快照。">
+  <meta name="description" content="Explore daily and rolling U.S. options Put/Call Ratios, historical context and your watchlist.">
   <script>if(location.hash==='#options-monitor')location.replace('/options-monitor.html'+location.search);</script>
-  <title>PCR 观察台 · 美股期权</title>
+  <title>PCR Market Watch</title>
   <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="/context.css">
 </head>
-<body data-page="dashboard">
+<body data-page="dashboard" class="access-pending">
   <main>
-    <nav class="site-nav" data-i18n-aria="navLabel" aria-label="网站导航"><a href="/" aria-current="page" data-i18n="navHome">PCR 观察台</a><a href="/options-monitor.html" data-i18n="navOptions">期权异动</a><a href="/market-brief.html" data-i18n="navBrief">市场解读</a><a href="/charts.html" data-i18n="navCharts">图表目录</a><button id="language-toggle" class="button secondary language-toggle" type="button" aria-label="Switch to English">English</button></nav>
+    <nav class="site-nav" data-i18n-aria="navLabel" aria-label="网站导航"><a href="/" aria-current="page" data-i18n="navHome">PCR 观察台</a><a href="/option-structure.html" data-i18n="navStructure">伽马 / 最大痛苦</a><a data-owner-only href="/options-monitor.html" data-i18n="navOptions">期权异动</a><a data-owner-only href="/quote-reviews.html" data-i18n="navReviews">定时复核</a><a data-owner-only href="/market-brief.html" data-i18n="navBrief">市场解读</a><a href="/charts.html" data-i18n="navCharts">图表目录</a><button id="language-toggle" class="button secondary language-toggle" type="button" aria-label="Switch to English">English</button></nav>
+    <div id="public-access-banner" class="public-access-banner" role="status" hidden><span data-i18n="publicViewer">公共查看 · 可更新数据；登录后管理关注名单。</span><a href="/_pcr/login" data-i18n="ownerLogin">管理员登录</a></div>
     <header class="page-header">
       <div><div id="eyebrow" class="eyebrow">美股期权 · 自选名单</div><h1 data-i18n="title">PCR 观察台</h1><p data-i18n="subtitle">看清每日交易、阶段变化与持仓构成。</p></div>
       <button id="refresh" class="button primary" type="button" data-i18n="refresh" disabled>更新数据</button>
@@ -19,10 +20,11 @@
     <div class="freshness" id="freshness" aria-live="polite" data-i18n="loading">正在读取已保存的数据…</div>
     <div id="source-status" class="source-status" aria-live="polite"></div>
     <div id="status" class="status" role="status" aria-live="polite" hidden></div>
-    <section id="cboe-panel" class="panel" aria-label="Cboe aggregate put/call ratios"></section>
-    <section class="panel watchlist-panel" aria-labelledby="watchlist-heading">
-      <div class="section-heading"><div><h2 id="watchlist-heading" data-i18n="symbol">关注标的</h2><p data-i18n="searchScope">名称搜索覆盖常用名单；其他标的请直接输入代码。</p></div></div>
-      <form id="search-form" class="search-form" role="search">
+    <section id="pcr-summary" class="panel pcr-summary" aria-label="PCR change summary"></section>
+    <section id="cboe-panel" class="panel pcr-navigation-target" aria-labelledby="cboe-heading" tabindex="-1"></section>
+    <section id="watchlist-panel" class="panel watchlist-panel" aria-labelledby="watchlist-heading" tabindex="-1">
+      <div class="section-heading"><div><h2 id="watchlist-heading" data-i18n="symbol">关注标的</h2><p data-owner-only data-i18n="searchScope">名称搜索覆盖常用名单；其他标的请直接输入代码。</p></div></div>
+      <form data-owner-only id="search-form" class="search-form" role="search">
         <label class="search-label" for="symbol-search" data-i18n="symbol">关注标的</label>
         <input id="symbol-search" name="symbol" type="search" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-expanded="false" maxlength="60" autocomplete="off" spellcheck="false" data-i18n-placeholder="searchPlaceholder" placeholder="输入股票或 ETF 代码" aria-controls="search-results" aria-describedby="search-status">
         <button id="search-submit" class="button secondary" type="submit" data-i18n="search" disabled>搜索</button>
@@ -31,18 +33,18 @@
       <ul id="search-results" class="search-results" role="listbox" aria-label="标的搜索建议" hidden></ul>
       <p id="search-status" class="metric-note" role="status" aria-live="polite"></p>
       <div id="watchlist" class="watchlist-chips" aria-label="Watchlist"></div>
-      <div class="controls category-controls"><label><span data-i18n="category">分类</span><select id="category-filter"><option value="all" data-i18n="categoryAll">全部</option><option value="unassigned" data-i18n="categoryUnassigned">未分类</option></select></label><label><span data-i18n="categoryEdit">当前标的分类</span><select id="category-editor" disabled><option value="" data-i18n="categoryUnassigned">未分类</option></select></label></div>
-      <form id="group-form" class="controls group-controls"><label><span data-i18n="groupName">新分组名称</span><input id="group-name" type="text" maxlength="40" autocomplete="off" data-i18n-placeholder="groupPlaceholder" placeholder="例如 科技股"></label><button id="create-group" class="button secondary" type="submit" data-i18n="groupCreate" disabled>新建分组</button><button id="delete-group" class="button secondary" type="button" data-i18n="groupDelete" disabled>删除当前分组</button></form>
-      <p class="metric-note" data-i18n="groupDeleteHint">删除分组会把其中标的移入“未分类”，保留标的和数据。</p>
+      <div class="controls category-controls"><label><span data-i18n="category">分类</span><select id="category-filter"><option value="all" data-i18n="categoryAll">全部</option><option value="unassigned" data-i18n="categoryUnassigned">未分类</option></select></label><label id="category-editor-label" data-owner-only><span data-i18n="categoryEdit">当前标的分类</span><select id="category-editor" disabled><option value="" data-i18n="categoryUnassigned">未分类</option></select></label></div>
+      <form data-owner-only id="group-form" class="controls group-controls"><label><span data-i18n="groupName">新分组名称</span><input id="group-name" type="text" maxlength="40" autocomplete="off" data-i18n-placeholder="groupPlaceholder" placeholder="例如 科技股"></label><button id="create-group" class="button secondary" type="submit" data-i18n="groupCreate" disabled>新建分组</button><button id="delete-group" class="button secondary" type="button" data-i18n="groupDelete" disabled>删除当前分组</button></form>
+      <p id="group-delete-hint" data-owner-only class="metric-note" data-i18n="groupDeleteHint">删除分组会把其中标的移入“未分类”，保留标的和数据。</p>
       <div class="watchlist-save-status"><p id="watchlist-storage" class="metric-note" role="status" aria-live="polite"></p><button id="watchlist-retry" class="button secondary" type="button" data-i18n="watchRetry" hidden>重新读取名单</button></div>
     </section>
     <section class="panel" aria-labelledby="overview-heading">
       <div class="section-heading"><div><h2 id="overview-heading" data-i18n="overviewHeading">关注名单 · PCR 对比</h2><p id="overview-caption"></p></div></div>
       <div class="controls">
         <label><span data-i18n="dateLabel">选择日期</span><input id="date" type="date" disabled></label>
-        <label><span data-i18n="windowLabel">成交量窗口</span><select id="volume" disabled><option value="day" data-i18n="windowDay">所选交易日 · 当日 PCR</option><option value="week" data-i18n="windowWeek">所选周截至该日</option><option value="20" data-i18n="window20">截至该日 · 20 个交易日</option><option value="60" data-i18n="window60">截至该日 · 60 个交易日</option></select></label>
-        <label><span data-i18n="oiSourceLabel">灰色持仓柱来源</span><select id="oi-source"><option value="moomoo" data-i18n="oiSourceMoomoo">moomoo 标的汇总</option><option value="saved" data-i18n="oiSourceSaved">已保存 Cboe 快照</option></select></label>
-        <button id="latest" class="button secondary" type="button" data-i18n="latest" disabled>最新完整数据日</button>
+        <label><span data-i18n="windowLabel">成交量窗口</span><select id="volume" disabled><option value="day" data-i18n="windowDay">所选交易日 · 当日 PCR</option><option value="week" data-i18n="windowWeek">所选周截至该日</option><option value="5" data-i18n="window5">截至该日 · 5 个交易日</option><option value="20" data-i18n="window20">截至该日 · 20 个交易日</option><option value="60" data-i18n="window60">截至该日 · 60 个交易日</option></select></label>
+        <label><span data-i18n="oiSourceLabel">灰色持仓柱来源</span><select id="oi-source"><option value="moomoo" data-i18n="oiSourceMoomoo">moomoo 每日 OI 归档</option><option value="saved" data-i18n="oiSourceSaved">已保存 Cboe 快照</option></select></label>
+        <button id="latest" class="button secondary" type="button" data-i18n="latest" disabled>最新有记录日</button>
         <button id="today" class="button secondary" type="button" data-i18n="today" disabled>今天</button>
       </div>
       <p id="date-note" class="date-note" aria-live="polite"></p>
@@ -54,26 +56,31 @@
             <div id="calendar-weekdays" class="calendar-weekdays" aria-hidden="true"></div>
             <div id="calendar-grid" class="calendar-grid" role="group" data-i18n-aria="calendarHeading" aria-label="交易日历"></div>
           </div>
-          <div class="calendar-copy"><p data-i18n="calendarHelp">蓝点表示关注名单中至少一个标的有完整日记录；周末、休市或源未发布的日期没有蓝点。</p><div class="calendar-key"><span><i class="calendar-dot"></i><span data-i18n="calendarAvailable">有记录</span></span><span><i class="calendar-no-dot"></i><span data-i18n="calendarMissing">无记录</span></span></div><div class="calendar-step"><button id="previous-session" class="button secondary" type="button" data-i18n="previousSession" disabled>上一个有记录日</button><button id="next-session" class="button secondary" type="button" data-i18n="nextSession" disabled>下一个有记录日</button></div></div>
+          <div class="calendar-copy"><p data-i18n="calendarHelp">蓝点表示完整关注名单中至少一个标的有当日成交量记录，不代表全部标的齐全，也与 OI 无关。周末、休市、源未发布或标的历史未覆盖时可能没有蓝点。</p><div class="calendar-key"><span><i class="calendar-dot"></i><span data-i18n="calendarAvailable">有记录</span></span><span><i class="calendar-oi-dot"></i><span data-i18n="oiArchiveCalendar">OI 已归档</span></span><span><i class="calendar-no-dot"></i><span data-i18n="calendarMissing">无记录</span></span></div><div class="calendar-step"><button id="previous-session" class="button secondary" type="button" data-i18n="previousSession" disabled>上一个有记录日</button><button id="next-session" class="button secondary" type="button" data-i18n="nextSession" disabled>下一个有记录日</button></div></div>
         </div>
       </details>
+      <p id="calendar-coverage-status" class="metric-note" role="status" aria-live="polite"></p>
+      <p id="oi-calendar-status" class="metric-note" role="status" aria-live="polite"></p><p class="metric-note"><a data-owner-only href="/quote-reviews.html#oi-daily-card" data-i18n="oiDailyScheduleLink">查看每日 OI 归档任务状态</a></p>
+      <p id="oi-note" class="metric-note"></p>
       <div id="overview" class="chart-host" aria-label="Watched symbols’ volume and open-interest PCR"></div>
       <p id="category-empty" class="empty-state" data-i18n="categoryEmpty" hidden>这个分类暂时没有已加载的标的。请添加标的或切换分类。</p>
-      <p id="oi-note" class="metric-note"></p><p id="oi-source-status" class="metric-note" role="status" aria-live="polite"></p><p id="extra-freshness" class="metric-note"></p>
+      <p id="oi-source-status" class="metric-note" role="status" aria-live="polite"></p><p id="extra-freshness" class="metric-note"></p>
     </section>
-    <section class="panel" aria-labelledby="history-heading">
-      <div class="section-heading"><div><h2 id="history-heading" data-i18n="historyHeading">每日 PCR 与趋势</h2><p data-i18n="historySubtitle">每日线显示当时成交；20／60 日线平滑观察阶段变化。</p></div></div>
+    <section id="history-panel" class="panel pcr-navigation-target" aria-labelledby="history-heading" tabindex="-1">
+      <div class="section-heading"><div><h2 id="history-heading" data-i18n="historyHeading">每日 PCR 与趋势</h2><p data-i18n="historySubtitle">每日线显示当时成交；5／20／60 日线观察不同窗口的阶段变化。</p></div></div>
       <div class="controls history-controls">
         <label><span data-i18n="symbol">关注标的</span><select id="symbol" disabled></select></label>
         <label><span data-i18n="range">显示区间</span><select id="range" disabled><option value="126" data-i18n="halfYear">截至所选日 · 近半年</option><option value="252" selected data-i18n="oneYear">截至所选日 · 近一年</option><option value="all" data-i18n="allHistory">截至所选日 · 全部记录</option></select></label>
       </div>
       <p id="history-note" class="date-note" aria-live="polite" hidden></p>
-      <div class="stats" aria-live="polite">
+      <div class="stats pcr-four-stats" aria-live="polite">
         <div><span data-i18n="daily">所选日 PCR</span><strong id="daily-value">—</strong><small id="daily-date">—</small></div>
+        <div><span data-i18n="p5">5 日成交量 PCR</span><strong id="p5-value">—</strong><small data-i18n="p5Detail">5 日合计 Put ÷ Call 成交量</small></div>
         <div><span data-i18n="p20">20 日成交量 PCR</span><strong id="p20-value">—</strong><small id="rank-value">—</small></div>
         <div><span data-i18n="p60">60 日成交量 PCR</span><strong id="p60-value">—</strong><small data-i18n="p60Detail">60 日合计 Put ÷ Call 成交量</small></div>
       </div>
-      <div id="history" class="chart-host" aria-label="Daily, 20-session and 60-session volume PCR history"></div>
+      <div id="history-pcr-reading" class="pcr-reading" aria-live="polite"></div>
+      <div id="history" class="chart-host" aria-label="Daily, 5-session, 20-session and 60-session volume PCR history"></div>
       <div class="explanation"><strong data-i18n="orangeHeading">下方橘色曲线怎么看？</strong><p data-i18n="orangeText">橘色是 60 日成交量 PCR。20 日线高于它，表示近期 Put 相对 Call 比长期更活跃；低于它则相反。两条线的高低不直接代表未来涨跌。</p></div>
     </section>
     <section class="panel compact" aria-labelledby="definitions-heading">
@@ -85,9 +92,12 @@
     <footer data-i18n="footer">以数据日期为准 · PCR 是交易结构指标，价格方向需要结合行情确认。</footer>
   </main>
   <noscript data-i18n="noscript">请启用 JavaScript，以选择日期、查看 PCR 曲线和更新数据。</noscript>
+  <script type="module" src="/public-access.js"></script>
+  <script type="module" src="/pcr-summary.js"></script>
   <script type="module" src="/app.js"></script>
   <script type="module" src="/cboe.js"></script>
   <script type="module" src="/market-overview.js"></script>
+  <script type="module" src="/watchlist-navigation.js"></script>
   <script type="module" src="/source-notes.js"></script>
 </body>
 </html>

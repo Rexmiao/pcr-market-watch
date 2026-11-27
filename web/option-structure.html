@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Compare model Gamma exposure, expiration structure, Max Pain and saved daily observations.">
+  <title>Gamma exposure & Max Pain · PCR Watch</title>
+  <link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/option-structure.css">
+</head>
+<body data-page="option-structure">
+  <main>
+    <nav class="site-nav" data-i18n-aria="navLabel" aria-label="网站导航"><a href="/" data-i18n="navHome">PCR 观察台</a><a href="/option-structure.html" aria-current="page" data-i18n="navStructure">伽马 / 最大痛苦</a><a href="/options-monitor.html" data-i18n="navOptions">期权异动</a><a href="/quote-reviews.html" data-i18n="navReviews">定时复核</a><a href="/market-brief.html" data-i18n="navBrief">市场解读</a><a href="/charts.html" data-i18n="navCharts">图表目录</a><button id="language-toggle" class="button secondary language-toggle" type="button">English</button></nav>
+    <header class="page-header"><div><div class="eyebrow" data-structure-copy="eyebrow">PCR 的波动结构参考</div><h1 data-structure-copy="title">伽马敞口与最大痛苦</h1><p data-structure-copy="subtitle">先看期限范围，再看敞口、墙位与到期结构。</p></div></header>
+    <section class="panel structure-selection" aria-labelledby="structure-selection-title">
+      <h2 id="structure-selection-title" data-structure-copy="selection">选择标的</h2>
+      <div class="controls"><label for="structure-symbol"><span data-structure-copy="symbol">关注标的</span><select id="structure-symbol" disabled></select></label><button id="structure-reload-list" class="button secondary" type="button" data-structure-copy="reloadList">重新读取名单</button><a class="structure-manage" href="/#watchlist-panel" data-structure-copy="manage">管理关注名单</a></div>
+      <p id="structure-list-status" class="metric-note" role="status"></p>
+      <p class="metric-note" data-structure-copy="loadingHelp">打开页面只读取已有快照；点击各项“更新”才会向 moomoo 检查，不刷新完整日 PCR。</p>
+      <div id="structure-view-tabs" class="structure-view-tabs" role="group" aria-label="快照模式"><button id="structure-view-live" class="button secondary" type="button" aria-pressed="true" data-structure-copy="liveView">最新快照</button><button id="structure-view-history" class="button secondary" type="button" aria-pressed="false" data-structure-copy="historyView">历史归档与对比</button></div>
+    </section>
+    <section id="structure-history-panel" class="panel" aria-labelledby="structure-history-title" hidden>
+      <div class="section-heading"><div><h2 id="structure-history-title" data-structure-copy="historyTitle">每日结构归档</h2><p data-structure-copy="historyIntro">按实际保存的美东查询日期回看。主快照为蓝色，对比快照为紫色；不存在的历史记录不补造。</p></div><button id="structure-history-reload" class="button secondary" type="button" data-structure-copy="historyReload">重新读取归档</button></div>
+      <p id="structure-history-status" class="status" role="status" aria-live="polite"></p>
+      <p id="structure-history-schedule" class="structure-meta"></p>
+      <div class="controls"><button id="structure-history-capture" class="button secondary" type="button" data-owner-only hidden data-structure-copy="historyCapture">立即采集并归档</button></div><p id="structure-capture-status" class="structure-meta" role="status" aria-live="polite"></p>
+      <div class="controls"><label for="history-date-primary"><span data-structure-copy="primaryDate">主快照 · 查询日期（美东）</span><select id="history-date-primary"></select></label><label for="history-date-comparison"><span data-structure-copy="comparisonDate">对比快照 · 查询日期（美东）</span><select id="history-date-comparison"></select></label></div>
+      <p id="structure-history-coverage" class="structure-meta"></p><p class="metric-note" data-structure-copy="historyRule">可比较同一天的不同到期日，或不同天的同一到期日。日期改变后，缺少原到期日时须重新选择；不以其他日期或到期日代替。</p>
+    </section>
+    <section id="gamma-panel" class="panel" aria-labelledby="gamma-title">
+      <div class="section-heading"><div><h2 id="gamma-title" data-structure-copy="gammaTitle">伽马敞口 · 到期前后对照</h2><p id="gamma-intro" data-structure-copy="gammaIntro">蓝线与橙线比较整个所选期权组合；柱状图单独展示各行权价的贡献。</p></div></div>
+      <div id="structure-live-gamma-controls" class="controls"><label for="gamma-window"><span data-structure-copy="range">到期范围</span><select id="gamma-window"><option value="nearest">最近到期</option><option value="7d">未来7天</option><option value="30d" selected>未来30天</option><option value="all">全期限</option></select></label><button id="gamma-refresh" class="button primary" type="button" data-structure-copy="gammaRefresh">更新伽马</button></div>
+      <div id="structure-history-gamma-controls" class="controls" hidden><label for="history-gamma-primary"><span data-structure-copy="primaryGammaScope">主快照 · 伽马范围</span><select id="history-gamma-primary"></select></label><label for="history-gamma-comparison"><span data-structure-copy="comparisonGammaScope">对比快照 · 伽马范围</span><select id="history-gamma-comparison"></select></label></div>
+      <p id="gamma-status" class="status" role="status" aria-live="polite"></p>
+      <p id="gamma-range-meta" class="structure-meta"></p>
+      <div id="gamma-snapshots" class="structure-snapshots"></div>
+      <div class="controls"><label for="gamma-price-range"><span data-structure-copy="priceRange">图表价格范围</span><select id="gamma-price-range"><option value="auto" selected>自动 · 包含墙位与现价</option><option value="near">手动 · 快照价附近 ±15%</option><option value="all">全部价格</option></select></label></div>
+      <p id="gamma-chart-range-note" class="metric-note"></p>
+      <div id="gamma-distribution" class="structure-distribution" aria-labelledby="gamma-distribution-title">
+        <div class="section-heading"><div><h3 id="gamma-distribution-title" data-structure-copy="distributionTitle">各行权价的伽马分布</h3><p data-structure-copy="distributionIntro">绿色为 Call，红色为 Put，灰色菱形为单档净值。观察墙位之外的集中区与稀疏区。</p></div></div>
+        <div class="controls"><label for="gamma-bars-scope"><span data-structure-copy="barsTitle">行权价分布 · 选择快照</span><select id="gamma-bars-scope"><option value="base">所选到期范围</option><option value="withoutNearest">去掉最近到期日</option></select></label></div>
+        <p id="gamma-distribution-meta" class="structure-meta"></p>
+        <div id="gamma-strikes" class="structure-chart"></div><div id="gamma-strikes-legend" class="structure-legend"></div>
+        <p class="metric-note" data-structure-copy="barsHelp">横轴是行权价，按所选快照的标的价格估值；保留各行权价的实际间距，不合并相邻档位。单档净值不同于下方假设股价曲线的全组合总量。</p>
+      </div>
+      <div class="structure-divider">
+      <h3 data-structure-copy="profileTitle">总 GEX 曲线 · 不同假设股价</h3>
+      <div id="gamma-profile" class="structure-chart" aria-live="polite"></div>
+      <div id="gamma-profile-legend" class="structure-legend"></div>
+      <p id="gamma-comparison-help" class="metric-note" data-structure-copy="lineComparison">蓝色实线包含所选到期日；橘黄虚线去掉其中最先到期的一期。两组数据时点不同时仅作结构对照；黄线不是未来走势。</p>
+      <p class="metric-note" data-structure-copy="profileHelp">横轴是假设标的价格，纵轴是全组合模型 GEX。蓝线高于零为模型净正伽马，低于零为净负伽马；曲线不是股价预测。</p>
+      </div>
+      <details><summary data-structure-copy="gammaReading">这些数据怎么读？</summary><p data-structure-copy="gammaCaveat">GEX 依赖做市商持仓方向假设，不能确认真实库存。净正伽马下的对冲可能缓和波动，净负伽马可能放大两个方向的波动。看涨墙／看跌墙是集中位置，不是保证有效的压力／支撑；零伽马也不是目标价。</p><p id="gamma-scope-help" data-structure-copy="comparisonHelp">排除最近到期日用于观察剩余期限结构，不是到期后行情预测。两个快照可能分次查询，各自保留时间；曲线差异不等于真实资金流入流出。单位沿用供应商口径，未披露时不称美元／每1%。</p></details>
+      <p class="metric-note"><a href="https://open.moomoo.com/api/quote/derivatives/option-gamma-exposure" target="_blank" rel="noopener noreferrer" data-structure-copy="gammaSource">moomoo 伽马数据说明</a> · <a href="https://www.moomoo.com/sg/learn/gamma-exposure-gex-understanding-dealer-hedging-flows-and-key-levels" target="_blank" rel="noopener noreferrer" data-structure-copy="gammaGuide">图表与模型限制</a></p>
+    </section>
+    <section id="max-pain-panel" class="panel" aria-labelledby="max-pain-title">
+      <div class="section-heading"><div><h2 id="max-pain-title" data-structure-copy="painTitle">最大痛苦 · 单个到期日</h2><p data-structure-copy="painIntro">按所选到期日的 OI 结构，观察不同结算价格下的理论内在价值总额。</p></div></div>
+      <div id="structure-live-pain-controls" class="controls"><label for="max-pain-expiry"><span data-structure-copy="expiry">到期日</span><select id="max-pain-expiry"><option value="">最近到期</option></select></label><button id="max-pain-refresh" class="button primary" type="button" data-structure-copy="painRefresh">更新最大痛苦</button></div>
+      <div id="structure-history-pain-controls" class="controls" hidden><label for="history-pain-primary"><span data-structure-copy="primaryPainExpiry">主快照 · 最大痛苦到期日</span><select id="history-pain-primary"></select></label><label for="history-pain-comparison"><span data-structure-copy="comparisonPainExpiry">对比快照 · 最大痛苦到期日</span><select id="history-pain-comparison"></select></label></div>
+      <p id="max-pain-status" class="status" role="status" aria-live="polite"></p>
+      <div id="max-pain-stats" class="structure-pain-stats"></div><p id="max-pain-meta" class="structure-meta"></p>
+      <div id="max-pain-chart" class="structure-chart"></div><div id="max-pain-legend" class="structure-legend"></div>
+      <p id="max-pain-history-help" class="metric-note" hidden></p>
+      <div class="explanation"><strong data-structure-copy="painReading">最大痛苦会变化吗？</strong><p data-structure-copy="painCaveat">最大痛苦是固定到期日与 OI 快照下，合计期权到期内在价值最小的位置，不包含权利金，不是持有者真实盈亏，也不保证股价向它靠拢。它主要随 OI 更新而变化；固定 OI 下，股价上涨或下跌本身不会直接改变其计算值。</p></div>
+      <p class="metric-note" data-structure-copy="painDateHelp">最大痛苦的单到期日与上方伽马的多期限范围独立。未披露 OI 结算日期时保持未知，不把查询时间当成结算日期。</p>
+      <p class="metric-note"><a href="https://open.moomoo.com/api/quote/derivatives/quote-option-max-pain" target="_blank" rel="noopener noreferrer" data-structure-copy="painSource">moomoo 最大痛苦数据说明</a></p>
+    </section>
+    <footer data-structure-copy="footer">moomoo 供应商快照 · 遵循真实范围与数据时间 · 作为 PCR 的辅助参考。</footer>
+  </main>
+  <noscript>请启用 JavaScript，以查看和更新伽马／最大痛苦。Enable JavaScript to view and refresh Gamma / Max Pain.</noscript>
+  <script type="module" src="/public-access.js"></script><script type="module" src="/option-structure.js"></script>
+</body>
+</html>

@@ -48,22 +48,34 @@ class LocalStatement {
 }
 
 class LocalD1 {
-  constructor(databasePath, pythonExecutable) {
+  constructor(databasePath, pythonExecutable, onChange) {
     this.databasePath = databasePath;
     this.pythonExecutable = pythonExecutable;
+    this.onChange = onChange;
   }
 
   prepare(sql) { return new LocalStatement(this, sql); }
 
   async execute(sql, params = []) {
-    return await this.call({action: 'statement', sql, params});
+    const result = await this.call({action: 'statement', sql, params});
+    await this.notifyChange([result]);
+    return result;
   }
 
   async batch(statements) {
     if (!Array.isArray(statements) || statements.some(statement => !(statement instanceof LocalStatement) || statement.database !== this)) {
       throw new TypeError('Batch requires statements prepared by this database.');
     }
-    return await this.call({action: 'batch', statements: statements.map(statement => ({sql: statement.sql, params: statement.params}))});
+    const result = await this.call({action: 'batch', statements: statements.map(statement => ({sql: statement.sql, params: statement.params}))});
+    await this.notifyChange(result);
+    return result;
+  }
+
+  async notifyChange(results) {
+    if (!this.onChange || !results.some(result => result?.meta?.changes > 0)) return;
+    // Notification failure cannot undo an already committed transaction. No
+    // SQL, values, identity, or result data is passed to the optional callback.
+    try { await this.onChange(); } catch {}
   }
 
   async call(input) {
@@ -131,13 +143,14 @@ async function readMigrations(directory) {
   return migrations;
 }
 
-export async function createLocalD1({databasePath, migrationsDirectory, pythonExecutable} = {}) {
+export async function createLocalD1({databasePath, migrationsDirectory, pythonExecutable, onChange} = {}) {
+  if (onChange !== undefined && typeof onChange !== 'function') throw new TypeError('onChange must be a function.');
   const chosenPath = databasePath || process.env.PCR_DB_PATH || resolve(projectDirectory, '..', 'local-data', 'pcr.sqlite3');
   if (chosenPath === ':memory:') throw new Error('Local D1 requires a persistent SQLite file.');
   const absolutePath = resolve(chosenPath);
   const migrations = await readMigrations(resolve(migrationsDirectory || join(projectDirectory, 'drizzle')));
   await mkdir(dirname(absolutePath), {recursive: true});
-  const database = new LocalD1(absolutePath, pythonCommand(pythonExecutable));
+  const database = new LocalD1(absolutePath, pythonCommand(pythonExecutable), onChange);
   database.migrationResult = await database.call({action: 'migrate', migrations});
   return database;
 }

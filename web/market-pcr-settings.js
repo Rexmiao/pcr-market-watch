@@ -15,11 +15,11 @@ export function readMarketSettings(value){
   if(value.initialized!==true)throw Error('INVALID_MARKET_SETTINGS');return {...value,items:cleanMarketItems(value.items)};
 }
 export function createMarketSettingsController({fetcher=globalThis.fetch,onChange=()=>{}}={}){
-  const state={items:[],revision:0,storage:null,ready:false,loading:false,saving:false,error:null,updatedAt:null};let loading=null;
+  const state={items:[],revision:0,storage:null,ready:false,loading:false,saving:false,error:null,updatedAt:null,readOnly:false,canRefresh:true};let loading=null;
   const emit=()=>onChange(state);
-  function apply(value){const next=readMarketSettings(value);if(next.items===null)throw Error('MARKET_SETTINGS_UNINITIALIZED');Object.assign(state,{items:next.items,revision:next.revision,storage:next.storage,updatedAt:next.updatedAt||null,ready:true,error:null});}
+  function apply(value){const next=readMarketSettings(value);if(next.items===null)throw Error('MARKET_SETTINGS_UNINITIALIZED');Object.assign(state,{items:next.items,revision:next.revision,storage:next.storage,readOnly:next.readOnly===true,canRefresh:next.canRefresh!==false,updatedAt:next.updatedAt||null,ready:true,error:null});}
   async function write(items,initializing=false){
-    if(state.saving||(!initializing&&(!state.ready||state.error==='load')))return false;
+    if(state.readOnly||state.saving||(!initializing&&(!state.ready||state.error==='load')))return false;
     const candidate=cleanMarketItems(items);state.saving=true;state.error=null;emit();
     try{
       const response=await fetcher('/api/market-pcr-settings',{method:'PUT',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:candidate,revision:state.revision}),signal:AbortSignal.timeout(20000)}),body=await response.json();
@@ -31,7 +31,7 @@ export function createMarketSettingsController({fetcher=globalThis.fetch,onChang
     if(loading)return loading;state.loading=true;state.error=null;emit();
     loading=(async()=>{try{
       const response=await fetcher('/api/market-pcr-settings',{credentials:'same-origin',signal:AbortSignal.timeout(20000)});if(!response.ok)throw Error('MARKET_SETTINGS_LOAD_FAILED');
-      const body=readMarketSettings(await response.json());state.revision=body.revision;state.storage=body.storage;
+      const body=readMarketSettings(await response.json());state.revision=body.revision;state.storage=body.storage;state.readOnly=body.readOnly===true;state.canRefresh=body.canRefresh!==false;
       if(body.items===null){const success=await write(DEFAULT_MARKET_ITEMS,true);if(!success&&!state.ready)state.error='load';}else apply(body);
     }catch{state.error='load';}finally{state.loading=false;loading=null;emit();}})();return loading;
   }};

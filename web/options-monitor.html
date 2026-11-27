@@ -1,16 +1,16 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="基于现有关注名单监测期权成交、累计成交量与 OI，明确数据来源、范围和未知信息。">
-  <title>期权异动 · PCR 观察台</title>
+  <meta name="description" content="Inspect read-only options activity with source scope and observation times.">
+  <title>Options activity · PCR Watch</title>
   <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="/option-monitor.css">
 </head>
 <body data-page="options-monitor">
   <main>
-    <nav class="site-nav" data-i18n-aria="navLabel" aria-label="网站导航"><a href="/" data-i18n="navHome">PCR 观察台</a><a href="/options-monitor.html" aria-current="page" data-i18n="navOptions">期权异动</a><a href="/market-brief.html" data-i18n="navBrief">市场解读</a><a href="/charts.html" data-i18n="navCharts">图表目录</a><button id="language-toggle" class="button secondary language-toggle" type="button" aria-label="Switch to English">English</button></nav>
+    <nav class="site-nav" data-i18n-aria="navLabel" aria-label="网站导航"><a href="/" data-i18n="navHome">PCR 观察台</a><a href="/option-structure.html" data-i18n="navStructure">伽马 / 最大痛苦</a><a href="/options-monitor.html" aria-current="page" data-i18n="navOptions">期权异动</a><a href="/quote-reviews.html" data-i18n="navReviews">定时复核</a><a href="/market-brief.html" data-i18n="navBrief">市场解读</a><a href="/charts.html" data-i18n="navCharts">图表目录</a><button id="language-toggle" class="button secondary language-toggle" type="button" aria-label="Switch to English">English</button></nav>
     <header class="page-header"><div><div class="eyebrow" data-i18n="monitorPageEyebrow">PCR 的盘中参考</div><h1 data-i18n="monitorPageTitle">期权异动</h1><p data-i18n="monitorPageSubtitle">监测关注合约的成交活动与 OI；各项数据保留自己的范围和日期。</p></div></header>
     <p class="monitor-page-note"><span data-i18n="monitorWatchlistCopy">与 PCR 观察台共用关注名单；添加、删除标的请前往</span> <a href="/#watchlist-heading" data-i18n="navHome">PCR 观察台</a> · <span data-i18n="monitorRefreshScope">此页只刷新期权监测，不更新 OCC 完整日 PCR。</span></p>
     <section id="options-monitor" class="panel options-monitor" aria-labelledby="options-monitor-title"></section>

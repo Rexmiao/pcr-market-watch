@@ -8,7 +8,7 @@ export function createCalendar(onSelect){
   $('calendar-next').addEventListener('click',()=>move(1));
   function draw(){
     if(!latest)return;
-    const {selected,dates,min,max}=latest,available=new Set(dates),language=getLanguage();
+    const {selected,dates,min,max,coverage,oiCoverage,oiTotal}=latest,available=new Set(dates),language=getLanguage();
     const first=new Date(month+'-01T12:00:00Z'),count=new Date(Date.UTC(first.getUTCFullYear(),first.getUTCMonth()+1,0)).getUTCDate(),padding=(first.getUTCDay()+6)%7;
     $('calendar-month').textContent=new Intl.DateTimeFormat(language==='en'?'en-US':'zh-CN',{year:'numeric',month:'long',timeZone:'UTC'}).format(first);
     $('calendar-prev').disabled=month<=min.slice(0,7);
@@ -20,9 +20,12 @@ export function createCalendar(onSelect){
       const date=month+'-'+String(day).padStart(2,'0'),button=document.createElement('button');
       button.type='button';button.className='calendar-day';button.textContent=String(day);button.dataset.date=date;
       const hasRecord=available.has(date),isSelected=date===selected;
+      const archived=oiCoverage?.[date],oiCount=Number.isInteger(archived?.count)?archived.count:Array.isArray(archived)?archived.length:Number.isInteger(archived)?archived:0;
+      button.classList.toggle('has-oi-archive',oiCount>0);
       button.classList.toggle('has-record',hasRecord);button.classList.toggle('is-selected',isSelected);
       button.disabled=date<min||date>max;
       button.setAttribute('aria-label',date+' · '+t(hasRecord?'calendarAvailable':'calendarMissing')+(isSelected?' · '+t('calendarSelected'):''));
+      if(coverage){const label=t('calendarDayCoverage',{date,count:coverage.byDate[date]?.length||0,total:coverage.total})+(oiCoverage?' · '+t('oiArchiveDayCoverage',{count:oiCount,total:oiTotal??coverage.total}):'');button.title=label;button.setAttribute('aria-label',label+' · '+t(hasRecord?'calendarAvailable':'calendarMissing')+(isSelected?' · '+t('calendarSelected'):''));}
       if(isSelected)button.setAttribute('aria-current','date');
       button.addEventListener('click',()=>onSelect(date));fragment.append(button);
     }

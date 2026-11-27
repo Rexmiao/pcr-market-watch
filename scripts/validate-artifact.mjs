@@ -30,4 +30,11 @@ assert(!(await home.text()).includes('src="/option-monitor.js"'),'The homepage m
 const cloudOi=await workerModule.default.fetch(new Request('https://pcr.example/api/oi-summaries?symbols=NVDA'),{},{});
 assert.equal(cloudOi.status,503);
 assert.equal((await cloudOi.json()).status,'local_backend_required');
+const reviewPage=await workerModule.default.fetch(new Request('https://pcr.example/quote-reviews.html'),{},{});
+assert.equal(reviewPage.status,200,'The scheduled-review page must be packaged.');
+assert((await reviewPage.text()).includes('/quote-reviews.js'));
+const cloudReviews=await workerModule.default.fetch(new Request('https://pcr.example/api/quote-reviews'),{},{});
+assert.equal(cloudReviews.status,501);assert.equal((await cloudReviews.json()).supported,false);
+const cloudBriefQuotes=await workerModule.default.fetch(new Request('https://pcr.example/api/brief-quotes/status'),{},{});
+assert.equal(cloudBriefQuotes.status,501);assert.equal((await cloudBriefQuotes.json()).supported,false);
 console.log("Artifact is valid ESM, serves the independent monitor, keeps homepage monitoring off and preserves the local-only OI boundary");

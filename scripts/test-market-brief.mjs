@@ -7,6 +7,8 @@ const stamp='2026-11-25T01:00:00Z';
 const market={provider:'Yahoo Finance',checkedAt:stamp,status:'current',quotes:['sp500','nasdaq','dow'].map((id,index)=>({id,price:100+index,changePercent:index===0?1:-1,marketTime:'2026-11-24T21:00:00Z'}))};
 assert.equal(briefMacroFacts(market).up,1);
 assert.equal(briefMacroFacts(market).down,2);
+const crossAsset={...market,quotes:[...market.quotes,{id:'bitcoin',price:61200,changePercent:50,marketTime:stamp},{id:'gold',price:3600,changePercent:-10,marketTime:stamp}]};
+assert.equal(briefMacroFacts(crossAsset).quotes.length,3);assert.equal(briefMacroFacts(crossAsset).up,1);assert.equal(briefMacroFacts(crossAsset).down,2,'Bitcoin/gold do not change the three-index direction summary');
 assert.equal(briefMacroFacts({quotes:[{id:'sp500',price:null,changePercent:1}]}).quotes.length,0);
 const cboe={asof:'2026-11-23',checkedAt:stamp,rows:[{date:'2026-11-23',available:true,index:{daily:1.21,r20:1.06,r60:1.01},equity:{daily:.55,r20:null,r60:null}},{date:'2026-11-24',available:false,index:{daily:null,r20:null,r60:null}}],coverage:{missingDates:['2026-11-24']},freshness:{status:'pending_source'}};
 assert.equal(briefPCRFacts(cboe).date,'2026-11-23');
@@ -23,10 +25,10 @@ const fetcher=async(path,options={})=>{
   if(url.pathname==='/api/watchlist')return json({instruments:{}});
   if(url.pathname==='/api/symbol')return json({symbol:url.searchParams.get('symbol'),asof:'2026-11-23',checkedAt:stamp,instrument:{rows:[{date:'2026-11-23',p:50,c:100,r20:.6,r60:.7}]}});
   if(url.pathname.startsWith('/api/cboe/history'))return json(cboe);
-  if(url.pathname==='/api/providers/moomoo/status')return json({provider:'moomoo',configured:true});
-  if(url.pathname==='/api/providers/moomoo/quotes'){
-    if(failRefresh)return json({error:'permission'},403);
-    return json({checkedAt:stamp,data:{basic_qot_list:url.searchParams.get('symbols').split(',').map(code=>({security:{code},cur_price:123,update_time:'2026-11-24 16:00:00'}))}});
+  if(url.pathname==='/api/brief-quotes/status')return json({provider:'moomoo_webapi',configured:true,readOnly:true});
+  if(url.pathname==='/api/brief-quotes'){
+    if(failRefresh)return json({provider:'moomoo_webapi',code:'NO_PERMISSION',error:'permission'},403);
+    return json({provider:'moomoo_webapi',checkedAt:stamp,status:'current',data:{basic_qot_list:url.searchParams.get('symbols').split(',').map(code=>({security:{code},cur_price:123,update_timestamp:1795554000}))}});
   }
   throw Error('Unexpected endpoint '+path);
 };
@@ -34,7 +36,7 @@ const controller=createMarketBriefController({fetcher});await controller.load();
 assert.equal(controller.state.library.records().length,21);
 assert.equal(controller.state.library.records()[0].instrument.rows.at(-1).r20,.6);
 assert.equal(controller.state.stockQuotes.size,21);
-const priceCalls=calls.filter(call=>call.path.startsWith('/api/providers/moomoo/quotes'));
+const priceCalls=calls.filter(call=>call.path.startsWith('/api/brief-quotes?'));
 assert.equal(priceCalls.length,2);
 assert.equal(new URL(priceCalls[0].path,'https://test.example').searchParams.get('symbols').split(',').length,20);
 failRefresh=true;const before=controller.state.market.quotes[0].price;

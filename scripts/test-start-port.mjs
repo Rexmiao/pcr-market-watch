@@ -28,7 +28,7 @@ try {
     visited.push(request.url);
     if(request.url==='/api/watchlist'){response.setHeader('content-type','application/json');response.end(JSON.stringify({instruments:{NVDA:{}}}));}
     else if(request.url==='/api/watchlist-settings'){response.setHeader('content-type','application/json');response.end(JSON.stringify({storage:'local',revision:1,initialized:true,items:[],groups:[]}));}
-    else if(['/','/options-monitor.html','/charts.html','/archive/index-trends.html','/archive/seven-watchlist.html'].includes(request.url)){response.setHeader('content-type','text/html');response.end('<!doctype html><title>PCR fixture</title>');}
+    else if(['/','/options-monitor.html','/quote-reviews.html','/charts.html','/archive/index-trends.html','/archive/seven-watchlist.html'].includes(request.url)){response.setHeader('content-type','text/html');response.end('<!doctype html><title>PCR fixture</title>');}
     else{response.statusCode=404;response.end('missing');}
   });
   assert.equal(await isPcrServer(foreign.port),false,'An unrelated server must not be mistaken for PCR even if one endpoint looks similar');
@@ -43,7 +43,7 @@ try {
   assert.deepEqual(await selectLaunchTarget([foreign.port,free]),{port:free,url:`http://127.0.0.1:${free}/`,existing:false});
   assert.equal((await fetch(foreign.url)).status,200,'Port selection must leave the unrelated server running');
   await assert.rejects(selectLaunchTarget([foreign.port]),/No available PCR port/);
-  assert.deepEqual(await verifyPcrPages(pcr.url),['','options-monitor.html','charts.html','archive/index-trends.html','archive/seven-watchlist.html']);
+  assert.deepEqual(await verifyPcrPages(pcr.url),['','options-monitor.html','quote-reviews.html','charts.html','archive/index-trends.html','archive/seven-watchlist.html']);
 
   const launcher=fileURLToPath(new URL('../start-local.mjs',import.meta.url));
   const options={env:{...process.env,PCR_PREVIEW_PORT:String(pcr.port)},windowsHide:true,timeout:10000};
@@ -55,7 +55,7 @@ try {
   assert(checked.stdout.includes('PASS local watchlist API'));
   assert.equal(await isPcrServer(pcr.port),true,'--check must not stop a reused PCR backend');
   assert.equal((await fetch(foreign.url)).status,200,'Neither launcher mode may stop a foreign service');
-  for(const path of ['/','/options-monitor.html','/charts.html','/archive/index-trends.html','/archive/seven-watchlist.html'])assert(visited.includes(path));
+  for(const path of ['/','/options-monitor.html','/quote-reviews.html','/charts.html','/archive/index-trends.html','/archive/seven-watchlist.html'])assert(visited.includes(path));
   console.log('PASS launcher ports: foreign-service identification, existing PCR reuse, free fallback, preferred-port validation, actual URL output and archive checks without stopping existing services');
 } finally {
   await Promise.all(owned.map(server=>new Promise(accept=>{server.close(()=>accept());server.closeAllConnections?.();})));
