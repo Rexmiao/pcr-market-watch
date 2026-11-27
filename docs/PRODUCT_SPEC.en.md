@@ -4,6 +4,8 @@
 
 Date: 2026-11-27. Scope: the current project's watchlists, groups, PCR data/change summary, historical comparisons, Gamma/Max Pain model references, local/HF cloud read-only market data and daily OI diagnostics, plus bilingual GitHub Pages showcase/documentation entry points. This document describes source-code behavior and acceptance requirements for this iteration. Completed source changes, passing tests, local operation, and a published deployment are separate states.
 
+Current publication status (2026-11-27): [Windows v0.2.18](https://github.com/Rexmiao/pcr-market-watch/releases/tag/v0.2.18) is published with Gamma/Max Pain, per-expiry archives/history within 30 days and English-on-first-use runtime support. Personal data, authorization and task configuration are not bundled. Earlier v0.2.3/unpublished statements retain their original historical meaning. See the [Release Spec](RELEASE_SPEC.en.md) for published-artifact versus later main-document/test boundaries; existing tags/assets are not overwritten.
+
 Maintenance requirement: changes to features, data methodology, or publication must update the affected Chinese and English specifications in the same change. See [project maintenance rules](../AGENTS.md) for documentation responsibilities and completion criteria.
 
 The structure uses user stories, requirement IDs, acceptance scenarios, and verifiable success criteria, drawing on the [official GitHub Spec Kit specification template](https://github.com/github/spec-kit/blob/main/templates/spec-template.md). Only the writing structure is reused; Spec Kit, OpenBB, and a new application framework are not installed.

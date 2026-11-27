@@ -1,8 +1,12 @@
-# Release and Installation Specification (v0.2.18 source; GitHub release remains v0.2.3)
+# Release and Installation Specification (v0.2.18 source and Windows release)
 
 [简体中文](RELEASE_SPEC.md) | **English**
 
-The public release remains v0.2.3. HF v0.2.7 guest PCR viewing/explicit refresh, login and cache recovery are verified. The v0.2.8 source adjusts administrator password limits; actual cloud credential rotation and prior-data preservation are verified. Owner edits/private pages require login and the Bucket stays private. No new GitHub release replaces existing tags, ZIPs or checksums.
+The current public Windows release is [v0.2.18](https://github.com/Rexmiao/pcr-market-watch/releases/tag/v0.2.18), including Gamma/Max Pain, 30-day per-expiry archives/history and English-on-first-use runtime support. Personal databases, credentials and task configuration are not bundled. Historical v0.2.3 tags/assets remain unchanged.
+
+CI published v0.2.18 at 2026-11-27T07:58:47Z from tagged commit [79a2cfb981b4d79f68a0f498b98d90a636e510a4](https://github.com/Rexmiao/pcr-market-watch/commit/79a2cfb981b4d79f68a0f498b98d90a636e510a4). The Windows ZIP is 3,647,876 bytes and the SHA-256 manifest is 103 bytes. Later main-branch documentation/tests/CI registration may evolve without rewriting this tag, ZIP or checksum manifest. A repeated release check finding the existing Release keeps its original assets rather than overwriting them. Changes to installable runtime behavior require a new version.
+
+Historical HF acceptance: v0.2.7 guest PCR viewing/explicit refresh, login and cache recovery were verified; v0.2.8 administrator password-limit changes, actual cloud credential rotation and prior-data preservation were also verified. Owner edits/private pages require login and the Bucket remains private. These earlier deployment records do not replace independent evidence for the current installer, actual cloud operation or scheduled execution.
 
 ## Deliverables
 
@@ -348,7 +352,7 @@ See GARCH in the [Product Spec](PRODUCT_SPEC.en.md) and the [backend guide](MOOM
 | ID | Delivery and acceptance |
 | --- | --- |
 | REL-038-001 | Deliver bounded page caches, same-key request coalescing, one ordinary read-only status SQL statement (at most three bounded reads for large checkpoints) and30-second successful Windows-task metadata caching under PERF-018/PERF-API. Add no migration, quote permission, paid resource or collection-rate change. Cover A/B sharing/independent cancellation, TTL/LRU/byte caps, oversized/failed entries not cached, reload/capture-completion/list/permission invalidation and late-request isolation. Preserve SQL results, original times, dynamic lease decisions and write-free GETs. |
-| REL-038-002 | Synchronize paired Product/backend/Release/HF guides, three READMEs and the HF template; update current source to v0.2.18, preserving v0.2.17 historical sections and GitHub v0.2.3 tags/ZIPs/checksums. Record controlled request counts/bytes/p50/p95 separately from actual timings, without treating a benchmark as a cloud promise. Preserve personal local data/tasks. Verify the latest private backup and confirmed PAUSED before cloud upload/start; use GET only after restart to compare original archives/PCR/OI/source times. Verify anonymous HTTP and real browsers separately. |
+| REL-038-002 | Synchronize paired Product/backend/Release/HF guides, three READMEs and the HF template. Current source/Windows release is v0.2.18; later main documentation/tests may evolve independently. Preserve v0.2.17 historical sections, historical v0.2.3 assets and published v0.2.18 tags/ZIPs/checksums without overwriting releases. Record controlled request counts/bytes/p50/p95 separately from actual timings, without treating a benchmark as a cloud promise. Preserve personal local data/tasks. Verify the latest private backup and confirmed PAUSED before cloud upload/start; use GET only after restart to compare original archives/PCR/OI/source times. Verify anonymous HTTP and real browsers separately. |
 
 Manual captures, tests and Ready plans do not establish future 17:45 execution. Reduced repeated page reads must not be described as faster provider-wide chain collection.
 

@@ -10,6 +10,8 @@ Explore U.S. options activity through daily Put/Call Ratios, 5-, 20- and 60-sess
 
 ![PCR Market Watch: market aggregates, source dates, and historical trends](site/assets/dashboard.png)
 
+**Latest Windows release: [v0.2.18](https://github.com/Rexmiao/pcr-market-watch/releases/tag/v0.2.18)**, published 2026-11-27. It includes Gamma/Max Pain, daily per-expiry archive/history support and English on first use. Configure your own market-data authorization and daily task; personal data and credentials are not bundled. Versioned sections below retain their original introduction/verification history; v0.2.3 is a historical release with unchanged assets.
+
 ## Features
 
 - **Market references:** Cboe INDEX, TOTAL, ETF/ETP, and EQUITY categories, plus stocks or ETFs you add. Every initial recommendation can be removed.
@@ -24,7 +26,7 @@ Explore U.S. options activity through daily Put/Call Ratios, 5-, 20- and 60-sess
 - **Optional moomoo integration:** Read-only market data through local desktop or separately authorized backend WebAPI. No trading or account operations are exposed.
 - **Gamma / Max Pain (v0.2.17 source):** 30-day Gamma with nearest/seven-day/all scopes, an excluding-nearest comparison, provider walls/zero-Gamma levels, and independent single-expiry Max Pain. The chart defaults to Auto to include key prices, with manual Near/All views retained. Availability depends on returned data and quote entitlements; these are model references, not observed dealer inventory or price targets.
 - **Durable structure history (v0.2.17 source):** Save each actual expiry within 30 calendar days for Gamma and single-expiry Max Pain, plus 30-day/excluding-nearest Gamma. Compare saved query days, expiries and capture times. A separate 17:45 New York task stores private database observations; sleep, permissions and collection budgets can leave explicit gaps.
-- **Saved OI by query day (v0.2.6, local/unpublished):** Exact-date gray bars, original query times, confirmed-or-unknown settlement dates, and a separate daily 17:30 ET archive task.
+- **Saved OI by query day (introduced in v0.2.6):** Exact-date gray bars, original query times, confirmed-or-unknown settlement dates, and a separate daily 17:30 ET archive task.
 - **Guest PCR and owner controls (v0.2.7 source):** Optional password-free charts and explicit data refresh, with shared 60-second update budgets. Owner login protects list/group edits and private pages; the Bucket stays private. [Hosting guide](docs/HUGGING_FACE.en.md).
 - **Options activity monitor (since v0.2.0):** Select a symbol and auto/desktop/webapi. Desktop scans at most 20 nearby strikes/40 contracts. Optional WebAPI works without the desktop client and provides provider summaries/unusual events with separate credentials and permissions.
 
@@ -215,7 +217,7 @@ Windows uses the standalone `PCR-Structure-Daily-Snapshot` task: the browser, pr
 
 Live process cache remains separate from append-only SQLite history. Private backups include the new records; storage is bounded and archives are not automatically deleted. They are not published as GitHub quote files. Guests can view current published-symbol history and safe job status; whole-list manual capture requires owner login, and an accepted request is not a completed capture. See the [backend/task guide](docs/MOOMOO_BACKEND.en.md) and [hosting limits](docs/HUGGING_FACE.en.md).
 
-The current source is **v0.2.18**; the existing GitHub **v0.2.3** installer/tag/checksums remain unchanged. Local/manual tests, real scheduled execution, cloud deployment and GET-only backup recovery require separate evidence; one does not prove the others.
+The current source and [Windows release](https://github.com/Rexmiao/pcr-market-watch/releases/tag/v0.2.18) are **v0.2.18**, including the archive/Gamma runtime described here. The historical **v0.2.3** tag/installer/checksums remain unchanged. Local/manual tests, real scheduled execution, cloud deployment and GET-only backup recovery require separate evidence; one does not prove the others.
 
 ## Application language
 
@@ -229,4 +231,4 @@ Already-read historical snapshots can be reused within the current page, and ide
 
 The backend also reduces repeated task-status database reads; successful local Windows plan metadata may lag external changes by up to 30 seconds. These changes target viewing saved data, not faster moomoo collection. Existing collection limits, quote-only permissions, private archives/backups and CPU Basic sleep limits remain. Measured request counts/timings and actual deployment are recorded separately; see the [performance contract](docs/PRODUCT_SPEC.en.md).
 
-The hosted application, administrator sign-in and GitHub Pages showcase now default to **English on a first visit**, while valid `lang=zh` or a saved Chinese preference still opens Chinese. The language control works both ways and saves the choice; README/Spec links follow the selected language. Existing historical static snapshots and English demonstration media retain their original languages. The showcase presents features/downloads; the interactive application runs on a separately deployed local or cloud backend. The existing v0.2.3 ZIP does not acquire newer source features.
+The hosted application, administrator sign-in and GitHub Pages showcase now default to **English on a first visit**, while valid `lang=zh` or a saved Chinese preference still opens Chinese. The language control works both ways and saves the choice; README/Spec links follow the selected language. Existing historical static snapshots and English demonstration media retain their original languages. The showcase presents features/downloads; the interactive application runs on a separately deployed local or cloud backend. Windows v0.2.18 includes these runtime features; later main-branch documentation/tests do not rewrite its published tag/ZIP/checksums or historical v0.2.3 assets.

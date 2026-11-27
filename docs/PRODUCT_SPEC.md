@@ -4,6 +4,8 @@
 
 日期：2026-11-27。范围：当前项目的自选名单、分组、PCR数据及变化摘要、历史比较、Gamma／Max Pain模型参考、本机与HF云端只读行情／每日OI诊断，以及GitHub Pages双语介绍页和文档入口。本文描述源码行为与本轮验收要求；源码完成、测试通过、本地运行和线上发布是不同状态。
 
+当前发布状态（2026-11-27）：[Windows v0.2.18](https://github.com/Rexmiao/pcr-market-watch/releases/tag/v0.2.18)已发布，包含伽马／最大痛苦、未来30日逐期归档与历史查看、首次英文等程序支持；个人数据、授权和任务配置不随包。旧v0.2.3及较早“未发布”说明保留当时版本的历史含义；当前发行与后续main文档／测试的边界见[发布规格](RELEASE_SPEC.md)，不覆盖既有标签或附件。
+
 维护要求：每次功能、数据口径或发布方式变更，同一批改动必须更新相关中英文 Spec；具体文档分工及完成条件见 [项目维护规则](../AGENTS.md)。
 
 本文采用用户故事、需求编号、验收场景和可核查成功标准组织内容，借鉴 [GitHub Spec Kit 官方规格模板](https://github.com/github/spec-kit/blob/main/templates/spec-template.md)。只借鉴写法，不安装 Spec Kit、OpenBB 或新的应用框架。
