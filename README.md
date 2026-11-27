@@ -100,3 +100,8 @@ Public historical snapshots support display and calculation; their own data date
 The current release runs locally. Cloud D1 storage and identity configuration require a separate deployment. GitHub Pages cannot run the SQLite or desktop moomoo backend.
 
 See [MOOMOO_BACKEND.en.md](docs/MOOMOO_BACKEND.en.md) for desktop setup, permissions, and read-only endpoints. Configure the AppKey locally; no key is distributed with the release. There is currently no persistent cloud-to-desktop bridge, AI chat, dealer GEX calculation, or order-entry feature.
+
+## Application language
+
+The app starts in English when this browser has no valid saved preference, including with a Chinese browser locale. Manually select Chinese or English to keep that choice on the same site across pages and reloads; existing saved Chinese choices remain unchanged. This does not change data, calculations, permissions or background tasks. See [LANG-001–003](docs/PRODUCT_SPEC.en.md#english-on-first-application-use-2026-11-27). Local checks and HF deployment are verified separately.
+

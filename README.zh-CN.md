@@ -99,3 +99,8 @@ v0.2.3 卡片显示供应商 BUY／SELL／NEUTRAL 分类及日期／到秒的纽
 当前发行包以本地运行方式交付。云端 D1 与身份配置需要单独部署，GitHub Pages 本身不能运行 SQLite / moomoo 后端。
 
 moomoo 的安装、权限与只读接口见 [MOOMOO_BACKEND.md](docs/MOOMOO_BACKEND.md)。AppKey 在本机单独配置，不随发布包分发。当前没有云端访问桌面 moomoo 的常驻桥，也没有 AI chat、dealer GEX 或下单功能。
+
+## 应用语言
+
+浏览器没有有效的已保存语言偏好时，应用默认英文，包括浏览器语言为中文的情况。手动选择中文或英文后，同一站点会在跨页面和刷新时保留选择；已有中文选择不重置。本次不修改数据、计算、权限或后台任务。见 [LANG-001—003](docs/PRODUCT_SPEC.md#应用首次使用英文2026-11-27)。本地检查与 HF 上线分别验证。
+

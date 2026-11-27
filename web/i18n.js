@@ -1,5 +1,5 @@
 export const LANGUAGE_KEY='pcr-dashboard:language:v1';
-let language='zh';
+let language='en';
 try {const saved=localStorage.getItem(LANGUAGE_KEY);if(saved==='en'||saved==='zh')language=saved;}catch{}
 const messages={
   categoryUnassigned:['未分类','Unassigned'],

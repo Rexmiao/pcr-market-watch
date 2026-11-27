@@ -386,3 +386,13 @@ These rules describe the showcase and documentation on `main`. The published v0.
 | [moomoo: Get The Watchlist](https://openapi.moomoo.com/moomoo-api-doc/en/quote/get-user-security.html) | The concept of reading securities by group. Official API examples are not treated as completed brokerage-watchlist synchronization. |
 
 Reference links are carried forward from the previous specification. Actual product behavior follows this project's source code and acceptance evidence; external examples are not evidence of implemented capabilities.
+
+## English on first application use (2026-11-27)
+
+| ID | Implemented behavior |
+| --- | --- |
+| LANG-001 | The application defaults to English without a valid saved language preference, regardless of browser language. Existing `pcr-dashboard:language:v1=zh` or `en` choices keep priority and are never reset. |
+| LANG-002 | Manual Chinese/English choices use the existing localStorage key in the same browser and site, surviving reloads and navigation between application pages. If storage is unavailable, switching still works for the current page and a new visit starts in English. |
+| LANG-003 | This changes only the application language default, without changing market data, source dates, calculations, permissions, trading capabilities, credentials or background tasks. The separate GitHub Pages product showcase retains its existing language rules. |
+
+Acceptance: first visits use English even with a Chinese browser locale; saved Chinese/English choices remain; manual choices survive navigation/reloads; invalid or unavailable storage falls back to English. Build and existing public-permission checks run separately. Local verification does not establish deployment; HF publication and read-only data recovery need separate evidence.
