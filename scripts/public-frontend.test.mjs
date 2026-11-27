@@ -31,7 +31,7 @@ async function fixture(readOnly,{cooldown=false,legacyLocal=false}={}){
   let settings={items:[{symbol:'NVDA',category:'semi'}],groups:watch.DEFAULT_GROUPS,revision:1,initialized:true,storage:'cloud',readOnly,canRefresh:true};
   if(legacyLocal){settings.storage='local';delete settings.readOnly;delete settings.canRefresh;}
   const archive=date=>({provider:'moomoo_webapi',status:'current',checkedAt:date+'T22:30:01Z',items:[{symbol:'NVDA',putOi:80,callOi:100,checkedAt:date+'T22:30:01Z',oiAsOf:null,oiAsOfConfirmed:false,oiBasis:'previous_session',archived:true,observationDate:date,status:'current'}]});
-  const context=vm.createContext({...model,...oi,...watch,...search,interpretPcr,renderPcrInterpretation(){},t,getLanguage:()=> 'zh',translatePage(){},initLanguageToggle(){},createCalendar:()=>({render(){}}),mountChart:(_host,config)=>({config}),
+  const context=vm.createContext({...model,...oi,...watch,...search,interpretPcr,renderPcrInterpretation(){},t:(key,params)=>t(key,params,'zh'),getLanguage:()=> 'zh',translatePage(){},initLanguageToggle(){},createCalendar:()=>({render(){}}),mountChart:(_host,config)=>({config}),
     document:{addEventListener(){},getElementById:id=>{assert(elements.has(id),'Missing HTML element '+id);return elements.get(id);},createElement:tag=>new Element(tag),querySelector:()=>new Element('section')},
     window:{dispatchEvent(){},addEventListener(){}},CustomEvent:class{constructor(type,options){this.type=type;this.detail=options?.detail;}},localStorage:{getItem:()=>null,setItem(){}},URLSearchParams,AbortSignal,AbortController,Response,console,setTimeout,clearTimeout,
     fetch:async(url,options={})=>{

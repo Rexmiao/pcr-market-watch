@@ -2,9 +2,11 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import * as model from '../web/model.js';
+import * as oi from '../web/oi-summary-model.js';
 import * as watch from '../web/watchlist-model.js';
 import * as searchModel from '../web/search-model.js';
 import {t} from '../web/i18n.js';
+import {interpretPcr} from '../web/pcr-interpretation.js';
 
 const seed=JSON.parse(fs.readFileSync(new URL('../data/seed.json',import.meta.url),'utf8'));
 const html=fs.readFileSync(new URL('../web/index.html',import.meta.url),'utf8');
@@ -27,11 +29,13 @@ async function start(server,legacy={}){
   const historyPanel=new Element('section');
   const local=new Map(Object.entries(legacy));
   const context=vm.createContext({
-    ...model,...watch,...searchModel,t,getLanguage:()=> 'zh',translatePage(){},initLanguageToggle(){},createCalendar:()=>({render(){}}),mountChart:(_host,config)=>({config}),
+    // This fixture owns watchlist behavior; use the real pure OI/PCR models
+    // while their dedicated view tests cover the interpretation DOM.
+    ...model,...oi,...watch,...searchModel,interpretPcr,renderPcrInterpretation(){},t:(key,params)=>t(key,params,'zh'),getLanguage:()=> 'zh',translatePage(){},initLanguageToggle(){},createCalendar:()=>({render(){}}),mountChart:(_host,config)=>({config}),
     document:{addEventListener(){},getElementById:id=>{assert.ok(elements.has(id),'Missing HTML element '+id);return elements.get(id);},createElement:tag=>new Element(tag),querySelector:()=>historyPanel},
     window:{dispatchEvent(){},addEventListener(){}},CustomEvent:class{constructor(type,options){this.type=type;this.detail=options?.detail;}},
     localStorage:{getItem:key=>local.get(key)??null,setItem:(key,value)=>local.set(key,value)},
-    AbortSignal,AbortController,Response,console,setTimeout,clearTimeout,
+    URLSearchParams,AbortSignal,AbortController,Response,console,setTimeout,clearTimeout,
     fetch:async(url,options={})=>{
       if(url==='/api/watchlist')return Response.json(seed);
       if(url==='/api/watchlist-settings'){

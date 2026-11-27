@@ -29,7 +29,7 @@ const payload=date=>({provider:'moomoo_webapi',status:'current',checkedAt:date+'
 const context=vm.createContext({
   // This fixture exercises OI date isolation; the separate view tests cover
   // PCR-reading DOM/tooltip behavior. Keep the real pure calculation available.
-  ...model,...oi,...watch,...search,interpretPcr,renderPcrInterpretation(){},t,getLanguage:()=> 'zh',translatePage(){},initLanguageToggle(){},createCalendar:()=>({render(){}}),mountChart:(_host,config)=>{const chart={config};mounted.push(chart);return chart;},
+  ...model,...oi,...watch,...search,interpretPcr,renderPcrInterpretation(){},t:(key,params)=>t(key,params,'zh'),getLanguage:()=> 'zh',translatePage(){},initLanguageToggle(){},createCalendar:()=>({render(){}}),mountChart:(_host,config)=>{const chart={config};mounted.push(chart);return chart;},
   document:{addEventListener(){},getElementById:id=>{assert(elements.has(id),'Missing HTML element '+id);return elements.get(id);},createElement:tag=>new Element(tag),querySelector:()=>new Element('section')},
   window:{dispatchEvent(){},addEventListener(){}},CustomEvent:class{constructor(type,options){this.type=type;this.detail=options?.detail;}},localStorage:{getItem:()=>null,setItem(){}},
   URLSearchParams,AbortSignal,AbortController,Response,console,setTimeout,clearTimeout,
