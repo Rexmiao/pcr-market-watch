@@ -10,7 +10,7 @@ license: mit
 
 # PCR Market Watch
 
-Current source and [Windows release](https://github.com/Rexmiao/pcr-market-watch/releases/tag/v0.2.18): **v0.2.18**, including Gamma/Max Pain, per-expiry archive/history and English-first runtime support. Historical **v0.2.3** assets remain unchanged; later main documentation/tests do not rewrite released tags/ZIPs/checksums. 当前源码及Windows发行均为**v0.2.18**，已含伽马／最大痛苦、逐期归档／历史与首次英文等程序；旧**v0.2.3**资产保留，后续main文档／测试不改写已发布标签／ZIP／校验值。Cloud runtime/recovery requires independent verification; 云端实际运行／恢复仍按独立发布验证记录确认。
+Current source and [Windows release](https://github.com/Rexmiao/pcr-market-watch/releases/tag/v0.2.19): **v0.2.19**, including Gamma/Max Pain, per-expiry archive/history and English-first runtime support. Historical **v0.2.3** assets remain unchanged; later main documentation/tests do not rewrite released tags/ZIPs/checksums. 当前源码及Windows发行均为**v0.2.19**，已含伽马／最大痛苦、逐期归档／历史与首次英文等程序；旧**v0.2.3**资产保留，后续main文档／测试不改写已发布标签／ZIP／校验值。Cloud runtime/recovery requires independent verification; 云端实际运行／恢复仍按独立发布验证记录确认。
 
 [English guide](../../docs/HUGGING_FACE.en.md) · [中文说明](../../docs/HUGGING_FACE.md)
 
@@ -135,8 +135,8 @@ Current hosted application/sign-in and the GitHub Pages showcase default to Engl
 
 当前托管应用／登录与GitHub Pages介绍页首次无有效URL或已存选择时默认英文，中文直达／设备偏好仍为中文，双向切换保存；文档链接对应所选语言，旧静态快照保留原语言。介绍页是静态功能／下载入口，完整交互由独立本机／云后端运行；GitHub既有v0.2.3 ZIP不变。
 
-## Interface refresh / 界面整理（v0.2.19, packaged locally, not deployed）
+## Interface refresh / 界面整理（v0.2.19）
 
-Source v0.2.19 is a front-end-only change: a dark blue-slate theme on every app page (charts and tooltips included), a homepage PCR snapshot strip (TOTAL first), a wide summary table with a sticky first column and decimal-aligned numbers, a compact floating quote bar, an English / 中文 switch showing both options, unified accent bars and PCR trend colours ordered by importance (daily gray, 5-session teal, 20-session bright blue, 60-session amber). No API, calculation, database migration, credential, quote permission, cooldown, polling or public/owner boundary changes. The Windows ZIP and this source package were built and checked locally only; the Space is not updated until the existing backup → PAUSED → upload/start → GET-only verification procedure runs. The released GitHub v0.2.18 assets stay unchanged.
+Source v0.2.19 is a front-end-only change: a dark blue-slate theme on every app page (charts and tooltips included), a homepage PCR snapshot strip (TOTAL first), a wide summary table with a sticky first column and decimal-aligned numbers, a compact floating quote bar, an English / 中文 switch showing both options, unified accent bars and PCR trend colours ordered by importance (daily gray, 5-session teal, 20-session bright blue, 60-session amber). No API, calculation, database migration, credential, quote permission, cooldown, polling or public/owner boundary changes. GitHub v0.2.19 was released by CI on 2026-11-28; the Space is updated only through the existing backup → PAUSED → upload/start → GET-only verification procedure. Released v0.2.18 assets stay unchanged.
 
-源码v0.2.19只改前端：全部应用页面改为蓝灰深色主题（含图表与悬浮提示），首页新增PCR快照指标条（TOTAL置首），摘要宽表首列固定、数字按小数点对齐，悬浮行情滚动后收为紧凑条，语言切换同时显示English／中文，色条统一，PCR趋势线按重要性配色（单日灰、5日青绿、20日亮蓝、60日琥珀）。不改API、算法、数据库迁移、凭据、行情权限、冷却、轮询或公开／所有者边界。Windows ZIP与本源包仅在本机构建和核验；Space需按既有备份→PAUSED→上传／启动→只GET核验流程执行后才更新。已发布的GitHub v0.2.18资产不变。
+源码v0.2.19只改前端：全部应用页面改为蓝灰深色主题（含图表与悬浮提示），首页新增PCR快照指标条（TOTAL置首），摘要宽表首列固定、数字按小数点对齐，悬浮行情滚动后收为紧凑条，语言切换同时显示English／中文，色条统一，PCR趋势线按重要性配色（单日灰、5日青绿、20日亮蓝、60日琥珀）。不改API、算法、数据库迁移、凭据、行情权限、冷却、轮询或公开／所有者边界。GitHub v0.2.19已于2026-11-28由CI发布；Space只按既有备份→PAUSED→上传／启动→只GET核验流程更新。已发布的v0.2.18资产不变。

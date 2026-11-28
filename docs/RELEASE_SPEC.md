@@ -1,10 +1,10 @@
-# 发布与安装规格（v0.2.18源码与Windows发行）
+# 发布与安装规格（v0.2.19源码与Windows发行）
 
 **简体中文** | [English](RELEASE_SPEC.en.md)
 
-当前公开Windows发行是[v0.2.18](https://github.com/Rexmiao/pcr-market-watch/releases/tag/v0.2.18)，包含伽马／最大痛苦、30日逐期归档／历史查看与首次英文等程序支持；个人数据库、凭证及任务配置不随包。历史v0.2.3标签与附件保留原样。
+当前公开Windows发行是[v0.2.19](https://github.com/Rexmiao/pcr-market-watch/releases/tag/v0.2.19)，在v0.2.18的伽马／最大痛苦、30日逐期归档／历史查看与首次英文等程序之上，新增深色主题、PCR快照指标条与摘要宽表整理；个人数据库、凭证及任务配置不随包。历史v0.2.3标签与附件保留原样。
 
-v0.2.18由CI于2026-11-27T07:58:47Z发布，标签对应提交[79a2cfb981b4d79f68a0f498b98d90a636e510a4](https://github.com/Rexmiao/pcr-market-watch/commit/79a2cfb981b4d79f68a0f498b98d90a636e510a4)；Windows ZIP为3,647,876字节，SHA-256清单为103字节。后续main的文档／测试／CI注册可以演进，不重写该标签、ZIP或校验清单；重复发布检查发现该Release已存在时保留原附件，不覆盖资产。更改可安装运行行为应另发新版本。
+v0.2.19由CI于2026-11-28T08:31:28Z发布，标签对应提交[b29e3a21c4ef9407078aed38dde93a89964677cc](https://github.com/Rexmiao/pcr-market-watch/commit/b29e3a21c4ef9407078aed38dde93a89964677cc)；Windows ZIP为3,706,122字节，SHA-256 `bef29f24aaa8aae5bffa27b6987071a52ca8d516729f157ab4f82708b9d26743`。v0.2.18由CI于2026-11-27T07:58:47Z发布，标签对应提交[79a2cfb981b4d79f68a0f498b98d90a636e510a4](https://github.com/Rexmiao/pcr-market-watch/commit/79a2cfb981b4d79f68a0f498b98d90a636e510a4)；Windows ZIP为3,647,876字节，SHA-256清单为103字节。后续main的文档／测试／CI注册可以演进，不重写该标签、ZIP或校验清单；重复发布检查发现该Release已存在时保留原附件，不覆盖资产。更改可安装运行行为应另发新版本。
 
 历史HF验收：v0.2.7游客PCR查看／显式更新、登录及缓存恢复已经验证；v0.2.8管理员密码范围调整、实际云端凭据轮换及原数据保留已验证。编辑和私人页面需所有者登录、Bucket私有。这些历史部署记录不代替当前安装包、云端实际运行或定时执行的独立证据。
 
@@ -358,7 +358,7 @@ v0.2.14本阶段验证补充：后端14项、前端11项、新浏览器夹具19�
 
 本批同时更新当前HF应用（含管理员登录）与GitHub Pages介绍页的首次无偏好语言为英文，保留有效URL／已存中文优先及双向切换。沿用HP与AC语言验收，核对语言对应文档链接、无存储、窄屏及历史快照原语言；不将新源码功能写成旧v0.2.3安装包已有内容。
 
-## v0.2.19：界面整理与深色主题（本机已打包，未发布）
+## v0.2.19：界面整理与深色主题（GitHub已发布）
 
 | ID | 交付与验收 |
 | --- | --- |
@@ -366,4 +366,4 @@ v0.2.14本阶段验证补充：后端14项、前端11项、新浏览器夹具19�
 | REL-039-002 | 按`npm run build`、完整`npm test`、`validate-artifact`及`scripts/package-release.py`生成`pcr-market-watch-v0.2.19-windows.zip`与`SHA256SUMS.txt`；打包前与最终ZIP各做一次文件名／敏感模式检查，再从全新解压目录以临时数据库和独立端口启动核对。HF源包由`hf-prepare.mjs`输出到项目外空目录并同样扫描。 |
 | REL-039-003 | 发布需另行执行：GitHub经既有个人仓库授权更新`main`并打v0.2.19标签，由CI生成Release附件，不覆盖v0.2.18标签／ZIP／校验值；README与介绍页的“当前发行”链接仅在v0.2.19 Release实际存在后改为v0.2.19。HF按有效私有备份→PAUSED→上传／启动→只GET核对原记录的既有流程更新，匿名HTTP与实际浏览器另行验收。 |
 
-v0.2.19本机打包记录（2026-11-28）：本机Node v26.13.1（满足22+）下构建、完整npm test各段（低优先级串行）与validate全部通过；`pcr-market-watch-v0.2.19-windows.zip`为3,706,995字节，SHA-256 `483f9957ab7cf9a5ef5139f6ed7eec7e6fe81e4b0bc813302add17cf6b844f98`，225个文件，校验清单与文件一致；不含.git／qa／release／node_modules／local-data、数据库、.env、DPAPI、密钥或令牌。全新解压后以临时数据库在独立端口启动，首页、两份主题样式、伽马与图表目录页及新图表颜色均可读取，数据库正常创建。HF源包219个文件（含SOURCE_MANIFEST），`uploaded:false`。首轮扫描曾命中`docs/GITHUB_NOTES.md`第3行的维护者本机文件夹路径（无凭据），已按维护者决定改为通用描述并重新打包；最终ZIP与HF源包扫描均0命中。本记录写入晚于打包，故ZIP内副本不含上述确切字节数与SHA-256。尚未推送GitHub、未创建Release、未更新HF Space；v0.2.18已发布资产不变。
+v0.2.19本机打包记录（2026-11-28）：本机Node v26.13.1（满足22+）下构建、完整npm test各段（低优先级串行）与validate全部通过；`pcr-market-watch-v0.2.19-windows.zip`为3,706,995字节，SHA-256 `483f9957ab7cf9a5ef5139f6ed7eec7e6fe81e4b0bc813302add17cf6b844f98`，225个文件，校验清单与文件一致；不含.git／qa／release／node_modules／local-data、数据库、.env、DPAPI、密钥或令牌。全新解压后以临时数据库在独立端口启动，首页、两份主题样式、伽马与图表目录页及新图表颜色均可读取，数据库正常创建。HF源包219个文件（含SOURCE_MANIFEST），`uploaded:false`。首轮扫描曾命中`docs/GITHUB_NOTES.md`第3行的维护者本机文件夹路径（无凭据），已按维护者决定改为通用描述并重新打包；最终ZIP与HF源包扫描均0命中。本记录写入晚于打包，故ZIP内副本不含上述确切字节数与SHA-256。其后经现有个人仓库授权（GitHub CLI细粒度令牌）推送`main`提交b29e3a2（43个文件，保留远程`.gitignore`与去除Sites项目ID的`.openai/hosting.json`，不纳入内部`docs/GITHUB_NOTES.md`）；CI的检查、Windows打包与Pages部署均成功，Release v0.2.19于2026-11-28T08:31:28Z发布为Latest，附件ZIP 3,706,122字节、SHA-256 `bef29f24aaa8aae5bffa27b6987071a52ca8d516729f157ab4f82708b9d26743`（CI在Node 22上重新构建，故与上述本机ZIP校验值不同），介绍页返回200。HF Space尚未更新；v0.2.18已发布资产不变。
