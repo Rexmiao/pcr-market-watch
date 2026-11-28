@@ -10,7 +10,7 @@ license: mit
 
 # PCR Market Watch
 
-Current source and [Windows release](https://github.com/Rexmiao/pcr-market-watch/releases/tag/v0.2.22): **v0.2.22**, including Gamma/Max Pain, per-expiry archive/history and English-first runtime support. Historical **v0.2.3** assets remain unchanged; later main documentation/tests do not rewrite released tags/ZIPs/checksums. 当前源码及Windows发行均为**v0.2.22**，已含伽马／最大痛苦、逐期归档／历史与首次英文等程序；旧**v0.2.3**资产保留，后续main文档／测试不改写已发布标签／ZIP／校验值。Cloud runtime/recovery requires independent verification; 云端实际运行／恢复仍按独立发布验证记录确认。
+Current source and [Windows release](https://github.com/Rexmiao/pcr-market-watch/releases/tag/v0.2.23): **v0.2.23**, including Gamma/Max Pain, per-expiry archive/history and English-first runtime support. Historical **v0.2.3** assets remain unchanged; later main documentation/tests do not rewrite released tags/ZIPs/checksums. 当前源码及Windows发行均为**v0.2.23**，已含伽马／最大痛苦、逐期归档／历史与首次英文等程序；旧**v0.2.3**资产保留，后续main文档／测试不改写已发布标签／ZIP／校验值。Cloud runtime/recovery requires independent verification; 云端实际运行／恢复仍按独立发布验证记录确认。
 
 [English guide](../../docs/HUGGING_FACE.en.md) · [中文说明](../../docs/HUGGING_FACE.md)
 
