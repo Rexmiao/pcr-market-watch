@@ -11,6 +11,7 @@ function element(tag){
   const node={tagName:tag.toUpperCase(),attributes:{},children:[],listeners:{},style:{},className:'',textContent:'',title:'',type:'',parent:null,
     setAttribute(name,value){this.attributes[name]=String(value);},
     getAttribute(name){return name in this.attributes?this.attributes[name]:null;},
+    get firstChild(){return this.children[0]||null;},
     appendChild(child){detach(child);child.parent=this;this.children.push(child);return child;},
     insertBefore(child,before){detach(child);child.parent=this;const at=before?this.children.indexOf(before):-1;if(at<0)this.children.push(child);else this.children.splice(at,0,child);return child;},
     addEventListener(type,fn){(this.listeners[type]??=[]).push(fn);},
@@ -58,14 +59,17 @@ test('night is the default mode and a valid saved choice is applied before paint
 
 test('the switch sits before the language switch, presses the current mode and is bilingual',()=>{
   let h=harness({lang:'en'});
-  const tools=h.nav.children[0];assert.equal(tools.className,'nav-tools');assert.equal(h.nav.children.length,1);
+  const hub=h.nav.children[0];assert.equal(hub.className,'hub-link');assert.equal(hub.href,'https://levyquant.ai/');assert.equal(hub.textContent,'Lévy Quant');assert.equal(hub.title,'Back to the Lévy Quant main site');
+  const tools=h.nav.children[1];assert.equal(tools.className,'nav-tools');assert.equal(h.nav.children.length,2,'Hub link first, then the switches');
   assert.equal(tools.children[0],h.group);assert.equal(tools.children[1].className,'language-switch','Both switches wrap together, day/night first');
   assert.equal(h.group.className,'language-switch theme-switch');assert.equal(h.group.getAttribute('role'),'group');assert.equal(h.group.getAttribute('aria-label'),'Display mode');
   assert.deepEqual(h.buttons.map(b=>[b.getAttribute('data-theme-mode'),b.textContent,b.getAttribute('aria-pressed'),b.type]),[['light','Day','false','button'],['dark','Night','true','button']]);
   h=harness({lang:'zh-CN',stored:'light'});
   assert.equal(h.group.getAttribute('aria-label'),'显示模式');
   assert.deepEqual(h.buttons.map(b=>[b.textContent,b.getAttribute('aria-pressed'),b.title]),[['日间','true','切换到日间模式'],['夜间','false','切换到夜间模式']]);
+  assert.equal(h.nav.children[0].textContent,'Lévy Quant 主站');
   h.root.lang='en';h.windowListeners['pcr-language-change'].forEach(fn=>fn({}));assert.deepEqual(h.buttons.map(b=>b.textContent),['Day','Night'],'Labels follow a language change');
+  assert.equal(h.nav.children[0].textContent,'Lévy Quant','The hub link label follows the language too');
 });
 
 test('choosing a mode applies, saves, mirrors the cookie and announces it once',()=>{

@@ -16,7 +16,7 @@ function run(args,{env=process.env}={}){return new Promise((accept,reject)=>{
 async function request(path,{auth=true,...init}={}){return fetch(origin+path,{...init,headers:{...(auth?{authorization:'Basic '+Buffer.from('pcr:'+password).toString('base64')}:{}) ,...init.headers},signal:AbortSignal.timeout(10000)});}
 let started=false;
 try{
-  await run(['run','-d','--name',container,'-p','127.0.0.1:8796:7860','--env','PCR_CLOUD_PASSWORD','--env','PCR_CLOUD_PUBLIC_ORIGIN='+origin,process.env.PCR_HF_IMAGE||'pcr-market-watch-hf:0.2.22'],{env:{...process.env,PCR_CLOUD_PASSWORD:password}});started=true;
+  await run(['run','-d','--name',container,'-p','127.0.0.1:8796:7860','--env','PCR_CLOUD_PASSWORD','--env','PCR_CLOUD_PUBLIC_ORIGIN='+origin,process.env.PCR_HF_IMAGE||'pcr-market-watch-hf:0.2.23'],{env:{...process.env,PCR_CLOUD_PASSWORD:password}});started=true;
   let ready=false;
   for(let i=0;i<30;i++){
     try{if((await request('/',{auth:false})).status===401){ready=true;break;}}catch{}

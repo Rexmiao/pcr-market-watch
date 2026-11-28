@@ -843,6 +843,7 @@ v0.2.14本阶段验证补充：后端14项、前端11项、新浏览器夹具19�
 | UI-019-011 | 日间／夜间模式（v0.2.20，GitHub与HF已发布）：全部6个应用页面在`<head>`最先加载`theme-mode.js`，于样式生效前按`localStorage`（`pcr-dashboard:theme:v1`）或同名功能cookie镜像设置`<html data-theme>`，默认夜间、无效值回退夜间；导航末端`.nav-tools`把“日间／夜间（Day／Night）”分段按钮与English／中文放在一起，窄屏整体换行、右对齐，当前项`aria-pressed`。`theme-dark.css`全部选择器限定为`:root[data-theme="dark"]`，夜间外观与v0.2.19逐元素一致；日间为`theme.css`浅色设计，弱化文字色加深为#737f91以提高可读性。切换时写入选择及功能cookie `pcr-theme`（仅light／dark，无个人信息；内嵌huggingface.co时为SameSite=None; Secure; Partitioned，否则Lax），广播`pcr-theme-change`，首页、市场历史与伽马页图表即时重绘，其他标签页经storage事件同步。图表配色按模式区分并保持同一主次（夜间：单日#6b7686／5日#2fbfa8／20日#5a9bff／60日#f2a541；日间：#9aa3b0／#12867a／#2563c9／#d9771e）。登录页受CSP限制不运行脚本，由网关读取`pcr-theme=light`在服务端输出日间样式，否则追加夜间样式；HTML标签、CSP、CSRF与会话cookie不变。不改API、算法、数据库、权限或轮询。 |
 | UI-019-012 | 自定义域名（v0.2.21，2026-11-28已上线）：应用可经用户选定的`option-chain-watcher.levyquant.ai`访问，与默认hf.space地址并存；两处各自保存登录会话（Cookie按主机隔离），日间／夜间与语言偏好也按地址分别保存。安全规则见Release Spec REL-041。 |
 | UI-019-013 | 登录页记住语言（v0.2.22）：私人工作台登录页与私人页面登录框跟随应用中最后使用的语言（经`pcr-lang`功能cookie），`?lang=`优先，首次无选择仍默认英文。规则见Release Spec REL-042。 |
+| UI-019-014 | 主站入口（v0.2.23）：全部应用页面导航最前面为指向 https://levyquant.ai/ 的“Lévy Quant 主站”（英文“Lévy Quant”）链接。规则见Release Spec REL-043。 |
 
 | 编号 | v0.2.19候选验收 |
 | --- | --- |

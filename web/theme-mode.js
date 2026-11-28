@@ -6,9 +6,10 @@
 (function(){
   var KEY='pcr-dashboard:theme:v1',COOKIE='pcr-theme',root=document.documentElement;
   var WORDS={
-    zh:{group:'显示模式',light:'日间',dark:'夜间',lightHelp:'切换到日间模式',darkHelp:'切换到夜间模式'},
-    en:{group:'Display mode',light:'Day',dark:'Night',lightHelp:'Switch to day mode',darkHelp:'Switch to night mode'}
+    zh:{group:'显示模式',light:'日间',dark:'夜间',lightHelp:'切换到日间模式',darkHelp:'切换到夜间模式',hub:'Lévy Quant 主站',hubHelp:'返回 Lévy Quant 主站'},
+    en:{group:'Display mode',light:'Day',dark:'Night',lightHelp:'Switch to day mode',darkHelp:'Switch to night mode',hub:'Lévy Quant',hubHelp:'Back to the Lévy Quant main site'}
   };
+  var HUB='https://levyquant.ai/';
   function valid(value){return value==='light'||value==='dark';}
   function saved(){try{var value=localStorage.getItem(KEY);if(valid(value))return value;}catch(error){}
     var match=/(?:^|;\s*)pcr-theme=(light|dark)(?:;|$)/.exec(document.cookie||'');return match?match[1]:'dark';}
@@ -31,7 +32,9 @@
     try{document.cookie='pcr-lang='+value+cookieAttributes();}catch(error){}
   }
   function words(){return WORDS[String(root.lang||'').toLowerCase().indexOf('zh')===0?'zh':'en'];}
+  function renderHub(link){var copy=words();if(link.textContent!==copy.hub)link.textContent=copy.hub;link.title=copy.hubHelp;}
   function render(group){
+    var hub=document.querySelector('.hub-link');if(hub)renderHub(hub);
     var copy=words(),mode=current(),buttons=group.querySelectorAll('[data-theme-mode]');
     group.setAttribute('aria-label',copy.group);
     for(var index=0;index<buttons.length;index++){
@@ -50,6 +53,11 @@
   function mount(){
     var nav=document.querySelector('.site-nav');
     if(!nav||nav.querySelector('.theme-switch'))return;
+    // Every Lévy Quant site links back to the hub; first in the nav so it wraps
+    // with the page links instead of crowding the switches on phones.
+    var hub=document.createElement('a');
+    hub.className='hub-link';hub.href=HUB;hub.setAttribute('data-skip-i18n','');
+    nav.insertBefore(hub,nav.firstChild);
     var group=document.createElement('div');
     // Shares the language switch's segmented-control styles (light and dark).
     group.className='language-switch theme-switch';

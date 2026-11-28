@@ -158,3 +158,9 @@ The gateway trusts the custom domains HF lists for this Space in `HF_SPACE_HOST`
 The sign-in page follows the language you last used in the app through a functional `pcr-lang` cookie (zh/en only); a `?lang=` link still wins.
 
 登录页通过只含zh／en的功能cookie `pcr-lang`跟随你在应用中最后使用的语言；带`?lang=`的链接仍然优先。
+
+## Main-site link / 主站入口（v0.2.23）
+
+Every page starts its navigation with a link back to the Lévy Quant main site, https://levyquant.ai/.
+
+每个页面的导航最前面都有回到 Lévy Quant 主站 https://levyquant.ai/ 的链接。

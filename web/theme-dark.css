@@ -312,3 +312,7 @@
 
 /* Scrollbars */
 :root[data-theme="dark"]{scrollbar-color:#334253 var(--bg)}
+
+/* Hub link (theme-mode.js): as prominent as in day mode. */
+:root[data-theme="dark"] .site-nav a.hub-link{color:var(--ink)}
+:root[data-theme="dark"] .site-nav a.hub-link:hover{color:var(--link)}
