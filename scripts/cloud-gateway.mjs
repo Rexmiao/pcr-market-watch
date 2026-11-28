@@ -16,11 +16,30 @@ export function cloudConfig(env=process.env){
   if(!/^[A-Za-z0-9_-]{1,64}$/.test(username)||password.length<10||password.length>256||/[\r\n\0]/.test(password))throw Error('Configure a private cloud login with a password of 10 to 256 characters.');
   const port=Number(env.PORT||7860),internalPort=Number(env.PCR_INTERNAL_PORT||8765);
   if(![port,internalPort].every(p=>Number.isInteger(p)&&p>=1024&&p<=65535)||port===internalPort)throw Error('Choose separate valid public and internal ports.');
-  const rawOrigin=env.PCR_CLOUD_PUBLIC_ORIGIN||(env.SPACE_HOST?'https://'+env.SPACE_HOST:'');
+  // HF lists the default *.hf.space host first, then any custom domain bound to this
+  // Space, comma-separated (HF_SPACE_HOST; SPACE_HOST carries the same value).
+  const hosts=spaceHosts(env.HF_SPACE_HOST||env.SPACE_HOST);
+  const rawOrigin=env.PCR_CLOUD_PUBLIC_ORIGIN||(hosts.primary?'https://'+hosts.primary:'');
   let url;try{url=new URL(rawOrigin);}catch{throw Error('Set the exact public Space origin.');}
   if(url.origin!==rawOrigin||url.username||url.password||url.protocol!=='https:'&&!(url.protocol==='http:'&&['127.0.0.1','localhost'].includes(url.hostname)))throw Error('Use an HTTPS Space origin or a loopback origin for local testing.');
-  return {username,password,port,internalPort,publicOrigin:url.origin,internalOrigin:'http://127.0.0.1:'+internalPort};
+  const appOrigins=[...new Set([url.origin,...hosts.extra.map(host=>'https://'+host)])];
+  return {username,password,port,internalPort,publicOrigin:url.origin,appOrigins,internalOrigin:'http://127.0.0.1:'+internalPort};
 }
+// Bound custom domains become additional same-app origins, so sign-in, sign-out and
+// refreshes work on them as on the default host. Hosts must be exact lowercase DNS
+// names; any malformed entry, or more than five extras, trusts no extra origin (fail
+// closed, matching the LevyQuant digest's DIGEST_ADMIN_ORIGINS rule).
+const HOST_NAME=/^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
+export function spaceHosts(value){
+  if(typeof value!=='string'||!value.trim()||value.length>1024)return {primary:null,extra:[]};
+  const entries=value.split(',').map(entry=>entry.trim());
+  const primary=HOST_NAME.test(entries[0])?entries[0]:null;
+  const rest=entries.slice(1);
+  if(!primary||rest.length>5||rest.some(entry=>!HOST_NAME.test(entry)))return {primary,extra:[]};
+  return {primary,extra:[...new Set(rest)].filter(host=>host!==primary)};
+}
+function appOrigin(config,origin){return typeof origin==='string'&&(config.appOrigins||[config.publicOrigin]).includes(origin);}
+function requestOrigin(config,host){const value=String(host||'').toLowerCase();return (config.appOrigins||[config.publicOrigin]).find(origin=>new URL(origin).host===value)||config.publicOrigin;}
 export function cloudAuthorized(header,{username,password}){
   if(typeof header!=='string'||header.length>1024||!/^Basic [A-Za-z0-9+/]+={0,2}$/.test(header))return false;
   let value;try{value=Buffer.from(header.slice(6),'base64').toString('utf8');}catch{return false;}
@@ -54,7 +73,7 @@ function loginLanguage(url){
 function loginRoute(language){return '/_pcr/login'+(language?'?lang='+language:'');}
 function loginDestination(language){return '/'+(language?'?lang='+language:'');}
 function loginTheme(cookie){return /(?:^|;\s*)pcr-theme=light(?:;|$)/.test(String(cookie||''))?'light':'dark';}
-function loginDocument(config,{failed=false,csrfNonce='',language=null,theme='dark'}={}){
+function loginDocument(config,{failed=false,csrfNonce='',language=null,theme='dark',origin=config.publicOrigin}={}){
   const chinese=language==='zh',copy=chinese?{
     title:'PCR · 私人工作台',heading:'私人 PCR 工作台',intro:'请登录后查看数据。',
     failure:'登录信息不正确或页面已过期，请重试。',username:'用户名',password:'密码',submit:'登录',
@@ -67,7 +86,7 @@ function loginDocument(config,{failed=false,csrfNonce='',language=null,theme='da
   const action=loginRoute(language),switchRoute=loginRoute(copy.switchLanguage);
   // Night is the default display mode (theme-mode.js); the app's pcr-theme=light cookie selects day.
   const night=theme!=='light'?'html{color-scheme:dark;color:#e8edf3;background:#0b1118}main{background:#121a24;border-color:#25313f}p{color:#9aa6b5}input{color:#e8edf3;background:#0f1620;border-color:#2e3b4a}button{background:#3f82ec;border-color:#3f82ec}input:focus,button:focus,.lang a:focus{outline-color:#6aa2ff}.error{color:#ff929b}a{color:#7fb0ff}.lang{background:#172130;border-color:#2e3b4a}.lang a{color:#9aa6b5}.lang a:hover{background:#1b2633;color:#e8edf3}.lang span{background:#121a24;color:#e8edf3;box-shadow:0 0 0 1px #2e3b4a}':'';
-  return `<!doctype html><html lang="${chinese?'zh-CN':'en'}"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${copy.title}</title><style>html{font:16px/1.55 system-ui,sans-serif;color:#182b49;background:#f4f7fc}body{margin:0;padding:2rem 1rem}main{max-width:26rem;margin:2rem auto;background:white;border:1px solid #d8e1ed;border-radius:16px;padding:1.5rem;box-sizing:border-box}h1{font-size:1.5rem;line-height:1.35;margin-top:0}p{color:#536580}label{display:block;margin:1rem 0 .4rem}input,button{font:inherit;box-sizing:border-box;width:100%;padding:.75rem;border:1px solid #b8c7db;border-radius:8px}button{margin-top:1.25rem;color:white;background:#213653;border-color:#213653;cursor:pointer}input:focus,button:focus{outline:3px solid #8bb2eb;outline-offset:2px}.error{color:#a51a35}a{color:#205baf}.lang{display:flex;width:max-content;margin:0 0 1rem auto;gap:2px;padding:3px;border:1px solid #d7dfeb;border-radius:10px;background:#eef2f7}.lang a,.lang span{display:block;min-width:4.25rem;padding:.4rem .75rem;border-radius:7px;font-size:.875rem;line-height:1.2;text-align:center;text-decoration:none;color:#4d5d76}.lang a:hover{background:#e2e8f1;color:#21334f}.lang a:focus{outline:3px solid #8bb2eb;outline-offset:1px}.lang span{background:white;color:#21334f;font-weight:600;box-shadow:0 1px 2px #21334f1f,0 0 0 1px #d2dbe8}${night}</style><main><nav class="lang" aria-label="${chinese?'语言':'Language'}">${chinese?`<a href="${switchRoute}" lang="en" hreflang="en" aria-label="${copy.switchHelp}">${copy.switchLabel}</a><span aria-current="true" lang="zh-CN">中文</span>`:`<span aria-current="true" lang="en">English</span><a href="${switchRoute}" lang="zh-CN" hreflang="zh-CN" aria-label="${copy.switchHelp}">${copy.switchLabel}</a>`}</nav><h1>${copy.heading}</h1><p>${copy.intro}</p>${failed?'<p class="error" role="alert">'+copy.failure+'</p>':''}<form action="${action}" method="post"><input type="hidden" name="csrf" value="${escape(csrfNonce)}"><label for="username">${copy.username}</label><input id="username" name="username" autocomplete="username" maxlength="64" value="${escape(config.username)}" required><label for="password">${copy.password}</label><input id="password" name="password" type="password" autocomplete="current-password" maxlength="256" required><button type="submit">${copy.submit}</button></form><p><a href="${escape(config.publicOrigin+action)}" target="_blank" rel="noopener noreferrer">${copy.newWindow}</a></p></main></html>`;
+  return `<!doctype html><html lang="${chinese?'zh-CN':'en'}"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${copy.title}</title><style>html{font:16px/1.55 system-ui,sans-serif;color:#182b49;background:#f4f7fc}body{margin:0;padding:2rem 1rem}main{max-width:26rem;margin:2rem auto;background:white;border:1px solid #d8e1ed;border-radius:16px;padding:1.5rem;box-sizing:border-box}h1{font-size:1.5rem;line-height:1.35;margin-top:0}p{color:#536580}label{display:block;margin:1rem 0 .4rem}input,button{font:inherit;box-sizing:border-box;width:100%;padding:.75rem;border:1px solid #b8c7db;border-radius:8px}button{margin-top:1.25rem;color:white;background:#213653;border-color:#213653;cursor:pointer}input:focus,button:focus{outline:3px solid #8bb2eb;outline-offset:2px}.error{color:#a51a35}a{color:#205baf}.lang{display:flex;width:max-content;margin:0 0 1rem auto;gap:2px;padding:3px;border:1px solid #d7dfeb;border-radius:10px;background:#eef2f7}.lang a,.lang span{display:block;min-width:4.25rem;padding:.4rem .75rem;border-radius:7px;font-size:.875rem;line-height:1.2;text-align:center;text-decoration:none;color:#4d5d76}.lang a:hover{background:#e2e8f1;color:#21334f}.lang a:focus{outline:3px solid #8bb2eb;outline-offset:1px}.lang span{background:white;color:#21334f;font-weight:600;box-shadow:0 1px 2px #21334f1f,0 0 0 1px #d2dbe8}${night}</style><main><nav class="lang" aria-label="${chinese?'语言':'Language'}">${chinese?`<a href="${switchRoute}" lang="en" hreflang="en" aria-label="${copy.switchHelp}">${copy.switchLabel}</a><span aria-current="true" lang="zh-CN">中文</span>`:`<span aria-current="true" lang="en">English</span><a href="${switchRoute}" lang="zh-CN" hreflang="zh-CN" aria-label="${copy.switchHelp}">${copy.switchLabel}</a>`}</nav><h1>${copy.heading}</h1><p>${copy.intro}</p>${failed?'<p class="error" role="alert">'+copy.failure+'</p>':''}<form action="${action}" method="post"><input type="hidden" name="csrf" value="${escape(csrfNonce)}"><label for="username">${copy.username}</label><input id="username" name="username" autocomplete="username" maxlength="64" value="${escape(config.username)}" required><label for="password">${copy.password}</label><input id="password" name="password" type="password" autocomplete="current-password" maxlength="256" required><button type="submit">${copy.submit}</button></form><p><a href="${escape(origin+action)}" target="_blank" rel="noopener noreferrer">${copy.newWindow}</a></p></main></html>`;
 }
 export function createCloudGateway(config,{database,publicAccess=false,now=()=>Date.now(),onSecurityEvent=event=>console.warn(JSON.stringify(event))}={}){
   const failures=new Map();
@@ -88,22 +107,22 @@ export function createCloudGateway(config,{database,publicAccess=false,now=()=>D
     const finish=(code,message,extra={})=>{res.writeHead(code,{'content-type':'text/plain; charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff','referrer-policy':'no-referrer',...extra});res.end(message);};
     // no-referrer makes Chromium serialize a navigation form POST's Origin as
     // null. Preserve the real same-app Origin rather than accepting opaque POSTs.
-    const login=(status,failed=false)=>{const csrf=csrfToken(config,now());return finish(status,loginDocument(config,{failed,csrfNonce:csrf.nonce,language:loginLanguage(path),theme:loginTheme(req.headers.cookie)}),{'content-type':'text/html; charset=utf-8','referrer-policy':'strict-origin-when-cross-origin','set-cookie':cookieHeader(csrf.value,config,{name:csrfName(config),lifetime:CSRF_LIFETIME}),'content-security-policy':"default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors "+framePolicy(config)});};
+    const login=(status,failed=false)=>{const csrf=csrfToken(config,now());return finish(status,loginDocument(config,{failed,csrfNonce:csrf.nonce,language:loginLanguage(path),theme:loginTheme(req.headers.cookie),origin:requestOrigin(config,req.headers.host)}),{'content-type':'text/html; charset=utf-8','referrer-policy':'strict-origin-when-cross-origin','set-cookie':cookieHeader(csrf.value,config,{name:csrfName(config),lifetime:CSRF_LIFETIME}),'content-security-policy':"default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors "+framePolicy(config)});};
     let path;try{path=new URL(req.url,config.publicOrigin);if(path.origin!==config.publicOrigin||!req.url.startsWith('/')||req.url.startsWith('//'))throw Error();}catch{return finish(400,'Invalid request.');}
     const safe=['GET','HEAD'].includes(req.method),api=path.pathname.startsWith('/api/'),loginPost=path.pathname==='/_pcr/login'&&req.method==='POST',origin=req.headers.origin,crossSite=req.headers['sec-fetch-site']==='cross-site',trustedParent=hfEmbedding(config)&&HF_PARENTS.has(origin),navigation=safe&&!api&&req.headers['sec-fetch-mode']==='navigate'&&['document','iframe'].includes(req.headers['sec-fetch-dest']);
     const documentRequest=safe&&!api&&(path.pathname==='/'||path.pathname.endsWith('.html')||path.pathname==='/_pcr/login'||['document','iframe'].includes(req.headers['sec-fetch-dest'])||req.headers.accept?.includes('text/html'));
-    const compatibleLogin=hfEmbedding(config)&&loginPost&&(trustedParent||origin===config.publicOrigin&&crossSite);
+    const compatibleLogin=hfEmbedding(config)&&loginPost&&(trustedParent||appOrigin(config,origin)&&crossSite);
     const diagnostic=reason=>{
       if(now()-diagnosticSince>=60000){diagnosticSince=now();diagnosticCount=0;}if(diagnosticCount++>=30)return;
-      const event={event:'PCR_CLOUD_ORIGIN_DENIED',reason,method:['GET','HEAD','POST','PUT','PATCH','DELETE','OPTIONS'].includes(req.method)?req.method:'OTHER',route:loginPost||path.pathname==='/_pcr/login'?'login':path.pathname==='/_pcr/logout'?'logout':api?'api':'document',originPresent:Boolean(origin),originMatchesApp:origin===config.publicOrigin,originTrustedHfParent:trustedParent,originOpaque:origin==='null',fetchCrossSite:crossSite,fetchModeNavigate:req.headers['sec-fetch-mode']==='navigate',fetchDestFrame:['iframe','document'].includes(req.headers['sec-fetch-dest'])};
+      const event={event:'PCR_CLOUD_ORIGIN_DENIED',reason,method:['GET','HEAD','POST','PUT','PATCH','DELETE','OPTIONS'].includes(req.method)?req.method:'OTHER',route:loginPost||path.pathname==='/_pcr/login'?'login':path.pathname==='/_pcr/logout'?'logout':api?'api':'document',originPresent:Boolean(origin),originMatchesApp:appOrigin(config,origin),originTrustedHfParent:trustedParent,originOpaque:origin==='null',fetchCrossSite:crossSite,fetchModeNavigate:req.headers['sec-fetch-mode']==='navigate',fetchDestFrame:['iframe','document'].includes(req.headers['sec-fetch-dest'])};
       try{onSecurityEvent(event);}catch{}
     };
-    if(origin&&origin!==config.publicOrigin&&!(trustedParent&&navigation)&&!compatibleLogin){diagnostic('origin');return finish(403,'Same-origin requests only.');}
+    if(origin&&!appOrigin(config,origin)&&!(trustedParent&&navigation)&&!compatibleLogin){diagnostic('origin');return finish(403,'Same-origin requests only.');}
     if(crossSite&&(api||!safe)&&!compatibleLogin){diagnostic('fetch_site');return finish(403,'Same-origin requests only.');}
     if(path.pathname==='/_pcr/login'){
       if(['GET','HEAD'].includes(req.method))return login(200);
       if(req.method!=='POST')return finish(405,'Method not allowed.');
-      if(req.headers.origin!==config.publicOrigin&&!compatibleLogin){diagnostic('login_origin');return finish(403,'Same-origin requests only.');}
+      if(!appOrigin(config,req.headers.origin)&&!compatibleLogin){diagnostic('login_origin');return finish(403,'Same-origin requests only.');}
       const ip=req.socket.remoteAddress||'unknown',recent=attempts(ip);
       if(recent.count>=10)return finish(429,'Too many sign-in attempts. Please retry later.',{'retry-after':String(Math.max(1,Math.ceil((60000-(now()-recent.since))/1000)))});
       if(!/^application\/x-www-form-urlencoded(?:\s*;|$)/i.test(req.headers['content-type']||'')||Number(req.headers['content-length']||0)>2048){failAttempt(ip);return finish(400,'Invalid sign-in request.');}
@@ -119,7 +138,7 @@ export function createCloudGateway(config,{database,publicAccess=false,now=()=>D
     }
     if(path.pathname==='/_pcr/logout'){
       if(req.method!=='POST')return finish(405,'Method not allowed.');
-      if(req.headers.origin!==config.publicOrigin){diagnostic('logout_origin');return finish(403,'Same-origin requests only.');}
+      if(!appOrigin(config,req.headers.origin)){diagnostic('logout_origin');return finish(403,'Same-origin requests only.');}
       return finish(303,'Signed out.',{location:'/_pcr/login','set-cookie':[cookieHeader('',config,{clear:true}),...(hfEmbedding(config)?[cookieHeader('',config,{name:COOKIE,clear:true,embed:false})]:[])]});
     }
     // HF uses Authorization: Bearer for private Space access. App credentials

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
-import {cloudConfig,createCloudGateway} from './cloud-gateway.mjs';
+import {cloudConfig,createCloudGateway,spaceHosts} from './cloud-gateway.mjs';
 
 test('cloud deployment refuses missing login, invalid origins, and colliding ports',()=>{
   assert.throws(()=>cloudConfig({}),/password/);
@@ -31,12 +31,13 @@ test('all cloud paths require authentication, reject cross-origin API writes, an
   }finally{await Promise.all([new Promise(accept=>gateway.close(accept)),new Promise(accept=>backend.close(accept))]);}
 });
 
-async function sessionFixture({publicOrigin='https://unit-test.hf.space',username='pcr',password='a-long-test-password'}={}){
+async function sessionFixture({publicOrigin='https://unit-test.hf.space',username='pcr',password='a-long-test-password',hfSpaceHost}={}){
   let received=null,clock=Date.parse('2026-11-26T12:00:00Z');
   const events=[];
   const backend=http.createServer((req,res)=>{received={url:req.url,headers:req.headers};res.setHeader('content-type','application/json');res.end('{"ok":true}');});
   await new Promise(accept=>backend.listen(0,'127.0.0.1',accept));
-  const config={...cloudConfig({PCR_CLOUD_USERNAME:username,PCR_CLOUD_PASSWORD:password,PCR_CLOUD_PUBLIC_ORIGIN:publicOrigin}),internalPort:backend.address().port,internalOrigin:'http://127.0.0.1:'+backend.address().port};
+  const env=hfSpaceHost?{PCR_CLOUD_USERNAME:username,PCR_CLOUD_PASSWORD:password,HF_SPACE_HOST:hfSpaceHost}:{PCR_CLOUD_USERNAME:username,PCR_CLOUD_PASSWORD:password,PCR_CLOUD_PUBLIC_ORIGIN:publicOrigin};
+  const config={...cloudConfig(env),internalPort:backend.address().port,internalOrigin:'http://127.0.0.1:'+backend.address().port};
   const gateway=createCloudGateway(config,{now:()=>clock,onSecurityEvent:event=>events.push(event)});await new Promise(accept=>gateway.listen(0,'127.0.0.1',accept));
   return {config,events,origin:'http://127.0.0.1:'+gateway.address().port,auth:'Basic '+Buffer.from(username+':'+password).toString('base64'),get received(){return received;},advance(ms){clock+=ms;},async close(){await Promise.all([new Promise(accept=>gateway.close(accept)),new Promise(accept=>backend.close(accept))]);}};
 }
@@ -146,5 +147,46 @@ test('non-HF deployments keep SameSite Lax and do not trust HF parent logins',as
   const fixture=await sessionFixture({publicOrigin:'https://private.example'});try{
     const form=await csrfForm(fixture);assert(form.page.headers.get('set-cookie').includes('SameSite=Lax'));assert(!form.page.headers.get('set-cookie').includes('Partitioned'));
     assert.equal((await embeddedLogin(fixture,form)).status,403);const response=await signIn(fixture);assert.equal(response.status,303);assert(response.headers.get('set-cookie').includes('SameSite=Lax'));assert(!response.headers.get('set-cookie').includes('Partitioned'));
+  }finally{await fixture.close();}
+});
+
+const CUSTOM='option-chain-watcher.levyquant.ai',DEFAULT_HOST='unit-pcr.hf.space';
+test('HF_SPACE_HOST custom domains become extra app origins and a comma list no longer breaks startup',()=>{
+  const base={PCR_CLOUD_PASSWORD:'a-long-test-password'};
+  let config=cloudConfig({...base,SPACE_HOST:DEFAULT_HOST+','+CUSTOM});
+  assert.equal(config.publicOrigin,'https://'+DEFAULT_HOST,'SPACE_HOST mirrors HF_SPACE_HOST; its first entry stays the canonical origin');
+  assert.deepEqual(config.appOrigins,['https://'+DEFAULT_HOST,'https://'+CUSTOM]);
+  config=cloudConfig({...base,HF_SPACE_HOST:DEFAULT_HOST+', '+CUSTOM,SPACE_HOST:'ignored.hf.space'});assert.deepEqual(config.appOrigins,['https://'+DEFAULT_HOST,'https://'+CUSTOM],'HF_SPACE_HOST wins and spaces around commas are tolerated');
+  assert.deepEqual(cloudConfig({...base,HF_SPACE_HOST:DEFAULT_HOST}).appOrigins,['https://'+DEFAULT_HOST]);
+  assert.deepEqual(cloudConfig({...base,HF_SPACE_HOST:DEFAULT_HOST+','+DEFAULT_HOST}).appOrigins,['https://'+DEFAULT_HOST],'Duplicates collapse');
+  for(const bad of ['Option-Chain-Watcher.levyquant.ai','https://'+CUSTOM,CUSTOM+':8443',CUSTOM+'/x','evil example.com','*.levyquant.ai','','-bad.levyquant.ai',CUSTOM+'.'])
+    assert.deepEqual(cloudConfig({...base,HF_SPACE_HOST:DEFAULT_HOST+','+CUSTOM+','+bad}).appOrigins,['https://'+DEFAULT_HOST],bad+' must fail closed for every extra origin');
+  assert.deepEqual(cloudConfig({...base,HF_SPACE_HOST:[DEFAULT_HOST,'a.example.com','b.example.com','c.example.com','d.example.com','e.example.com','f.example.com'].join(',')}).appOrigins,['https://'+DEFAULT_HOST],'More than five extras trusts none');
+  assert.deepEqual(cloudConfig({...base,PCR_CLOUD_PUBLIC_ORIGIN:'http://127.0.0.1:7860',HF_SPACE_HOST:DEFAULT_HOST+','+CUSTOM}).appOrigins,['http://127.0.0.1:7860','https://'+CUSTOM],'An explicit origin stays canonical; bound custom domains still apply');
+  assert.throws(()=>cloudConfig({...base,HF_SPACE_HOST:'Not A Host,'+CUSTOM}),/origin/,'A malformed primary host still refuses to start');
+  assert.deepEqual(spaceHosts(undefined),{primary:null,extra:[]});assert.deepEqual(spaceHosts('x'.repeat(1025)),{primary:null,extra:[]});
+});
+
+test('sign-in, sign-out and API writes work from a bound custom domain while unknown origins stay rejected',async()=>{
+  const fixture=await sessionFixture({hfSpaceHost:DEFAULT_HOST+','+CUSTOM});try{
+    const custom='https://'+CUSTOM;
+    assert.equal((await signIn(fixture,'a-long-test-password',{origin:'https://evil.levyquant.ai'})).status,403,'Sibling subdomains are not trusted');
+    assert.equal((await signIn(fixture,'a-long-test-password',{origin:'http://'+CUSTOM})).status,403,'Scheme must match exactly');
+    assert.equal((await signIn(fixture,'wrong-unit-password',{origin:custom})).status,401,'Custom-domain origin passes the origin check');
+    const signed=await signIn(fixture,'a-long-test-password',{origin:custom});assert.equal(signed.status,303);const cookie=signed.headers.get('set-cookie').split(';')[0];
+    const write=await fetch(fixture.origin+'/api/watchlist-settings',{method:'PUT',headers:{cookie,origin:custom,'content-type':'application/json'},body:'{}'});assert.equal(write.status,200,'Authenticated writes from the custom domain reach the backend');
+    assert.equal(fixture.received.headers.origin,fixture.config.internalOrigin,'The backend still sees only the internal origin');
+    assert.equal((await fetch(fixture.origin+'/api/watchlist-settings',{method:'PUT',headers:{cookie,origin:'https://hostile.example','content-type':'application/json'},body:'{}'})).status,403);
+    const out=await fetch(fixture.origin+'/_pcr/logout',{method:'POST',redirect:'manual',headers:{cookie,origin:custom}});assert.equal(out.status,303);
+    assert(fixture.events.some(event=>event.reason==='origin'&&event.originMatchesApp===false));
+  }finally{await fixture.close();}
+});
+
+test('the sign-in page links its new-window action to the host in use, never to an unbound Host header',async()=>{
+  const fixture=await sessionFixture({hfSpaceHost:DEFAULT_HOST+','+CUSTOM});try{
+    const page=host=>new Promise((accept,reject)=>{const request=http.request(fixture.origin+'/_pcr/login',{headers:{host}},response=>{let body='';response.setEncoding('utf8');response.on('data',chunk=>body+=chunk);response.on('end',()=>accept(body));});request.on('error',reject);request.end();});
+    assert((await page(CUSTOM)).includes('href="https://'+CUSTOM+'/_pcr/login" target="_blank"'));
+    assert((await page(DEFAULT_HOST)).includes('href="https://'+DEFAULT_HOST+'/_pcr/login" target="_blank"'));
+    const spoofed=await page('attacker.example');assert(spoofed.includes('href="https://'+DEFAULT_HOST+'/_pcr/login" target="_blank"'));assert(!spoofed.includes('attacker.example'));
   }finally{await fixture.close();}
 });

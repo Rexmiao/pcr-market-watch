@@ -146,3 +146,9 @@ Source v0.2.19 is a front-end-only change: a dark blue-slate theme on every app 
 A Day/Night switch sits beside English / 中文 on every app page; night stays the default. The choice is kept in the browser and mirrored to a functional `pcr-theme` cookie (light/dark only) so the script-free sign-in page renders the same mode on the server. Chart colours follow the mode with the same hierarchy. No API, calculation, migration, credential, quote permission, cooldown, polling or public/owner boundary changes.
 
 每个应用页面在English／中文旁新增日间／夜间切换，默认仍为夜间。选择保存在浏览器，并镜像为只含light／dark的功能cookie `pcr-theme`，使不运行脚本的登录页在服务端输出相同模式；图表配色随模式切换并保持同一主次。不改API、算法、迁移、凭据、行情权限、冷却、轮询或公开／所有者边界。
+
+## Custom domain / 自定义域名（v0.2.21）
+
+The gateway trusts the custom domains HF lists for this Space in `HF_SPACE_HOST` (default host first, comma-separated; exact lowercase hosts, fail closed, at most five extras), so sign-in and refresh work on `option-chain-watcher.levyquant.ai` as on the hf.space address. Bind the domain only after this version is live, then restart once.
+
+网关信任HF在`HF_SPACE_HOST`中为本Space列出的自定义域名（默认主机在前、逗号分隔；须为精确小写主机名，格式错误即全部不信任，最多5个），因此`option-chain-watcher.levyquant.ai`上的登录与刷新与hf.space地址相同。须在本版本上线后再绑定域名，并重启一次。
