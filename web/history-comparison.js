@@ -1,4 +1,5 @@
 import {historyContext} from './history-context.js';
+import {chartPalette} from './chart-palette.js';
 
 const STORAGE_KEY='pcr-dashboard:history-comparison:v1';
 const FIELDS=['daily','r5','r20','r60'];
@@ -56,7 +57,7 @@ export function createHistoryComparison({root,onChange=()=>{}}){
       if(!config)return config;
       const currentName=String(annual.year||'—')+' · '+copy[field],previousName=String(annual.previousYear||'—')+' · '+copy[field];
       const data=annual.rows.flatMap(row=>[[row.date,currentName,row[field],row.originalDate],[row.date,previousName,row[previousField],row.previousOriginalDate||'—']]);
-      return {...config,title:(config.title||'')+' · '+copy.year,summary:copy.yearNote,columns:[copy.date,copy.series,'PCR',copy.original],rows:data,spec:{...config.spec,x:copy.date,y:'PCR',series:copy.series,yLabel:copy.axis,showLegend:true,colors:{[currentName]:'#5a9bff',[previousName]:'#8a96a8'},tooltipFields:[{field:copy.original,label:copy.original}]}};
+      return {...config,title:(config.title||'')+' · '+copy.year,summary:copy.yearNote,columns:[copy.date,copy.series,'PCR',copy.original],rows:data,spec:{...config.spec,x:copy.date,y:'PCR',series:copy.series,yLabel:copy.axis,showLegend:true,colors:{[currentName]:chartPalette().r20,[previousName]:chartPalette().previous},tooltipFields:[{field:copy.original,label:copy.original}]}};
     }
   };
 }

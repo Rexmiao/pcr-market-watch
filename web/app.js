@@ -328,6 +328,6 @@ async function initialize(){
   await loadSettings();const failures=settingsReady?await loadExtras():[];applySavedState();
   for(const control of Object.values(controls))control.disabled=false;render();if(failures.length)notice('extraFailed',{symbols:failures.join(', ')},true);
 }
-window.addEventListener('pcr-language-change',()=>{translatePage();render();});
+window.addEventListener('pcr-language-change',()=>{translatePage();render();});window.addEventListener('pcr-theme-change',()=>render());
 window.addEventListener('pcr-summary-date-select',event=>{if(event.detail?.date)selectDate(event.detail.date);});
 initialize().catch(()=>{notice('loadFailed',{},true);$('freshness').textContent=t('notLoaded');});

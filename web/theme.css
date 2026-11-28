@@ -4,7 +4,7 @@
    Price change keeps red/green; PCR change stays neutral (arrow + sign only).
    Archived static snapshots do not load it and keep their original look. */
 :root{
-  --ink:#0f1b2d;--ink-2:#34445a;--muted:#66748a;--faint:#8a96a8;
+  --ink:#0f1b2d;--ink-2:#34445a;--muted:#66748a;--faint:#737f91;
   --bg:#f4f5f7;--surface:#fff;--surface-2:#f8f9fb;--line:#e4e8ee;--line-strong:#d2d9e3;
   --brand:#0f2a4a;--brand-hover:#1d3f68;--link:#245aa0;--focus:#7aa2e0;
   --radius:12px;--radius-sm:8px;
@@ -88,6 +88,10 @@ h2{font-size:1.0625rem;font-weight:650;letter-spacing:-.01em;color:var(--ink)}
 .summary-table tbody tr:not(.summary-group):hover>*{background:#f6f8fb}
 
 .language-switch{border-color:var(--line-strong);background:#eef1f5}
+/* Day/night switch (theme-mode.js) and the language switch share one right-aligned
+   group at the end of the nav, so they wrap together on narrow screens. */
+.site-nav .nav-tools{margin-left:auto;display:inline-flex;align-items:center;gap:8px;flex-wrap:nowrap}
+.site-nav .nav-tools .language-switch{margin-left:0}
 
 /* Accent bars, unified. Page CSS loads after this file, so these rules carry a
    `main` prefix. Gamma snapshot cards get the same neutral top bar as the PCR

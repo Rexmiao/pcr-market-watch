@@ -140,3 +140,9 @@ Current hosted application/sign-in and the GitHub Pages showcase default to Engl
 Source v0.2.19 is a front-end-only change: a dark blue-slate theme on every app page (charts and tooltips included), a homepage PCR snapshot strip (TOTAL first), a wide summary table with a sticky first column and decimal-aligned numbers, a compact floating quote bar, an English / 中文 switch showing both options, unified accent bars and PCR trend colours ordered by importance (daily gray, 5-session teal, 20-session bright blue, 60-session amber). No API, calculation, database migration, credential, quote permission, cooldown, polling or public/owner boundary changes. GitHub v0.2.19 was released by CI on 2026-11-28; the Space is updated only through the existing backup → PAUSED → upload/start → GET-only verification procedure. Released v0.2.18 assets stay unchanged.
 
 源码v0.2.19只改前端：全部应用页面改为蓝灰深色主题（含图表与悬浮提示），首页新增PCR快照指标条（TOTAL置首），摘要宽表首列固定、数字按小数点对齐，悬浮行情滚动后收为紧凑条，语言切换同时显示English／中文，色条统一，PCR趋势线按重要性配色（单日灰、5日青绿、20日亮蓝、60日琥珀）。不改API、算法、数据库迁移、凭据、行情权限、冷却、轮询或公开／所有者边界。GitHub v0.2.19已于2026-11-28由CI发布；Space只按既有备份→PAUSED→上传／启动→只GET核验流程更新。已发布的v0.2.18资产不变。
+
+## Day/night mode / 日间／夜间模式（v0.2.20）
+
+A Day/Night switch sits beside English / 中文 on every app page; night stays the default. The choice is kept in the browser and mirrored to a functional `pcr-theme` cookie (light/dark only) so the script-free sign-in page renders the same mode on the server. Chart colours follow the mode with the same hierarchy. No API, calculation, migration, credential, quote permission, cooldown, polling or public/owner boundary changes.
+
+每个应用页面在English／中文旁新增日间／夜间切换，默认仍为夜间。选择保存在浏览器，并镜像为只含light／dark的功能cookie `pcr-theme`，使不运行脚本的登录页在服务端输出相同模式；图表配色随模式切换并保持同一主次。不改API、算法、迁移、凭据、行情权限、冷却、轮询或公开／所有者边界。

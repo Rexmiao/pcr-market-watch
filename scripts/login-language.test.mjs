@@ -68,6 +68,20 @@ test('language parameters preserve original origin and HF embedded CSRF protecti
   const embedded=await f.signIn('/_pcr/login?lang=zh',{fields:{csrf:nonce},headers:{origin:'https://huggingface.co','sec-fetch-site':'cross-site',cookie}});assert.equal(embedded.status,303);assert.equal(embedded.headers.get('location'),'/?lang=zh');
 });
 
+test('the sign-in page follows the app day/night cookie without scripts or HTML changes',async t=>{
+  const f=await fixture(t);
+  const night=await (await f.get('/_pcr/login')).text();
+  assert(night.includes('html{color-scheme:dark;color:#e8edf3;background:#0b1118}'),'Night is the default, matching the app');
+  assert(night.includes('<html lang="en">'));assert(!/<script/i.test(night));
+  const day=await (await fetch(f.origin+'/_pcr/login',{headers:{cookie:'other=1; pcr-theme=light'}})).text();
+  assert(!day.includes('#0b1118'),'pcr-theme=light renders the original day styles');assert(day.includes('background:#f4f7fc'));
+  for(const cookie of ['pcr-theme=LIGHT','xpcr-theme=light','pcr-theme=light%22%3E','pcr-theme="light"']){
+    const html=await (await fetch(f.origin+'/_pcr/login?lang=zh',{headers:{cookie}})).text();
+    assert(html.includes('background:#0b1118'),cookie+' falls back to night');assert(!html.includes('%22%3E'));assert(html.includes('<html lang="zh-CN">'));
+  }
+  const gated=await fetch(f.origin+'/market-brief.html',{headers:{cookie:'pcr-theme=light'}});assert.equal(gated.status,401);assert(!(await gated.text()).includes('#0b1118'),'The inline private-page gate follows the same cookie');
+});
+
 test('an unauthenticated Chinese app URL gets a Chinese login without preserving a return target',async t=>{
   const f=await fixture(t),page=await f.get('/market-brief.html?lang=zh&next=https://hostile.example'),html=await page.text();assert.equal(page.status,401);assert(html.includes('<html lang="zh-CN">'));assert.equal(form(html).action,'/_pcr/login?lang=zh');assert(!html.includes('hostile.example'));
 });

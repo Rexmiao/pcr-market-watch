@@ -215,7 +215,7 @@ export function mountMarketPcrPanel(root,text){
   });
   window.addEventListener('pcr-market-navigation-request',publishNavigation);
   find('cboe-range').addEventListener('change',()=>{range=find('cboe-range').value;rememberView();if(metric&&!isReferenceMetric(metric))void loadHistory(requestedDate);render();});
-  window.addEventListener('pcr-language-change',event=>{language=event.detail?.language==='en'?'en':'zh';render();});
+  window.addEventListener('pcr-language-change',event=>{language=event.detail?.language==='en'?'en':'zh';render();});window.addEventListener('pcr-theme-change',()=>render());
   window.addEventListener('pcr-date-change',event=>{if(event.detail?.date){requestedDate=event.detail.date;void loadSelected();render();}});
   window.addEventListener('pcr-data-refresh',()=>{if(settings.state.readOnly){void settings.load().then(()=>{if(metric&&isReferenceMetric(metric))void loadSymbol(entry().symbol,false,true);});}else if(metric&&isReferenceMetric(metric))void loadSymbol(entry().symbol,false,true);});
   render();void settings.load();
