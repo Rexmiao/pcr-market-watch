@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
-import {chartPalette,chartTheme} from '../web/chart-palette.js';
+import {chartPalette,chartTheme,structurePalette} from '../web/chart-palette.js';
 import {cboeChartConfig} from '../web/cboe-model.js';
 
 const SOURCE=readFileSync(new URL('../web/theme-mode.js',import.meta.url),'utf8');
@@ -123,4 +123,13 @@ test('chart palettes keep the same hierarchy in both modes and follow the page m
     assert.equal(config.spec.colors['Daily volume PCR'],day.daily);assert.equal(config.spec.colors['20-session volume PCR'],day.r20);assert.equal(config.spec.colors['60-session volume PCR'],day.r60);
   }finally{if(previous===undefined)delete globalThis.document;else globalThis.document=previous;}
   assert.equal(cboeChartConfig(payload,{metric:'index',range:'126',language:'en'}).spec.colors['20-session volume PCR'],night.r20);
+});
+
+test('Gamma chart colours brighten in night mode and keep the original day palette',()=>{
+  const night=structurePalette('dark'),day=structurePalette('light');
+  assert.deepEqual([day.call,day.put,day.net,day.base],['#168b68','#d34d68','#718096','#2867c7'],'Day keeps the original Gamma palette');
+  assert.equal(day.spot,'#4b5a70','The day underlying marker is a little darker for legibility');
+  assert.deepEqual([night.call,night.put,night.net,night.spot],['#34d399','#fb7185','#dbe3ee','#e8edf3'],'Night uses brighter bars, diamonds and the underlying marker');
+  assert.deepEqual([night.base,night.without,night.comparison],['#4d8ef0','#e09440','#a07ad6'],'Night series match the snapshot-card swatches');
+  assert.equal(structurePalette('sepia'),night);assert.equal(structurePalette(),night,'Outside a browser the night palette is used');
 });

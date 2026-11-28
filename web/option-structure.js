@@ -1,4 +1,5 @@
 import {getLanguage,setLanguage,initLanguageToggle} from './i18n.js';
+import {structurePalette} from './chart-palette.js';
 import {createStructureController,createStructureArchiveController,structureSymbols,structureExpiries,chartSegments,validStructureSymbol,layoutMarkerLabels,strikeBarWidths,gammaPriceDomain} from './option-structure-model.js';
 
 const copy={
@@ -18,7 +19,8 @@ const priceNumeric=value=>Number.isFinite(value)?new Intl.NumberFormat(getLangua
 const rawNumeric=value=>Number.isFinite(value)?String(value):'—';
 const compact=value=>new Intl.NumberFormat(getLanguage()==='en'?'en-US':'zh-CN',{notation:'compact',maximumFractionDigits:2}).format(value);
 function stamp(value){if(!value||!Number.isFinite(Date.parse(value)))return word('unknown');return new Intl.DateTimeFormat(getLanguage()==='en'?'en-US':'zh-CN',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date(value))+' ET';}
-const colors={base:'#2867c7',without:'#c47a24',comparison:'#8555b6',call:'#168b68',put:'#d34d68',net:'#718096',spot:'#617089',zero:'#9360ad'};
+// Read per render so charts follow the day/night mode (see chart-palette.js).
+const colors=new Proxy({},{get:(_,key)=>structurePalette()[key]});
 let symbols=[],listBusy=false,listFailed=false,canRefresh=true,canManage=false,controller,historyController,viewMode='live',captureStarting=false,captureWatch=null,captureNote=null,historyPollTimer=null,historyPollBusy=false,historyObservedRunning=false,historyPermissionContext=null;
 const getState=()=>controller.state;
 function setOptions(select,options,value){select.replaceChildren(...options.map(([v,label])=>{const option=create('option',null,label);option.value=v;return option;}));select.value=options.some(option=>option[0]===value)?value:options[0]?.[0]||'';}
@@ -51,7 +53,7 @@ function snapshotCard(snapshot,key,expiries,record){
 
 // Profile and strike contribution charts have separate horizontal axes and
 // separate scales. Missing values split paths instead of being turned into zero.
-function chart(host,{series,markers=[],xLabel,yLabel,empty,bars=false,title,displayDomain,nonNegative=false,height=300}){
+function chart(host,{series,markers=[],xLabel,yLabel,empty,bars=false,title,displayDomain,nonNegative=false,height=300,overlapBars=false}){
   host.replaceChildren();const points=series.flatMap(item=>chartSegments(item.rows,item.x,item.y).flat());
   if(!points.length){host.append(create('p','structure-empty',empty));return;}
   const W=1000,H=height,L=82,R=25,T=34,B=52,plotW=W-L-R,plotH=H-T-B;
@@ -69,10 +71,13 @@ function chart(host,{series,markers=[],xLabel,yLabel,empty,bars=false,title,disp
   add('text',{x:L,y:17,class:'structure-axis-title'},yLabel);add('text',{x:L+plotW/2,y:H-7,'text-anchor':'middle',class:'structure-axis-title'},xLabel);
   const barSeries=plotted.filter(item=>(bars||item.bar)&&!item.point),lineSeries=plotted.filter(item=>!bars&&!item.bar&&!item.point),pointSeries=plotted.filter(item=>item.point);
   if(barSeries.length){
-    const widths=strikeBarWidths(visiblePoints.map(point=>point.x),{min:minX,max:maxX,pixels:plotW,series:barSeries.length});
-    for(const [index,item]of barSeries.entries())for(const point of chartSegments(item.rows,item.x,item.y).flat()){const width=widths.get(point.x)||0,rect=add('rect',{x:x(point.x)+(index-(barSeries.length-1)/2)*width-width/2,y:Math.min(y(0),y(point.y)),width,height:Math.abs(y(point.y)-y(0)),fill:item.color,opacity:item.opacity??.88,'data-series':item.y,'data-price':point.x});const tip=document.createElementNS(ns,'title');tip.textContent=`${xLabel} ${priceNumeric(point.x)} · ${item.label}: ${rawNumeric(point.y)}`;rect.append(tip);}
+    // Overlapping bars share one full-width column (Call above zero, Put below), so dense
+    // chains stay readable; the taller bar is drawn first so a same-sign shorter one stays visible.
+    const columns=overlapBars?1:barSeries.length,widths=strikeBarWidths(visiblePoints.map(point=>point.x),{min:minX,max:maxX,pixels:plotW,series:columns});
+    const drawn=barSeries.flatMap((item,index)=>chartSegments(item.rows,item.x,item.y).flat().map(point=>({item,index,point})));if(overlapBars)drawn.sort((a,b)=>Math.abs(b.point.y)-Math.abs(a.point.y));
+    for(const {item,index,point}of drawn){const width=widths.get(point.x)||0,offset=overlapBars?0:(index-(barSeries.length-1)/2)*width,rect=add('rect',{x:x(point.x)+offset-width/2,y:Math.min(y(0),y(point.y)),width,height:Math.abs(y(point.y)-y(0)),fill:item.color,opacity:item.opacity??.9,'data-series':item.y,'data-price':point.x});const tip=document.createElementNS(ns,'title');tip.textContent=`${xLabel} ${priceNumeric(point.x)} · ${item.label}: ${rawNumeric(point.y)}`;rect.append(tip);}
   }
-  for(const item of pointSeries)for(const point of chartSegments(item.rows,item.x,item.y).flat()){const px=x(point.x),py=y(point.y),mark=add('path',{d:`M${px},${py-2.6}l2.6,2.6l-2.6,2.6l-2.6,-2.6Z`,fill:item.color,'data-series':item.y,'data-price':point.x,class:'structure-net-point'}),tip=document.createElementNS(ns,'title');tip.textContent=`${xLabel} ${priceNumeric(point.x)} · ${item.label}: ${rawNumeric(point.y)}`;mark.append(tip);}
+  for(const item of pointSeries)for(const point of chartSegments(item.rows,item.x,item.y).flat()){const px=x(point.x),py=y(point.y),r=Math.abs(py-y(0))<3?2:3.4,mark=add('path',{d:`M${px},${py-r}l${r},${r}l-${r},${r}l-${r},-${r}Z`,fill:item.color,'data-series':item.y,'data-price':point.x,class:'structure-net-point'}),tip=document.createElementNS(ns,'title');tip.textContent=`${xLabel} ${priceNumeric(point.x)} · ${item.label}: ${rawNumeric(point.y)}`;mark.append(tip);}
   for(const item of lineSeries)for(const segment of chartSegments(item.rows,item.x,item.y)){if(segment.length===1)add('circle',{cx:x(segment[0].x),cy:y(segment[0].y),r:3,fill:item.color});else add('path',{d:segment.map((point,index)=>(index?'L':'M')+x(point.x).toFixed(2)+','+y(point.y).toFixed(2)).join(' '),stroke:item.color,class:'structure-profile-line'+(item.dashed?' structure-comparison-line':'')});}
   const visible=markers.filter(marker=>Number.isFinite(marker.value)&&marker.value>0&&marker.value>=minX&&marker.value<=maxX).map(marker=>({...marker,screenX:x(marker.value),text:marker.kind==='wall'&&!marker.showLabel?'':marker.kind==='zero'?`${marker.zeroLabel||(marker.comparison?'Γ0 ex':'Γ0')} ${priceNumeric(marker.value)}`:`${marker.label.trim()} ${priceNumeric(marker.value)}`}));
   for(const marker of layoutMarkerLabels(visible,{left:L,right:W-R})){const line=add('line',{x1:marker.screenX,x2:marker.screenX,y1:T,y2:H-B,stroke:marker.color,'data-marker':marker.kind||'spot','data-value':marker.value,'stroke-opacity':marker.kind==='wall'?.45:1,class:'structure-marker'}),tip=document.createElementNS(ns,'title');tip.textContent=`${marker.label}: ${rawNumeric(marker.value)}`;line.append(tip);if(marker.labelRow!==null)add('text',{x:marker.labelX,y:T+11+marker.labelRow*15,style:'fill:'+marker.color,class:'structure-marker-label'},marker.text);}
@@ -130,7 +135,7 @@ function renderGamma(){
   const sourceRecord=$('gamma-bars-scope').value==='withoutNearest'?comparisonRecord:record;
   $('gamma-distribution-meta').textContent=`${word('spot')}: ${priceNumeric(source?.underlyingPrice)} · ${history?archiveMetadata(sourceRecord):metadata(source)} · ${word('expiries')}: ${source?.selectedExpiries?.join(' · ')||sourceRecord?.expiries?.join(' · ')||'—'}`+(priceMode==='auto'?' · '+word(distributionDomain?'distributionAutoNote':'autoPriceFallback'):priceMode==='near'&&!distributionDomain?' · '+word('priceViewFallback'):'');
   const distributionMarkers=[{value:source?.underlyingPrice,label:word('spot'),color:colors.spot},{value:source?.callWall,label:word('callWall'),color:colors.call,kind:'wall',showLabel:true},{value:source?.putWall,label:word('putWall'),color:colors.put,kind:'wall',showLabel:true}];
-  chart($('gamma-strikes'),{series:bars,markers:distributionMarkers,xLabel:word('strikeAxis'),yLabel:word('gexUnit'),empty:word(without?.reason==='NO_REMAINING_EXPIRIES'&&$('gamma-bars-scope').value==='withoutNearest'?'noRemaining':'barsMissing'),title:word('distributionTitle'),displayDomain:distributionDomain,height:360});legend($('gamma-strikes-legend'),bars);
+  chart($('gamma-strikes'),{series:bars,markers:distributionMarkers,xLabel:word('strikeAxis'),yLabel:word('gexUnit'),empty:word(without?.reason==='NO_REMAINING_EXPIRIES'&&$('gamma-bars-scope').value==='withoutNearest'?'noRemaining':'barsMissing'),title:word('distributionTitle'),displayDomain:distributionDomain,height:360,overlapBars:true});legend($('gamma-strikes-legend'),bars);
 }
 function renderPain(){
   const history=viewMode==='history',state=historyController.state,primary=state.primary.pain,comparison=state.comparison.pain,slot=getState().pain,payload=history?primary?.payload:slot.payload;

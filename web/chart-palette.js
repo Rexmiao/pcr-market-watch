@@ -16,3 +16,15 @@ export function chartTheme() {
 export function chartPalette(theme = chartTheme()) {
   return PALETTES[theme] || PALETTES.dark;
 }
+
+// Gamma / Max Pain chart colours. Night values are brightened for the dark panel and
+// match the snapshot-card swatches in theme-dark.css; day values keep the original
+// palette, with the underlying-price marker a little darker for legibility.
+const STRUCTURE = {
+  dark: {base:'#4d8ef0', without:'#e09440', comparison:'#a07ad6', call:'#34d399', put:'#fb7185', net:'#dbe3ee', spot:'#e8edf3', zero:'#c4a5f5'},
+  light: {base:'#2867c7', without:'#c47a24', comparison:'#8555b6', call:'#168b68', put:'#d34d68', net:'#718096', spot:'#4b5a70', zero:'#9360ad'},
+};
+
+export function structurePalette(theme = chartTheme()) {
+  return STRUCTURE[theme] || STRUCTURE.dark;
+}

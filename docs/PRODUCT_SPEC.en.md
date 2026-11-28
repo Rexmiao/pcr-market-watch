@@ -843,6 +843,7 @@ This section changes only homepage layout, information hierarchy and existing in
 | UI-019-012 | Custom domain (v0.2.21, live since 2026-11-28): the app is reachable at the user-chosen `option-chain-watcher.levyquant.ai` alongside the default hf.space address; each address keeps its own sign-in session (cookies are host-only), and day/night and language preferences are also stored per address. Security rules are in Release Spec REL-041. |
 | UI-019-013 | Sign-in language memory (v0.2.22): the private-workspace sign-in page and private-page prompt follow the language last used in the app (via the functional `pcr-lang` cookie); `?lang=` wins and first visits without a choice stay English. Rules in Release Spec REL-042. |
 | UI-019-014 | Main-site link (v0.2.23): every app page starts its nav with a "Lévy Quant" ("Lévy Quant 主站" in Chinese) link to https://levyquant.ai/. Rules in Release Spec REL-043. |
+| UI-019-015 | Gamma distribution contrast (v0.2.24): Call/Put bars in the distribution-by-strike chart share a wider column, night colours are brighter with dimmer grid lines, and diamonds and wall/underlying labels are clearer; day keeps its palette. Rules in Release Spec REL-044. |
 
 | ID | v0.2.19 candidate acceptance |
 | --- | --- |

@@ -316,3 +316,10 @@
 /* Hub link (theme-mode.js): as prominent as in day mode. */
 :root[data-theme="dark"] .site-nav a.hub-link{color:var(--ink)}
 :root[data-theme="dark"] .site-nav a.hub-link:hover{color:var(--link)}
+
+/* Gamma / Max Pain charts: the generator kept light SVG strokes as-is, so grid and zero
+   lines outshone the data and diamond outlines glowed white. Dim the scaffolding and outline
+   diamonds in the panel colour so bars and markers lead. */
+:root[data-theme="dark"] .structure-chart svg .structure-grid{stroke:#1e2835}
+:root[data-theme="dark"] .structure-chart svg .structure-zero{stroke:#46566a}
+:root[data-theme="dark"] .structure-net-point{stroke:var(--card)}

@@ -90,6 +90,9 @@ h2{font-size:1.0625rem;font-weight:650;letter-spacing:-.01em;color:var(--ink)}
 .language-switch{border-color:var(--line-strong);background:#eef1f5}
 /* Day/night switch (theme-mode.js) and the language switch share one right-aligned
    group at the end of the nav, so they wrap together on narrow screens. */
+/* Gamma / Max Pain chart marker labels (call wall, put wall, underlying) keep a halo in
+   the panel colour so they stay legible where they cross dashed markers and bars. */
+.structure-chart svg .structure-marker-label{paint-order:stroke;stroke:var(--card,#fff);stroke-width:4px;stroke-linejoin:round}
 /* Link back to the Lévy Quant hub, first in the nav and set apart by a divider. */
 .site-nav a.hub-link{font-weight:650;color:var(--ink);padding-right:22px;border-right:1px solid var(--line-strong);margin-right:0}
 .site-nav a.hub-link:hover{color:var(--link)}

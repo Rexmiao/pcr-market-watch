@@ -164,3 +164,9 @@ The sign-in page follows the language you last used in the app through a functio
 Every page starts its navigation with a link back to the Lévy Quant main site, https://levyquant.ai/.
 
 每个页面的导航最前面都有回到 Lévy Quant 主站 https://levyquant.ai/ 的链接。
+
+## Gamma chart contrast / 伽马图对比度（v0.2.24）
+
+The Gamma distribution-by-strike chart is easier to read, especially in night mode: wider Call/Put bars, brighter colours, dimmer grid lines, clearer diamonds and haloed marker labels. Values are unchanged.
+
+伽马按行权价分布图更易读（尤其夜间）：Call／Put 柱更宽、颜色更亮、网格线更暗、菱形与标记标签更清楚；数值不变。
