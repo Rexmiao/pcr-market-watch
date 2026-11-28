@@ -1,10 +1,10 @@
-# 发布与安装规格（v0.2.20源码与Windows发行）
+# 发布与安装规格（v0.2.21源码与Windows发行）
 
 **简体中文** | [English](RELEASE_SPEC.en.md)
 
-当前公开Windows发行是[v0.2.20](https://github.com/Rexmiao/pcr-market-watch/releases/tag/v0.2.20)，在v0.2.19深色主题之上新增日间／夜间切换；v0.2.19则在v0.2.18的伽马／最大痛苦、30日逐期归档／历史查看与首次英文等程序之上，新增深色主题、PCR快照指标条与摘要宽表整理；个人数据库、凭证及任务配置不随包。历史v0.2.3标签与附件保留原样。
+当前公开Windows发行是[v0.2.21](https://github.com/Rexmiao/pcr-market-watch/releases/tag/v0.2.21)，新增自定义域名来源支持；v0.2.20在v0.2.19深色主题之上新增日间／夜间切换；v0.2.19则在v0.2.18的伽马／最大痛苦、30日逐期归档／历史查看与首次英文等程序之上，新增深色主题、PCR快照指标条与摘要宽表整理；个人数据库、凭证及任务配置不随包。历史v0.2.3标签与附件保留原样。
 
-v0.2.20由CI于2026-11-28T09:38:48Z发布，标签对应提交[341b78eb181e0df188dab49d130bf42e0d00ebde](https://github.com/Rexmiao/pcr-market-watch/commit/341b78eb181e0df188dab49d130bf42e0d00ebde)；Windows ZIP为3,724,407字节，SHA-256 `a8c9f4922dbd356643ee84e7168b05f53e9d4bb1a05ebc51f542b47ae2abf820`。v0.2.19由CI于2026-11-28T08:31:28Z发布，标签对应提交[b29e3a21c4ef9407078aed38dde93a89964677cc](https://github.com/Rexmiao/pcr-market-watch/commit/b29e3a21c4ef9407078aed38dde93a89964677cc)；Windows ZIP为3,706,122字节，SHA-256 `bef29f24aaa8aae5bffa27b6987071a52ca8d516729f157ab4f82708b9d26743`。v0.2.18由CI于2026-11-27T07:58:47Z发布，标签对应提交[79a2cfb981b4d79f68a0f498b98d90a636e510a4](https://github.com/Rexmiao/pcr-market-watch/commit/79a2cfb981b4d79f68a0f498b98d90a636e510a4)；Windows ZIP为3,647,876字节，SHA-256清单为103字节。后续main的文档／测试／CI注册可以演进，不重写该标签、ZIP或校验清单；重复发布检查发现该Release已存在时保留原附件，不覆盖资产。更改可安装运行行为应另发新版本。
+v0.2.21由CI于2026-11-28T10:11:49Z发布，标签对应提交[0cd70dccb471e1e84a57f0648c53da2d69fe8649](https://github.com/Rexmiao/pcr-market-watch/commit/0cd70dccb471e1e84a57f0648c53da2d69fe8649)；Windows ZIP为3,728,995字节，SHA-256 `929ecb4fb521bd2a75235d3b54a8c7528d68cc5d9218edb8fd6ef785512a2738`。v0.2.20由CI于2026-11-28T09:38:48Z发布，标签对应提交[341b78eb181e0df188dab49d130bf42e0d00ebde](https://github.com/Rexmiao/pcr-market-watch/commit/341b78eb181e0df188dab49d130bf42e0d00ebde)；Windows ZIP为3,724,407字节，SHA-256 `a8c9f4922dbd356643ee84e7168b05f53e9d4bb1a05ebc51f542b47ae2abf820`。v0.2.19由CI于2026-11-28T08:31:28Z发布，标签对应提交[b29e3a21c4ef9407078aed38dde93a89964677cc](https://github.com/Rexmiao/pcr-market-watch/commit/b29e3a21c4ef9407078aed38dde93a89964677cc)；Windows ZIP为3,706,122字节，SHA-256 `bef29f24aaa8aae5bffa27b6987071a52ca8d516729f157ab4f82708b9d26743`。v0.2.18由CI于2026-11-27T07:58:47Z发布，标签对应提交[79a2cfb981b4d79f68a0f498b98d90a636e510a4](https://github.com/Rexmiao/pcr-market-watch/commit/79a2cfb981b4d79f68a0f498b98d90a636e510a4)；Windows ZIP为3,647,876字节，SHA-256清单为103字节。后续main的文档／测试／CI注册可以演进，不重写该标签、ZIP或校验清单；重复发布检查发现该Release已存在时保留原附件，不覆盖资产。更改可安装运行行为应另发新版本。
 
 历史HF验收：v0.2.7游客PCR查看／显式更新、登录及缓存恢复已经验证；v0.2.8管理员密码范围调整、实际云端凭据轮换及原数据保留已验证。编辑和私人页面需所有者登录、Bucket私有。这些历史部署记录不代替当前安装包、云端实际运行或定时执行的独立证据。
 
@@ -386,3 +386,7 @@ v0.2.20 HF实际更新记录（2026-11-28）：经HF官方浏览器设备登录�
 | --- | --- |
 | REL-041-001 | 网关从HF运行时变量`HF_SPACE_HOST`（缺省时`SPACE_HOST`）读取主机列表：第一项为规范主地址，其余为已绑定到本Space的自定义域名；全部条目须为精确小写DNS名，任一格式错误或超过5个额外域名时不信任任何额外来源（与LevyQuant日报`DIGEST_ADMIN_ORIGINS`规则一致）。登录、退出、公开刷新及已登录写入在这些来源上与默认hf.space相同，其他来源仍403；登录页“在新窗口打开”使用当前访问的已绑定主机，伪造Host不生效。同时修复`SPACE_HOST`含逗号时网关无法启动的问题。HF嵌入cookie、CSP、CSRF及后端只见内部来源均不变。 |
 | REL-041-002 | 目标域名为用户选定的`option-chain-watcher.levyquant.ai`：Cloudflare CNAME指向`hf.space`（仅DNS），在v0.2.21上线后再于Space设置绑定，绑定后重启一次使运行时变量包含该域名；验收在新域名上分别核对浏览、登录、刷新与默认hf.space不受影响。 |
+
+v0.2.21由CI于2026-11-28T10:11:49Z发布（提交`0cd70dc`），ZIP为3,728,995字节，SHA-256 `929ecb4fb521bd2a75235d3b54a8c7528d68cc5d9218edb8fd6ef785512a2738`；HF Space已更新为v0.2.21（提交`006418e`），暂停前后备份未变、只GET核对原记录一致。自定义域名的Cloudflare记录与Space绑定由用户另行完成后再核验。
+
+发布说明修正：CI此前以整份`docs/RELEASE_SPEC.md`作为Release正文，其中14个相对链接（含English切换）在Release页面失效，且标题落后一个版本。现为每个版本在`docs/release-notes/v<版本>.md`维护简洁的中英双语说明（全部为指向该版本标签的绝对链接），发布流程优先使用该文件、缺失时才回退；v0.2.19至v0.2.21的Release正文已替换（安装包、标签与校验值不变）。

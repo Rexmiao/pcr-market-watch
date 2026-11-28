@@ -36,9 +36,13 @@ jobs:
             echo "Version v$VERSION already exists; keeping its original assets."
             exit 0
           fi
+          # Prefer the concise bilingual notes for this version; the full release spec has
+          # repository-relative links that do not resolve on the Release page.
+          NOTES="docs/release-notes/v$VERSION.md"
+          [ -f "$NOTES" ] || NOTES=docs/RELEASE_SPEC.md
           gh release create "v$VERSION" \
             "release/pcr-market-watch-v$VERSION-windows.zip" \
             "release/SHA256SUMS.txt" \
             --target "$RELEASE_COMMIT" \
             --title "PCR Market Watch v$VERSION" \
-            --notes-file docs/RELEASE_SPEC.md
+            --notes-file "$NOTES"
