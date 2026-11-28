@@ -109,7 +109,7 @@ A private **Hugging Face Docker Space** package is prepared with Node 22/Python 
 
 ## v0.2.7 HF cloud: guest PCR reading and refresh
 
-[Space](https://huggingface.co/spaces/Rexymiao/pcr-market-watch) · [Application](https://rexymiao-pcr-market-watch.hf.space) · [Hosting guide](docs/HUGGING_FACE.en.md)
+[Space](https://huggingface.co/spaces/Rexymiao/pcr-market-watch) · [Application](https://option-chain-watcher.levyquant.ai) (also [rexymiao-pcr-market-watch.hf.space](https://rexymiao-pcr-market-watch.hf.space)) · [Hosting guide](docs/HUGGING_FACE.en.md)
 
 The user selected a public Space with password-free PCR charts and explicit source updates. PCR_PUBLIC_VIEW=1 enables the new guest mode; its code/container/frontend checks pass, and actualHF anonymous HTTP/24 realEdge checks have passed. Generic Docker defaults to0. Owner login still protects adding/removing symbols, groups, market-reference configuration, administration and private pages. Public preferences are readOnly:true/canRefresh:true: configuration is read-only, data refresh is allowed.
 
@@ -166,7 +166,7 @@ v0.2.9 source daaf0dd passed actual HF checks: 99 Node cases plus model/source c
 
 ## Quote-overview shortcuts (v0.2.11)
 
-The quote card provides four shortcuts: [Market PCR](https://rexymiao-pcr-market-watch.hf.space/#cboe-panel), [Index ETFs](https://rexymiao-pcr-market-watch.hf.space/#market-etf-reference), [Watchlist](https://rexymiao-pcr-market-watch.hf.space/#watchlist-panel) and [Symbol history](https://rexymiao-pcr-market-watch.hf.space/#history-panel). This replaces v0.2.10's top-navigation Watchlist entry. The shortcuts remain available when the card is unpinned, clear its floating height, support keyboard/reduced motion and focus a section without opening the mobile keyboard.
+The quote card provides four shortcuts: [Market PCR](https://option-chain-watcher.levyquant.ai/#cboe-panel), [Index ETFs](https://option-chain-watcher.levyquant.ai/#market-etf-reference), [Watchlist](https://option-chain-watcher.levyquant.ai/#watchlist-panel) and [Symbol history](https://option-chain-watcher.levyquant.ai/#history-panel). This replaces v0.2.10's top-navigation Watchlist entry. The shortcuts remain available when the card is unpinned, clear its floating height, support keyboard/reduced motion and focus a section without opening the mobile keyboard.
 
 Market/ETF navigation keeps the current matching saved choice or selects the first saved item. If all matching references were removed, or settings are loading/failed, that shortcut is disabled with a reason; it never adds them back. ETF navigation uses the existing shared trend chart. View selection may read cached data with GET, without source refresh, search, preference writes or new polling. Dates, ranges, saved references and guest/owner permissions remain unchanged. Build/artifact validation, 7 related frontend tests and 33 fresh-profile fixture-browser checks passed; local installation was verified with saved data/tasks retained. Cloud deployment/recovery uses separate runtime evidence as required by the [Product Spec](docs/PRODUCT_SPEC.en.md); local tests do not prove cloud completion, and earlier v0.2.10 results remain historical.
 

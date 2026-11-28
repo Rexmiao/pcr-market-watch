@@ -149,6 +149,6 @@ A Day/Night switch sits beside English / 中文 on every app page; night stays t
 
 ## Custom domain / 自定义域名（v0.2.21）
 
-The gateway trusts the custom domains HF lists for this Space in `HF_SPACE_HOST` (default host first, comma-separated; exact lowercase hosts, fail closed, at most five extras), so sign-in and refresh work on `option-chain-watcher.levyquant.ai` as on the hf.space address. Bind the domain only after this version is live, then restart once.
+The gateway trusts the custom domains HF lists for this Space in `HF_SPACE_HOST` (default host first, comma-separated; exact lowercase hosts, fail closed, at most five extras), so sign-in and refresh work on `option-chain-watcher.levyquant.ai` as on the hf.space address. The domain has been live since 2026-11-28.
 
-网关信任HF在`HF_SPACE_HOST`中为本Space列出的自定义域名（默认主机在前、逗号分隔；须为精确小写主机名，格式错误即全部不信任，最多5个），因此`option-chain-watcher.levyquant.ai`上的登录与刷新与hf.space地址相同。须在本版本上线后再绑定域名，并重启一次。
+网关信任HF在`HF_SPACE_HOST`中为本Space列出的自定义域名（默认主机在前、逗号分隔；须为精确小写主机名，格式错误即全部不信任，最多5个），因此`option-chain-watcher.levyquant.ai`上的登录与刷新与hf.space地址相同。该域名已于2026-11-28上线。

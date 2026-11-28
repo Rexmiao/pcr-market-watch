@@ -390,3 +390,5 @@ v0.2.20 HF实际更新记录（2026-11-28）：经HF官方浏览器设备登录�
 v0.2.21由CI于2026-11-28T10:11:49Z发布（提交`0cd70dc`），ZIP为3,728,995字节，SHA-256 `929ecb4fb521bd2a75235d3b54a8c7528d68cc5d9218edb8fd6ef785512a2738`；HF Space已更新为v0.2.21（提交`006418e`），暂停前后备份未变、只GET核对原记录一致。自定义域名的Cloudflare记录与Space绑定由用户另行完成后再核验。
 
 发布说明修正：CI此前以整份`docs/RELEASE_SPEC.md`作为Release正文，其中14个相对链接（含English切换）在Release页面失效，且标题落后一个版本。现为每个版本在`docs/release-notes/v<版本>.md`维护简洁的中英双语说明（全部为指向该版本标签的绝对链接），发布流程优先使用该文件、缺失时才回退；v0.2.19至v0.2.21的Release正文已替换（安装包、标签与校验值不变）。
+
+自定义域名上线记录（2026-11-28）：经用户HF登录以`POST /api/spaces/Rexymiao/pcr-market-watch/custom-domain`绑定`option-chain-watcher.levyquant.ai`；用户在Cloudflare创建仅限levyquant.ai DNS编辑的令牌（存于其Windows用户环境变量、未在对话中出现），据此经Cloudflare API新增CNAME `option-chain-watcher` → `hf.space`（仅DNS）。公共DNS（1.1.1.1／8.8.8.8）解析后HF状态由PENDING经PENDING_CHALLENGE（签发证书）约7.5分钟变为READY；随后确认备份未变、暂停至PAUSED再启动，使运行时`HF_SPACE_HOST`包含新域名。新域名14项检查通过：Let's Encrypt证书有效（至2027-02-26）、首页／图表目录／伽马页200、公开数据与原记录一致、私人页面401、登录页新窗口链接指向新域名、来自新域名的登录POST进入密码校验（错误密码401而非403）、恶意来源与兄弟子域名仍403、默认hf.space登录与链接不变；重启后只GET核对原记录一致。

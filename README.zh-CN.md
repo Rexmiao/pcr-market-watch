@@ -109,7 +109,7 @@ v0.2.3 卡片显示供应商 BUY／SELL／NEUTRAL 分类及日期／到秒的纽
 
 ## v0.2.7 HF云端：游客查看与更新PCR
 
-[Space](https://huggingface.co/spaces/Rexymiao/pcr-market-watch) · [应用](https://rexymiao-pcr-market-watch.hf.space) · [托管说明](docs/HUGGING_FACE.md)
+[Space](https://huggingface.co/spaces/Rexymiao/pcr-market-watch) · [应用](https://option-chain-watcher.levyquant.ai)（亦可用[rexymiao-pcr-market-watch.hf.space](https://rexymiao-pcr-market-watch.hf.space)） · [托管说明](docs/HUGGING_FACE.md)
 
 用户已明确选择公开Space、游客免密码看PCR并显式更新来源。PCR_PUBLIC_VIEW=1开启新版游客模式，代码／容器／前端及实际HF匿名HTTP、全新无登录Edge24项均已通过；通用Docker默认0。新增删除标的、分组、市场参考配置、管理及私人页面仍需所有者登录。公开偏好readOnly:true／canRefresh:true表示配置不可改、来源数据可更新。
 
@@ -165,7 +165,7 @@ v0.2.9功能源码daaf0dd已通过实际HF验收：99项Node及模型／来源�
 
 ## 行情概览快捷入口（v0.2.11）
 
-行情卡提供四个快捷入口：[整体市场PCR](https://rexymiao-pcr-market-watch.hf.space/#cboe-panel)、[三大指数ETF](https://rexymiao-pcr-market-watch.hf.space/#market-etf-reference)、[关注标的](https://rexymiao-pcr-market-watch.hf.space/#watchlist-panel)和[个股历史](https://rexymiao-pcr-market-watch.hf.space/#history-panel)，替代v0.2.10顶部导航中的关注标的入口。取消悬浮后仍可用；跳转避开悬浮高度，支持键盘和减少动效，仅聚焦区域，不自动弹出手机键盘。
+行情卡提供四个快捷入口：[整体市场PCR](https://option-chain-watcher.levyquant.ai/#cboe-panel)、[三大指数ETF](https://option-chain-watcher.levyquant.ai/#market-etf-reference)、[关注标的](https://option-chain-watcher.levyquant.ai/#watchlist-panel)和[个股历史](https://option-chain-watcher.levyquant.ai/#history-panel)，替代v0.2.10顶部导航中的关注标的入口。取消悬浮后仍可用；跳转避开悬浮高度，支持键盘和减少动效，仅聚焦区域，不自动弹出手机键盘。
 
 整体／ETF入口保留当前匹配的已保存选择，否则取第一保存项；对应参考全删、设置加载中或失败时显示禁用原因，不自动加回。ETF沿用共用趋势图。视图选择可GET读取缓存，不触发来源刷新、搜索、偏好写入或新轮询；所选日期、区间、保存参考及游客／所有者权限保持。构建／发行物校验、7项相关前端及33项全新浏览器夹具检查通过，本机安装已核验且原数据／任务保留。云端部署／恢复采用[产品规格](docs/PRODUCT_SPEC.md)所要求的独立运行证据，不由本机测试推定完成；既有v0.2.10结果仅属历史证据。
 
