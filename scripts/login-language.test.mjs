@@ -82,6 +82,22 @@ test('the sign-in page follows the app day/night cookie without scripts or HTML 
   const gated=await fetch(f.origin+'/market-brief.html',{headers:{cookie:'pcr-theme=light'}});assert.equal(gated.status,401);assert(!(await gated.text()).includes('#0b1118'),'The inline private-page gate follows the same cookie');
 });
 
+test('the sign-in page remembers a saved Chinese choice through the pcr-lang cookie; ?lang= still wins',async t=>{
+  const f=await fixture(t),withCookie=(path,cookie)=>fetch(f.origin+path,{redirect:'manual',headers:{cookie}});
+  let html=await (await withCookie('/_pcr/login','pcr-lang=zh')).text();
+  assert(html.includes('<html lang="zh-CN">'));assert(html.includes('<h1>私人 PCR 工作台</h1>'));assert.equal(form(html).action,'/_pcr/login?lang=zh','The form keeps the remembered language through a failed attempt');
+  html=await (await withCookie('/_pcr/login?lang=en','pcr-lang=zh')).text();assert(html.includes('<html lang="en">'),'An explicit URL language overrides the cookie');
+  html=await (await withCookie('/_pcr/login','other=1; pcr-lang=en; pcr-theme=light')).text();assert(html.includes('<html lang="en">'));assert(!html.includes('#0b1118'),'Language and theme cookies combine');
+  for(const cookie of ['pcr-lang=ZH','xpcr-lang=zh','pcr-lang=zh%22%3E','pcr-lang="zh"','pcr-lang=fr']){
+    html=await (await withCookie('/_pcr/login',cookie)).text();assert(html.includes('<html lang="en">'),cookie+' is ignored');assert(!html.includes('%22%3E'));assert(!/<script/i.test(html));
+  }
+  const gate=await withCookie('/market-brief.html','pcr-lang=zh');assert.equal(gate.status,401);assert((await gate.text()).includes('<html lang="zh-CN">'),'The private-page gate follows the remembered language');
+  const failed=await f.signIn('/_pcr/login',{password:'synthetic-wrong-password',headers:{cookie:'pcr-lang=zh'}});assert.equal(failed.status,401);assert((await failed.text()).includes('<html lang="zh-CN">'));
+  const page=await (await withCookie('/_pcr/login','pcr-lang=zh')).text();
+  const signed=await f.signIn(form(page).action,{headers:{cookie:'pcr-lang=zh'}});assert.equal(signed.status,303);assert.equal(signed.headers.get('location'),'/?lang=zh','Submitting the remembered-language form lands in the same language');
+  assert.equal(f.upstream(),0);
+});
+
 test('an unauthenticated Chinese app URL gets a Chinese login without preserving a return target',async t=>{
   const f=await fixture(t),page=await f.get('/market-brief.html?lang=zh&next=https://hostile.example'),html=await page.text();assert.equal(page.status,401);assert(html.includes('<html lang="zh-CN">'));assert.equal(form(html).action,'/_pcr/login?lang=zh');assert(!html.includes('hostile.example'));
 });

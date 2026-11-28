@@ -15,12 +15,20 @@
   function current(){return root.getAttribute('data-theme')==='light'?'light':'dark';}
   function apply(mode){root.setAttribute('data-theme',mode);root.style.colorScheme=mode;}
   function framed(){try{return window.top!==window.self;}catch(error){return true;}}
+  // Inside the cross-site huggingface.co iframe a Lax cookie is neither stored nor sent,
+  // so mirror the gateway's embedded cookies (SameSite=None; Secure; Partitioned).
+  function cookieAttributes(){var https=location.protocol==='https:';return '; Path=/; Max-Age=31536000'+(https&&framed()?'; SameSite=None; Secure; Partitioned':'; SameSite=Lax'+(https?'; Secure':''));}
   function remember(mode){
     try{localStorage.setItem(KEY,mode);}catch(error){}
-    // Inside the cross-site huggingface.co iframe a Lax cookie is neither stored nor sent,
-    // so mirror the gateway's embedded cookies (SameSite=None; Secure; Partitioned).
-    var https=location.protocol==='https:',attributes=https&&framed()?'; SameSite=None; Secure; Partitioned':'; SameSite=Lax'+(https?'; Secure':'');
-    try{document.cookie=COOKIE+'='+mode+'; Path=/; Max-Age=31536000'+attributes;}catch(error){}
+    try{document.cookie=COOKIE+'='+mode+cookieAttributes();}catch(error){}
+  }
+  // The script-free sign-in page cannot read localStorage, so the page language
+  // (<html lang>, set from the saved or linked choice) is mirrored to a functional
+  // pcr-lang cookie (zh|en only) that the gateway reads.
+  function rememberLanguage(){
+    var value=String(root.lang||'').toLowerCase().indexOf('zh')===0?'zh':'en';
+    if(new RegExp('(?:^|;\\s*)pcr-lang='+value+'(?:;|$)').test(document.cookie||''))return;
+    try{document.cookie='pcr-lang='+value+cookieAttributes();}catch(error){}
   }
   function words(){return WORDS[String(root.lang||'').toLowerCase().indexOf('zh')===0?'zh':'en'];}
   function render(group){
@@ -62,9 +70,9 @@
     nav.insertBefore(tools,language);
     tools.appendChild(group);
     if(language)tools.appendChild(language);
-    render(group);
-    window.addEventListener('pcr-language-change',function(){render(group);});
-    if(typeof MutationObserver==='function')new MutationObserver(function(){render(group);}).observe(root,{attributes:true,attributeFilter:['lang']});
+    render(group);rememberLanguage();
+    window.addEventListener('pcr-language-change',function(){render(group);rememberLanguage();});
+    if(typeof MutationObserver==='function')new MutationObserver(function(){render(group);rememberLanguage();}).observe(root,{attributes:true,attributeFilter:['lang']});
   }
   apply(saved());
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();

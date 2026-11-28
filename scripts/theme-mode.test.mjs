@@ -87,6 +87,15 @@ test('the cookie mirror matches the gateway cookies when embedded and drops Secu
   h=harness({framed:true,protocol:'http:'});h.click('light');assert(h.document.cookie.endsWith('SameSite=Lax'),'SameSite=None requires https, so plain http keeps Lax');
 });
 
+test('the page language is mirrored to a pcr-lang cookie for the script-free sign-in page',()=>{
+  let h=harness({lang:'zh-CN'});
+  assert.equal(h.document.cookie,'pcr-lang=zh; Path=/; Max-Age=31536000; SameSite=Lax; Secure','Mounting records the current page language');
+  h.root.lang='en';h.windowListeners['pcr-language-change'].forEach(fn=>fn({}));
+  assert.equal(h.document.cookie,'pcr-lang=en; Path=/; Max-Age=31536000; SameSite=Lax; Secure','A language change updates the mirror');
+  h=harness({lang:'zh-CN',cookie:'pcr-lang=zh'});assert.equal(h.document.cookie,'pcr-lang=zh','An up-to-date mirror is not rewritten');
+  h=harness({lang:'zh-CN',framed:true});assert(h.document.cookie.endsWith('SameSite=None; Secure; Partitioned'),'Embedded pages use the partitioned cookie form');
+});
+
 test('a choice made in another tab is applied through the storage event',()=>{
   const h=harness();
   h.windowListeners.storage.forEach(fn=>fn({key:'pcr-dashboard:theme:v1',newValue:'light'}));

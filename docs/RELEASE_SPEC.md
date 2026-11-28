@@ -392,3 +392,10 @@ v0.2.21由CI于2026-11-28T10:11:49Z发布（提交`0cd70dc`），ZIP为3,728,995
 发布说明修正：CI此前以整份`docs/RELEASE_SPEC.md`作为Release正文，其中14个相对链接（含English切换）在Release页面失效，且标题落后一个版本。现为每个版本在`docs/release-notes/v<版本>.md`维护简洁的中英双语说明（全部为指向该版本标签的绝对链接），发布流程优先使用该文件、缺失时才回退；v0.2.19至v0.2.21的Release正文已替换（安装包、标签与校验值不变）。
 
 自定义域名上线记录（2026-11-28）：经用户HF登录以`POST /api/spaces/Rexymiao/pcr-market-watch/custom-domain`绑定`option-chain-watcher.levyquant.ai`；用户在Cloudflare创建仅限levyquant.ai DNS编辑的令牌（存于其Windows用户环境变量、未在对话中出现），据此经Cloudflare API新增CNAME `option-chain-watcher` → `hf.space`（仅DNS）。公共DNS（1.1.1.1／8.8.8.8）解析后HF状态由PENDING经PENDING_CHALLENGE（签发证书）约7.5分钟变为READY；随后确认备份未变、暂停至PAUSED再启动，使运行时`HF_SPACE_HOST`包含新域名。新域名14项检查通过：Let's Encrypt证书有效（至2027-02-26）、首页／图表目录／伽马页200、公开数据与原记录一致、私人页面401、登录页新窗口链接指向新域名、来自新域名的登录POST进入密码校验（错误密码401而非403）、恶意来源与兄弟子域名仍403、默认hf.space登录与链接不变；重启后只GET核对原记录一致。
+
+## v0.2.22：登录页记住语言
+
+| ID | 交付与验收 |
+| --- | --- |
+| REL-042-001 | `theme-mode.js`把页面`<html lang>`（来自已存或链接语言）同步为功能cookie `pcr-lang`（仅zh／en，属性与`pcr-theme`相同：内嵌huggingface.co时SameSite=None; Secure; Partitioned，否则Lax），值未变时不重写；网关在URL无有效`?lang=`时读取该cookie决定登录页及私人页面401登录框语言，无效值回退英文。CSP、CSRF、会话cookie与登录后跳转不变。 |
+| REL-042-002 | 验收：cookie zh时登录页／401登录框／密码错误页为中文且表单保留语言，`?lang=en`优先于cookie，大小写／仿冒名／编码注入／其他语言均被忽略且页面无脚本；挂载即同步、切换语言即更新、已同步不重写、内嵌用分区cookie。发布沿用GitHub CI与HF备份→PAUSED→上传／启动→只GET核对流程，并在自定义域名上复核。 |

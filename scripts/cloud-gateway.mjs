@@ -72,6 +72,9 @@ function loginLanguage(url){
 }
 function loginRoute(language){return '/_pcr/login'+(language?'?lang='+language:'');}
 function loginDestination(language){return '/'+(language?'?lang='+language:'');}
+// The app mirrors the page language to a functional pcr-lang cookie (zh|en) so this
+// script-free page can follow a saved Chinese choice; an explicit ?lang= still wins.
+function loginCookieLanguage(cookie){const match=/(?:^|;\s*)pcr-lang=(zh|en)(?:;|$)/.exec(String(cookie||''));return match?match[1]:null;}
 function loginTheme(cookie){return /(?:^|;\s*)pcr-theme=light(?:;|$)/.test(String(cookie||''))?'light':'dark';}
 function loginDocument(config,{failed=false,csrfNonce='',language=null,theme='dark',origin=config.publicOrigin}={}){
   const chinese=language==='zh',copy=chinese?{
@@ -107,7 +110,7 @@ export function createCloudGateway(config,{database,publicAccess=false,now=()=>D
     const finish=(code,message,extra={})=>{res.writeHead(code,{'content-type':'text/plain; charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff','referrer-policy':'no-referrer',...extra});res.end(message);};
     // no-referrer makes Chromium serialize a navigation form POST's Origin as
     // null. Preserve the real same-app Origin rather than accepting opaque POSTs.
-    const login=(status,failed=false)=>{const csrf=csrfToken(config,now());return finish(status,loginDocument(config,{failed,csrfNonce:csrf.nonce,language:loginLanguage(path),theme:loginTheme(req.headers.cookie),origin:requestOrigin(config,req.headers.host)}),{'content-type':'text/html; charset=utf-8','referrer-policy':'strict-origin-when-cross-origin','set-cookie':cookieHeader(csrf.value,config,{name:csrfName(config),lifetime:CSRF_LIFETIME}),'content-security-policy':"default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors "+framePolicy(config)});};
+    const login=(status,failed=false)=>{const csrf=csrfToken(config,now());return finish(status,loginDocument(config,{failed,csrfNonce:csrf.nonce,language:loginLanguage(path)||loginCookieLanguage(req.headers.cookie),theme:loginTheme(req.headers.cookie),origin:requestOrigin(config,req.headers.host)}),{'content-type':'text/html; charset=utf-8','referrer-policy':'strict-origin-when-cross-origin','set-cookie':cookieHeader(csrf.value,config,{name:csrfName(config),lifetime:CSRF_LIFETIME}),'content-security-policy':"default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors "+framePolicy(config)});};
     let path;try{path=new URL(req.url,config.publicOrigin);if(path.origin!==config.publicOrigin||!req.url.startsWith('/')||req.url.startsWith('//'))throw Error();}catch{return finish(400,'Invalid request.');}
     const safe=['GET','HEAD'].includes(req.method),api=path.pathname.startsWith('/api/'),loginPost=path.pathname==='/_pcr/login'&&req.method==='POST',origin=req.headers.origin,crossSite=req.headers['sec-fetch-site']==='cross-site',trustedParent=hfEmbedding(config)&&HF_PARENTS.has(origin),navigation=safe&&!api&&req.headers['sec-fetch-mode']==='navigate'&&['document','iframe'].includes(req.headers['sec-fetch-dest']);
     const documentRequest=safe&&!api&&(path.pathname==='/'||path.pathname.endsWith('.html')||path.pathname==='/_pcr/login'||['document','iframe'].includes(req.headers['sec-fetch-dest'])||req.headers.accept?.includes('text/html'));

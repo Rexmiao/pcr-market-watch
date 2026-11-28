@@ -152,3 +152,9 @@ A Day/Night switch sits beside English / 中文 on every app page; night stays t
 The gateway trusts the custom domains HF lists for this Space in `HF_SPACE_HOST` (default host first, comma-separated; exact lowercase hosts, fail closed, at most five extras), so sign-in and refresh work on `option-chain-watcher.levyquant.ai` as on the hf.space address. The domain has been live since 2026-11-28.
 
 网关信任HF在`HF_SPACE_HOST`中为本Space列出的自定义域名（默认主机在前、逗号分隔；须为精确小写主机名，格式错误即全部不信任，最多5个），因此`option-chain-watcher.levyquant.ai`上的登录与刷新与hf.space地址相同。该域名已于2026-11-28上线。
+
+## Sign-in language / 登录页语言（v0.2.22）
+
+The sign-in page follows the language you last used in the app through a functional `pcr-lang` cookie (zh/en only); a `?lang=` link still wins.
+
+登录页通过只含zh／en的功能cookie `pcr-lang`跟随你在应用中最后使用的语言；带`?lang=`的链接仍然优先。
