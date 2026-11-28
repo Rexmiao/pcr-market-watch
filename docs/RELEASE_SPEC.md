@@ -1,10 +1,10 @@
-# 发布与安装规格（v0.2.19源码与Windows发行）
+# 发布与安装规格（v0.2.20源码与Windows发行）
 
 **简体中文** | [English](RELEASE_SPEC.en.md)
 
-当前公开Windows发行是[v0.2.19](https://github.com/Rexmiao/pcr-market-watch/releases/tag/v0.2.19)，在v0.2.18的伽马／最大痛苦、30日逐期归档／历史查看与首次英文等程序之上，新增深色主题、PCR快照指标条与摘要宽表整理；个人数据库、凭证及任务配置不随包。历史v0.2.3标签与附件保留原样。
+当前公开Windows发行是[v0.2.20](https://github.com/Rexmiao/pcr-market-watch/releases/tag/v0.2.20)，在v0.2.19深色主题之上新增日间／夜间切换；v0.2.19则在v0.2.18的伽马／最大痛苦、30日逐期归档／历史查看与首次英文等程序之上，新增深色主题、PCR快照指标条与摘要宽表整理；个人数据库、凭证及任务配置不随包。历史v0.2.3标签与附件保留原样。
 
-v0.2.19由CI于2026-11-28T08:31:28Z发布，标签对应提交[b29e3a21c4ef9407078aed38dde93a89964677cc](https://github.com/Rexmiao/pcr-market-watch/commit/b29e3a21c4ef9407078aed38dde93a89964677cc)；Windows ZIP为3,706,122字节，SHA-256 `bef29f24aaa8aae5bffa27b6987071a52ca8d516729f157ab4f82708b9d26743`。v0.2.18由CI于2026-11-27T07:58:47Z发布，标签对应提交[79a2cfb981b4d79f68a0f498b98d90a636e510a4](https://github.com/Rexmiao/pcr-market-watch/commit/79a2cfb981b4d79f68a0f498b98d90a636e510a4)；Windows ZIP为3,647,876字节，SHA-256清单为103字节。后续main的文档／测试／CI注册可以演进，不重写该标签、ZIP或校验清单；重复发布检查发现该Release已存在时保留原附件，不覆盖资产。更改可安装运行行为应另发新版本。
+v0.2.20由CI于2026-11-28T09:38:48Z发布，标签对应提交[341b78eb181e0df188dab49d130bf42e0d00ebde](https://github.com/Rexmiao/pcr-market-watch/commit/341b78eb181e0df188dab49d130bf42e0d00ebde)；Windows ZIP为3,724,407字节，SHA-256 `a8c9f4922dbd356643ee84e7168b05f53e9d4bb1a05ebc51f542b47ae2abf820`。v0.2.19由CI于2026-11-28T08:31:28Z发布，标签对应提交[b29e3a21c4ef9407078aed38dde93a89964677cc](https://github.com/Rexmiao/pcr-market-watch/commit/b29e3a21c4ef9407078aed38dde93a89964677cc)；Windows ZIP为3,706,122字节，SHA-256 `bef29f24aaa8aae5bffa27b6987071a52ca8d516729f157ab4f82708b9d26743`。v0.2.18由CI于2026-11-27T07:58:47Z发布，标签对应提交[79a2cfb981b4d79f68a0f498b98d90a636e510a4](https://github.com/Rexmiao/pcr-market-watch/commit/79a2cfb981b4d79f68a0f498b98d90a636e510a4)；Windows ZIP为3,647,876字节，SHA-256清单为103字节。后续main的文档／测试／CI注册可以演进，不重写该标签、ZIP或校验清单；重复发布检查发现该Release已存在时保留原附件，不覆盖资产。更改可安装运行行为应另发新版本。
 
 历史HF验收：v0.2.7游客PCR查看／显式更新、登录及缓存恢复已经验证；v0.2.8管理员密码范围调整、实际云端凭据轮换及原数据保留已验证。编辑和私人页面需所有者登录、Bucket私有。这些历史部署记录不代替当前安装包、云端实际运行或定时执行的独立证据。
 
@@ -370,7 +370,7 @@ v0.2.19本机打包记录（2026-11-28）：本机Node v26.13.1（满足22+）�
 
 v0.2.19 HF实际更新记录（2026-11-28）：经HF官方浏览器设备登录（令牌仅存任务专用目录）对个人Space `Rexymiao/pcr-market-watch`操作。更新前私有Bucket `Rexymiao/pcr-market-watch-data`共345份清单／快照，最新有效清单`pcr-2026-11-27T23-22-21-112Z-4e8838fdb38e2792`（2,654,208字节）仅核对元数据（文件名含sha256、字节数一致），未下载私人快照；匿名GET显示结构采集完成于23:22:20Z、Core／Cboe检查时间更早，备份后无新写入。随后暂停至PAUSED，暂停后未出现新清单（内容未变即不重复写），上传v0.2.19源包（218个文件；`.openai/hosting.json`为去除Sites项目ID的公开版，保留Space原`.gitignore`，不含内部`docs/GITHUB_NOTES.md`），Space提交`8af459b`，再启动至RUNNING，硬件仍为CPU Basic。重启后只用GET核对：Core 7标的×498行、asof 2026-11-25、原checkedAt 2026-11-26T10:36:50.576Z及行哈希不变；Cboe 252行、末日2026-11-25及行哈希不变；QQQ结构归档索引、市场参考设置及结构运行记录（runId 32ac6679、保存144／146）不变。Cboe历史接口的checkedAt由11-26 12:36:32Z变为11-27 05:03:20Z，原因是该字段取全部记录的最大检查时间，而新随包种子带有后者；11-25记录仍保留原11-26 12:36:32Z，并非重新抓取。重启后仍为345份清单且无新清单，表明启动备份判定内容与既有快照相同。独立匿名验收：公开页面／API 200、未发布标的403、跨域POST 403、私人页面401、登录页含English／中文；实际浏览器中首页、伽马、图表目录为深色、无横向溢出。`/api/watchlist-settings`匿名只读投影返回200属REL-PUB-001／002既定行为。遗留：游客访问私人页面时显示的登录页仍为浅色内联样式，未纳入深色主题。未增加收费资源；未来17:30／17:45定时执行需另行观察。
 
-## v0.2.20：日间／夜间模式
+## v0.2.20：日间／夜间模式（GitHub已发布）
 
 | ID | 交付与验收 |
 | --- | --- |
