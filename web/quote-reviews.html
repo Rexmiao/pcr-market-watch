@@ -6,11 +6,13 @@
   <meta name="description" content="Review local task status and saved quote observations.">
   <title>Scheduled reviews · PCR Watch</title>
   <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/theme.css">
   <link rel="stylesheet" href="/quote-reviews.css">
+  <link rel="stylesheet" href="/theme-dark.css">
 </head>
 <body data-page="quote-reviews">
   <main>
-    <nav class="site-nav" data-i18n-aria="navLabel" aria-label="网站导航"><a href="/" data-i18n="navHome">PCR 观察台</a><a href="/option-structure.html" data-i18n="navStructure">伽马 / 最大痛苦</a><a href="/options-monitor.html" data-i18n="navOptions">期权异动</a><a href="/quote-reviews.html" aria-current="page" data-i18n="navReviews">定时复核</a><a href="/market-brief.html" data-i18n="navBrief">市场解读</a><a href="/charts.html" data-i18n="navCharts">图表目录</a><button id="language-toggle" class="button secondary language-toggle" type="button" aria-label="Switch to English">English</button></nav>
+    <nav class="site-nav" data-i18n-aria="navLabel" aria-label="网站导航"><a href="/" data-i18n="navHome">PCR 观察台</a><a href="/option-structure.html" data-i18n="navStructure">伽马 / 最大痛苦</a><a href="/options-monitor.html" data-i18n="navOptions">期权异动</a><a href="/quote-reviews.html" aria-current="page" data-i18n="navReviews">定时复核</a><a href="/market-brief.html" data-i18n="navBrief">市场解读</a><a href="/charts.html" data-i18n="navCharts">图表目录</a><div id="language-toggle" class="language-switch" role="group" aria-label="Language" data-skip-i18n><button type="button" data-lang="en" lang="en" aria-pressed="true">English</button><button type="button" data-lang="zh" lang="zh-CN" aria-pressed="false">中文</button></div></nav>
     <header class="page-header"><div><div class="eyebrow" data-i18n="reviewEyebrow">本机任务与报价归档</div><h1 data-i18n="reviewTitle">定时复核</h1><p data-i18n="reviewSubtitle">查看下一次运行和每次保存的报价，回来人工复核。</p></div><button id="reviews-refresh" class="button primary" type="button" data-i18n="reviewRefresh">刷新状态</button></header>
     <p class="review-intro" data-i18n="reviewReadOnly">刷新只读取任务状态与已有文件，不触发行情抓取、不运行任务，也不下单。</p>
     <section id="oi-daily-card" class="panel review-job" aria-labelledby="oi-daily-heading"><div class="review-section-heading"><h2 id="oi-daily-heading" data-i18n="oiDailyTitle">每日 OI 归档</h2><a class="button secondary" href="/#overview-heading" data-i18n="oiDailyOpen">选择历史日期</a></div><p id="oi-daily-status" class="review-note" role="status" aria-live="polite"></p><p id="oi-daily-health" class="review-status" role="status" aria-live="polite"></p><dl id="oi-daily-details"></dl><p class="review-note" data-i18n="oiDailyNote">美东查询日与结算日分开记录；未知结算日不会按 T−1 推算。本机任务需开机并登录，云端任务需服务保持运行和可持久保存。</p><p class="review-note" data-i18n="oiDailyHealthNote">“就绪”和手动抓取不代表定时成功。只依据实际定时报告核验；未保存的过去 OI 不会反填。休眠、停机或网络都可能影响采集，无记录时不猜原因。</p></section>

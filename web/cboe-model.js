@@ -13,7 +13,7 @@ export function marketMetricEntry(value){
 }
 export function isReferenceMetric(metric){try{return marketMetricEntry(metric).type==='symbol';}catch{return false;}}
 
-export const CBOE_COLORS={daily:'#6ca3ba',r5:'#208980',r20:'#2867c7',r60:'#ed842b'};
+export const CBOE_COLORS={daily:'#6b7686',r5:'#2fbfa8',r20:'#5a9bff',r60:'#f2a541'};
 const names={zh:{index:'指数期权 · INDEX',total:'期权合计 · TOTAL',etp:'ETF／ETP',equity:'个股期权 · EQUITY',spy:'标普 500 · SPY ETF PCR',qqq:'纳指 100 · QQQ ETF PCR',dia:'道指 · DIA ETF PCR',daily:'单日成交量 PCR',r5:'5 日成交量 PCR',r20:'20 日成交量 PCR',r60:'60 日成交量 PCR',date:'日期',series:'曲线',p:'Put 成交量',c:'Call 成交量',axis:'Put / Call（倍）'},en:{index:'Index options · INDEX',total:'Options total · TOTAL',etp:'ETFs / ETPs',equity:'Single-stock options · EQUITY',spy:'S&P 500 · SPY ETF PCR',qqq:'Nasdaq-100 · QQQ ETF PCR',dia:'Dow · DIA ETF PCR',daily:'Daily volume PCR',r5:'5-session volume PCR',r20:'20-session volume PCR',r60:'60-session volume PCR',date:'Date',series:'Series',p:'Put volume',c:'Call volume',axis:'Put / Call (ratio)'}};
 export function cboeMetricLabel(metric,language='zh'){
   const entry=marketMetricEntry(metric),words=names[language==='en'?'en':'zh'];

@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "asof": "2026-11-23",
-  "checkedAt": "2026-11-25T01:06:05.999064+00:00",
+  "asof": "2026-11-24",
+  "checkedAt": "2026-11-27T05:03:20.543Z",
   "sourceUrl": "https://www.cboe.com/markets/us/options/market-statistics/daily",
-  "sourceLatestDate": "2026-11-23",
+  "sourceLatestDate": "2026-11-24",
   "historyStartDate": "2025-08-01",
   "expectedSessionDates": [
     "2025-08-01",
@@ -336,7 +336,8 @@
     "2026-11-18",
     "2026-11-19",
     "2026-11-20",
-    "2026-11-23"
+    "2026-11-23",
+    "2026-11-24"
   ],
   "observations": [
     {
@@ -11592,13 +11593,46 @@
           "method": "Put and Call separately equal TOTAL minus INDEX minus ETP; daily PCR is their ratio rounded to two decimals, not a directly retained published equity PCR."
         }
       }
+    },
+    {
+      "date": "2026-11-24",
+      "sourceUrl": "https://www.cboe.com/markets/us/options/market-statistics/daily?dt=2026-11-24",
+      "metrics": {
+        "total": {
+          "name": "TOTAL PUT/CALL RATIO",
+          "ratio": 0.95,
+          "put": 7005134,
+          "call": 7390726
+        },
+        "index": {
+          "name": "INDEX PUT/CALL RATIO",
+          "ratio": 1.12,
+          "put": 3679282,
+          "call": 3292274
+        },
+        "etp": {
+          "name": "EXCHANGE TRADED PRODUCTS PUT/CALL RATIO",
+          "ratio": 1.13,
+          "put": 1989016,
+          "call": 1760427
+        },
+        "equity": {
+          "name": "EQUITY PUT/CALL RATIO",
+          "ratio": 0.57,
+          "put": 1335780,
+          "call": 2337993,
+          "derived": false,
+          "source": "cboe_published",
+          "method": "Official EQUITY PUT/CALL RATIO and EQUITY OPTIONS volumes when available."
+        }
+      }
     }
   ],
   "coverage": {
     "expectedStart": "2025-08-01",
-    "expectedEnd": "2026-11-23",
-    "expectedSessions": 331,
-    "verifiedSessions": 331,
+    "expectedEnd": "2026-11-24",
+    "expectedSessions": 332,
+    "verifiedSessions": 332,
     "continuous": true,
     "missingDates": [],
     "sessionCalendarSource": "Dashboard U.S. session calendar, cross-checked against OCC SPY seed activity dates"

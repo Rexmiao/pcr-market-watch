@@ -1,0 +1,155 @@
+/* Shared theme (v0.2.19 candidate), loaded by every app page after style.css
+   (and context.css) and before page-specific CSS, so page layouts keep priority.
+   One brand colour plus semantic colours; neutral surfaces; numbers first.
+   Price change keeps red/green; PCR change stays neutral (arrow + sign only).
+   Archived static snapshots do not load it and keep their original look. */
+:root{
+  --ink:#0f1b2d;--ink-2:#34445a;--muted:#66748a;--faint:#8a96a8;
+  --bg:#f4f5f7;--surface:#fff;--surface-2:#f8f9fb;--line:#e4e8ee;--line-strong:#d2d9e3;
+  --brand:#0f2a4a;--brand-hover:#1d3f68;--link:#245aa0;--focus:#7aa2e0;
+  --radius:12px;--radius-sm:8px;
+  color:var(--ink);background:var(--bg);
+}
+body{background:var(--bg)}
+main{max-width:1240px}
+p{color:var(--ink-2)}
+a{color:var(--link)}
+
+/* Navigation and header */
+.site-nav{gap:4px 22px;margin-bottom:22px;padding-bottom:0;border-bottom:1px solid var(--line)}
+.site-nav a{position:relative;padding:12px 0 13px;font-size:.875rem;font-weight:500;color:var(--muted)}
+.site-nav a:hover{color:var(--ink);text-decoration:none}
+.site-nav a[aria-current="page"]{color:var(--ink);font-weight:650}
+.site-nav a[aria-current="page"]:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;border-radius:2px;background:var(--brand)}
+.page-header{margin-bottom:14px;align-items:flex-end}
+.eyebrow{font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-size:1.75rem;font-weight:700;letter-spacing:-.025em;margin:4px 0 4px;color:var(--ink)}
+.page-header p{font-size:.9375rem;color:var(--muted)}
+.freshness,.source-status{font-size:.8125rem;line-height:1.65;color:var(--muted)}
+.freshness{margin-bottom:8px}.source-status{margin:0 0 16px}
+
+/* Controls */
+.button{border-radius:var(--radius-sm);min-height:40px;padding:8px 15px;font-size:.875rem;font-weight:600}
+.button.primary{background:var(--brand)}.button.primary:hover{background:var(--brand-hover)}
+.button.secondary{border-color:var(--line-strong);color:var(--ink-2)}.button.secondary:hover{background:var(--surface-2);border-color:#bfc8d5}
+.controls input,.controls select,.summary-date input{height:40px;border-color:var(--line-strong);border-radius:var(--radius-sm);font-size:.9375rem;color:var(--ink)}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+
+/* Panels */
+.panel{border:1px solid var(--line);border-radius:var(--radius);box-shadow:none;padding:22px 24px 20px;margin-bottom:18px}
+.section-heading{margin-bottom:14px}
+h2{font-size:1.0625rem;font-weight:650;letter-spacing:-.01em;color:var(--ink)}
+.section-heading p{font-size:.8125rem;color:var(--muted)}
+.metric-note{font-size:.8125rem;color:var(--muted)}
+
+/* PCR key-metrics strip */
+.pcr-keystrip{margin:6px 0 16px}
+.keystrip-head{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 14px;margin-bottom:10px}
+.keystrip-head h2{font-size:.8125rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2)}
+.keystrip-head p{flex:1 1 320px;font-size:.8125rem;line-height:1.5;color:var(--muted)}
+.keystrip-link{font-size:.8125rem;font-weight:600;text-decoration:none}.keystrip-link:after{content:" \2193"}.keystrip-link:hover{text-decoration:underline}
+.keystrip-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.keycard{position:relative;min-width:0;padding:14px 16px 12px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);overflow:hidden}
+.keycard:before{content:"";position:absolute;left:0;top:0;right:0;height:3px;background:var(--brand)}
+.keycard-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:.8125rem;line-height:1.4}
+.keycard-label{min-width:0;font-weight:650;color:var(--ink-2);overflow-wrap:anywhere}
+.keycard-date{flex:0 0 auto;color:var(--faint);font-variant-numeric:tabular-nums}
+.keycard-value{margin:8px 0 2px;font-size:2.25rem;font-weight:680;line-height:1.1;letter-spacing:-.025em;color:var(--ink);font-variant-numeric:tabular-nums}
+.keycard-delta{display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 6px;min-height:1.5rem;font-size:.9375rem;font-weight:650;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.keycard-arrow{font-size:.625rem;transform:translateY(-1px)}
+.keycard-delta small{font-size:.75rem;font-weight:500;color:var(--faint)}
+.keycard-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0 0;padding-top:10px;border-top:1px solid var(--line)}
+.keycard-facts dt{font-size:.6875rem;line-height:1.35;color:var(--muted)}
+.keycard-facts dd{margin:2px 0 0;font-size:.875rem;font-weight:650;color:var(--ink);font-variant-numeric:tabular-nums}
+.keycard .summary-state{display:inline-block;margin-top:2px;padding:0 7px;border:1px solid;border-radius:999px;font-size:.75rem;line-height:1.6;font-weight:500}
+.keycard.is-loading .keycard-value{width:55%;color:transparent;border-radius:6px;background:#eef1f5}
+@media(max-width:1000px){.keystrip-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.keystrip-grid{gap:8px}.keycard{padding:12px 12px 10px}.keycard-value{font-size:1.75rem}.keycard-top{flex-direction:column;gap:0}.keycard-facts{grid-template-columns:1fr 1fr}.keycard-facts>div:last-child{grid-column:1/-1}}
+
+/* Market reference bar: present but quieter than PCR */
+.market-overview{padding:12px 16px 10px;border-color:var(--line)}
+.market-overview .market-head h2{font-size:.8125rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2)}
+.market-overview .market-head p,.market-overview .market-source-line{color:var(--faint)}
+.market-overview .market-card{border-right-color:var(--line)}
+.market-overview .market-card h3{color:var(--muted);font-weight:600}
+.market-overview .market-price{color:var(--ink)}
+.market-shortcuts .pcr-jump{border-color:var(--line);background:var(--surface-2);color:var(--ink-2);font-weight:500}
+.market-overview.is-floating{box-shadow:none}
+.market-overview.is-floating.is-stuck{box-shadow:0 6px 18px #0f1b2d14}
+
+/* Summary table */
+.summary-table-scroll{border-color:var(--line)}
+.summary-table thead th{background:var(--surface-2);color:var(--muted);font-weight:600}
+.summary-table th,.summary-table td{border-bottom-color:var(--line)}
+.summary-table .summary-group th{background:#eef1f6;color:var(--ink-2);font-weight:650}
+.summary-table .summary-number>span,.summary-table .summary-date-value{color:var(--ink)}
+.summary-table small{color:var(--muted)}
+.summary-open{color:var(--brand);text-decoration-color:#9fb3cf}
+.summary-table tbody tr:not(.summary-group):hover>*{background:#f6f8fb}
+
+.language-switch{border-color:var(--line-strong);background:#eef1f5}
+
+/* Accent bars, unified. Page CSS loads after this file, so these rules carry a
+   `main` prefix. Gamma snapshot cards get the same neutral top bar as the PCR
+   key cards; the series colour moves to a swatch before the title so cards
+   still match the chart lines (colours mirror option-structure.js). */
+main .structure-snapshot{border-color:var(--line);border-radius:var(--radius);background:var(--surface)}
+main .structure-snapshot[data-snapshot],main .structure-snapshot.is-history-comparison{border-top:3px solid var(--line-strong)}
+main .structure-snapshot h3:before{content:"";display:inline-block;width:10px;height:10px;margin-right:8px;border-radius:2px;vertical-align:0;background:var(--series,transparent)}
+main .structure-snapshot[data-snapshot="base"]{--series:#2867c7}
+main .structure-snapshot[data-snapshot="withoutNearest"]{--series:#c47a24}
+main .structure-snapshot.is-history-comparison{--series:#8555b6}
+/* Market brief source cards: same left bar as the data-status box; only
+   warning/error states colour it, with the shared state tokens. */
+main .brief-source-details{border-color:var(--line);border-radius:var(--radius)}
+main .brief-source-list>li{border-color:var(--line);border-left:3px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--surface)}
+main .brief-source-list>li[data-level="warning"]{border-left-color:var(--state-warn-fg);background:var(--state-warn-bg)}
+main .brief-source-list>li[data-level="error"]{border-left-color:var(--state-error-fg);background:var(--state-error-bg)}
+main .brief-source-list>li[data-level="warning"] .brief-source-level{color:var(--state-warn-fg)}
+main .brief-source-list>li[data-level="error"] .brief-source-level{color:var(--state-error-fg)}
+footer{color:var(--faint)}
+
+/* Refinement pass: deeper navy, neutral grey, tighter density, TOTAL lead card. */
+:root{--ink:#0d1a2b;--bg:#f2f3f5;--line:#e2e5ea;--line-strong:#cfd5de;--brand:#0b2342;--brand-hover:#173a63;--brand-tint:#f3f6fb;--link:#1f539a}
+main{padding-top:28px}
+.site-nav{margin-bottom:18px}
+.page-header{margin-bottom:10px}
+h1{font-size:1.625rem}
+.panel{padding:18px 20px 16px;margin-bottom:14px}
+.section-heading{margin-bottom:12px}
+.controls{gap:12px}
+/* Date and update notes: complete text, one quiet box. */
+.data-status{margin:0 0 14px;padding:8px 12px;border:1px solid var(--line);border-left:3px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--surface)}
+.data-status .freshness,.data-status .source-status{margin:0;font-size:.75rem;line-height:1.6}
+.data-status .source-status:empty{display:none}
+/* Strip */
+.pcr-keystrip{margin:4px 0 12px}
+.keystrip-head{margin-bottom:8px}
+.keystrip-head p{font-size:.75rem}
+.keystrip-link{margin-left:auto}
+.keystrip-grid{gap:10px}
+.keystrip-grid.has-lead[data-count="4"]{grid-template-columns:1.5fr repeat(3,minmax(0,1fr))}
+.keycard{padding:12px 14px 10px}
+.keycard:before{background:var(--line-strong)}
+.keycard.is-lead{background:var(--brand-tint);border-color:#cdd8e8}
+.keycard.is-lead:before{background:var(--brand)}
+.keycard-value{font-size:2rem;margin:6px 0 2px}
+.keycard.is-lead .keycard-value{font-size:2.625rem}
+.keycard-facts{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:10px;padding-top:8px}
+.keycard-facts dd{font-size:.8125rem}
+.keycard-facts dt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Summary table density */
+.summary-table th,.summary-table td{padding:.5rem .6rem}
+.summary-date{margin:.6rem 0}
+@media(max-width:1000px){.keystrip-grid.has-lead[data-count="4"]{grid-template-columns:repeat(2,minmax(0,1fr))}.keycard-facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){
+  .keystrip-grid.has-lead .keycard.is-lead{grid-column:1/-1}
+  .keystrip-grid.has-lead .keycard.is-lead .keycard-facts{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .keystrip-grid.has-lead[data-count="4"] .keycard:last-child{grid-column:1/-1}
+  .keystrip-grid.has-lead[data-count="4"] .keycard:last-child .keycard-facts{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .keycard-top{flex-direction:column;gap:0}
+  .keycard.is-lead .keycard-top,.keystrip-grid.has-lead[data-count="4"] .keycard:last-child .keycard-top{flex-direction:row}
+  .keycard-facts>div:last-child{grid-column:auto}
+  .panel{padding:16px 14px 14px}
+  main{padding-top:18px}
+}

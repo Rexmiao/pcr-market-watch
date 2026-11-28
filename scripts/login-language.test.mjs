@@ -21,6 +21,7 @@ test('first login is English with a same-origin Chinese link and unchanged CSP/f
   const f=await fixture(t),page=await f.get('/_pcr/login'),html=await page.text();
   assert.equal(page.status,200);assert(html.includes('<html lang="en">'));assert(html.includes('<h1>Private PCR workspace</h1>'));assert(html.includes('>Username</label>'));assert(html.includes('>Password</label>'));assert(html.includes('>Sign in</button>'));
   assert(html.includes('href="/_pcr/login?lang=zh"'));assert(html.includes('aria-label="Switch to Chinese">中文</a>'));
+  assert(html.includes('<span aria-current="true" lang="en">English</span>'),'Both languages are visible and the current one is marked');
   assert.equal(form(html).action,'/_pcr/login');assert.deepEqual(form(html).names,['csrf','username','password']);assert(form(html).nonce);
   assert(!/<script|onclick=|javascript:/i.test(html));assert(!html.includes(f.config.password));
   assert.equal(page.headers.get('content-security-policy'),"default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'self' https://huggingface.co https://hf.co");
@@ -28,6 +29,7 @@ test('first login is English with a same-origin Chinese link and unchanged CSP/f
 
 test('Chinese GET has an English switch and preserves only whitelisted query language in the form',async t=>{
   const f=await fixture(t),page=await f.get('/_pcr/login?lang=zh&next=https://hostile.example'),html=await page.text();
+  assert(html.includes('<span aria-current="true" lang="zh-CN">中文</span>'));assert(html.includes('aria-label="切换为英文">English</a>'));
   assert(html.includes('<html lang="zh-CN">'));assert(html.includes('<h1>私人 PCR 工作台</h1>'));assert(html.includes('>用户名</label>'));assert(html.includes('>密码</label>'));assert(html.includes('>登录</button>'));
   assert(html.includes('href="/_pcr/login?lang=en"'));assert.equal(form(html).action,'/_pcr/login?lang=zh');assert.deepEqual(form(html).names,['csrf','username','password']);assert(!html.includes('hostile.example'));
   assert(html.includes('href="'+f.config.publicOrigin+'/_pcr/login?lang=zh" target="_blank"'));

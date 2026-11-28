@@ -8,7 +8,10 @@ const key='pcr-dashboard:language:v1';
 
 function fixture({saved,storage,blocked=false,browserLanguage='zh-CN'}={}){
   const values=storage||new Map(saved===undefined?[]:[[key,saved]]),writes=[],events=[];
-  const toggle={textContent:'',setAttribute(name,value){this[name]=value;}};
+  const option=lang=>{const item={dataset:{lang},attrs:{},setAttribute(name,value){this.attrs[name]=value;}};item.closest=()=>item;return item;};
+  const options=[option('en'),option('zh')];
+  const toggle={textContent:'',dataset:{},options,querySelectorAll:()=>options,querySelector:()=>options[0],contains:item=>options.includes(item),
+    addEventListener(type,handler){this[type]=handler;},setAttribute(name,value){this[name]=value;}};
   const document={documentElement:{lang:'zh-CN'},body:{dataset:{page:'fixture'}},
     querySelectorAll:()=>[],getElementById:id=>id==='language-toggle'?toggle:null};
   const context=vm.createContext({document,navigator:{language:browserLanguage,languages:[browserLanguage]},
@@ -26,7 +29,7 @@ test('a first visit defaults to English even with a Chinese browser locale',()=>
   f.context.translatePage();
   assert.equal(f.document.documentElement.lang,'en');
   assert.equal(f.context.t('search'),'Search');
-  assert.equal(f.toggle.textContent,'中文');
+  assert.deepEqual(f.toggle.options.map(item=>item.attrs['aria-pressed']),['true','false']);
   assert.deepEqual(f.writes,[]);
 });
 
@@ -61,6 +64,24 @@ test('missing, invalid or unavailable saved preferences fall back to English',()
   assert.doesNotThrow(()=>blocked.context.setLanguage('zh'));
   assert.equal(blocked.context.getLanguage(),'zh');
   assert.deepEqual(blocked.writes,[]);
+});
+
+test('the switch shows both languages, presses the current one and switches on click',()=>{
+  const f=fixture();
+  f.context.initLanguageToggle();
+  const [en,zh]=f.toggle.options;
+  assert.deepEqual([en.attrs['aria-pressed'],zh.attrs['aria-pressed']],['true','false']);
+  f.toggle.click({target:zh});
+  assert.equal(f.context.getLanguage(),'zh');
+  assert.equal(f.document.documentElement.lang,'zh-CN');
+  assert.deepEqual([en.attrs['aria-pressed'],zh.attrs['aria-pressed']],['false','true']);
+  assert.deepEqual(f.writes,[[key,'zh']]);
+  // Choosing the current language again is a no-op: no write and no change event.
+  f.toggle.click({target:zh});
+  assert.equal(f.writes.length,1);assert.equal(f.events.length,1);
+  f.toggle.click({target:en});
+  assert.equal(f.context.getLanguage(),'en');
+  assert.deepEqual([en.attrs['aria-pressed'],zh.attrs['aria-pressed']],['true','false']);
 });
 
 test('invalid choices do not overwrite a saved preference',()=>{

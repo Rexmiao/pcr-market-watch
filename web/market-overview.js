@@ -12,9 +12,21 @@ if(main){
       if(['macro','etf'].includes(key)){link.setAttribute('aria-disabled','true');link.tabIndex=-1;link.dataset.disabledReason='navReferenceLoading';}
       shortcuts.append(link);
     }
-    panel.querySelector('.market-head').after(shortcuts);
+    // Page-position shortcuts share the bar's first row; site navigation stays in .site-nav.
+    panel.querySelector('.market-actions').before(shortcuts);
   }
   main.insertBefore(panel,main.querySelector('section'));
+  // A zero-height sentinel marks where the floating bar starts to stick. Once
+  // stuck it collapses to a compact strip; its height feeds scroll padding so
+  // anchors, focused controls and sticky table headers are not covered.
+  const sentinel=document.createElement('div');sentinel.className='market-overview-sentinel';sentinel.setAttribute('aria-hidden','true');panel.before(sentinel);
+  let stuck=false;
+  function syncOffset(){const floating=panel.classList.contains('is-floating'),height=floating?Math.ceil(panel.getBoundingClientRect().height)+8:0;document.documentElement.style.setProperty('--pcr-float-offset',height+'px');document.documentElement.style.scrollPaddingTop=floating?(height+12)+'px':'';}
+  function setStuck(value){const next=!!value&&panel.classList.contains('is-floating');if(next===stuck)return;stuck=next;panel.classList.toggle('is-stuck',stuck);syncOffset();}
+  // The observed area extends far below the viewport, so the only state change
+  // is crossing the top edge; an instant jump from below to above still reports.
+  if(typeof IntersectionObserver==='function')new IntersectionObserver(entries=>{for(const entry of entries)setStuck(!entry.isIntersecting&&entry.boundingClientRect.top<0);},{rootMargin:'0px 0px 100000px 0px'}).observe(sentinel);
+  if(typeof ResizeObserver==='function')new ResizeObserver(syncOffset).observe(panel);else window.addEventListener('resize',syncOffset);
   let payload=null,busy=false,failure=false,pinned=true,lastLoad=0,cooldownUntil=0;
   try{pinned=localStorage.getItem('pcr-dashboard:market-sticky:v1')!=='off';}catch{}
   const ids=['sp500','nasdaq','dow','oil','gold','bitcoin'];
@@ -29,7 +41,7 @@ if(main){
     const w=words(),language=getLanguage()==='en'?'en':'zh';
     if(shortcuts){shortcuts.setAttribute('aria-label',t('navPcrSections'));for(const link of shortcuts.children){link.textContent=t(link.dataset.shortcutLabel);link.title=link.dataset.disabledReason?t(link.dataset.disabledReason):link.textContent;}}
     node('market-overview-title').textContent=w.title;node('market-overview-note').textContent=w.note;
-    panel.classList.toggle('is-floating',pinned);node('market-pin').textContent=pinned?w.unpin:w.pin;node('market-pin').setAttribute('aria-pressed',String(pinned));
+    panel.classList.toggle('is-floating',pinned);setStuck(pinned&&sentinel.getBoundingClientRect().top<0);syncOffset();node('market-pin').textContent=pinned?w.unpin:w.pin;node('market-pin').setAttribute('aria-pressed',String(pinned));
     refreshControl();
     const quotes=Array.isArray(payload?.quotes)?payload.quotes:[];
     node('market-quotes').replaceChildren(...ids.map(id=>{
@@ -42,8 +54,8 @@ if(main){
       const contract=document.createElement('small');contract.className='market-contract';contract.textContent=['oil','gold'].includes(id)?quote?.contractName||quote?.name||'':quote?.symbol||'';
       card.append(heading,price,change,stamp,contract);return card;
     }));
-    const partial=quotes.some(q=>q.stale||!Number.isFinite(q.price));
-    node('market-status').textContent=busy?w.loading:failure?w.failed:[partial?w.partial:'',w.source,payload?.checkedAt?w.checked+' '+time(payload.checkedAt):'',w.reference].filter(Boolean).join(' · ');
+    const partial=quotes.some(q=>q.stale||!Number.isFinite(q.price));panel.classList.toggle('has-issue',failure||partial);
+    node('market-status').title=node('market-status').textContent=busy?w.loading:failure?w.failed:[partial?w.partial:'',w.source,payload?.checkedAt?w.checked+' '+time(payload.checkedAt):'',w.reference].filter(Boolean).join(' · ');
   }
   async function load(refresh=false){
     if(busy||(refresh&&Date.now()<cooldownUntil))return;busy=true;failure=false;render();

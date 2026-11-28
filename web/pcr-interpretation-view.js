@@ -17,16 +17,20 @@ function helpButton(label,explanation){
 }
 function node(tag,className,text){const element=document.createElement(tag);element.className=className;if(text!==undefined)element.textContent=text;return element;}
 export function clearPcrInterpretationHelp(root){if(owner&&root?.contains(owner.button)){tooltip.hidden=true;owner=null;}}
-export function renderPcrInterpretation(root,interpretation,{language='zh',source='',compact=false}={}){
-  if(!root)return;const copy=words[language==='en'?'en':'zh'],reading=interpretation||{},locale=language==='en'?'en-US':'zh-CN';
+// Dense table cells use short window names; aria-labels keep the full names.
+const short={zh:{r5:'5日',r20:'20日',r60:'60日',order:'排序',orderMissing:'排序：数据不足'},en:{r5:'5d',r20:'20d',r60:'60d',order:'Order',orderMissing:'Order: insufficient data'}};
+export function renderPcrInterpretation(root,interpretation,{language='zh',source='',compact=false,dense=false}={}){
+  if(!root)return;const full=words[language==='en'?'en':'zh'],copy=dense?{...full,...short[language==='en'?'en':'zh']}:full,reading=interpretation||{},locale=language==='en'?'en-US':'zh-CN';
   clearPcrInterpretationHelp(root);
-  root.replaceChildren();root.classList.add('pcr-reading');root.classList.toggle('pcr-reading-compact',compact);root.dataset.state=reading.state||'insufficient';
+  root.replaceChildren();root.classList.add('pcr-reading');root.classList.toggle('pcr-reading-compact',compact);root.classList.toggle('pcr-reading-dense',dense);root.dataset.state=reading.state||'insufficient';
   const format=value=>!Number.isFinite(value)?'—':Math.abs(value)>0&&Math.abs(value)<.0001?(value>0?'+':'−')+'<0.0001':new Intl.NumberFormat(locale,{minimumFractionDigits:2,maximumFractionDigits:4,signDisplay:'exceptZero'}).format(value);
   if(!compact){root.append(node('h3','pcr-reading-heading',copy.title),node('p','pcr-reading-context',[source,copy.date+' '+(reading.actualDate||'—'),copy.previous+' '+(reading.previousDate||'—')].filter(Boolean).join(' · ')));}
   const order=Array.isArray(reading.ordering)?copy.order+': '+reading.ordering.map(group=>group.map(field=>copy[field]).join(' = ')).join(' > '):copy.orderMissing;
-  root.append(node('p','pcr-reading-order',order));
+  const orderNode=node('p','pcr-reading-order',order);
+  if(dense)orderNode.setAttribute('aria-label',Array.isArray(reading.ordering)?full.order+': '+reading.ordering.map(group=>group.map(field=>full[field]).join(' = ')).join(' > '):full.orderMissing);
+  root.append(orderNode);
   const directions=node('p','pcr-reading-directions');
-  for(const field of fields){const detail=reading.fields?.[field]||{},direction=detail.direction||'unknown',arrow={up:'↑',down:'↓',flat:'→',unknown:'?'}[direction]||'?';const item=node('span','pcr-reading-window',copy[field]+' '+arrow+' '+format(detail.delta));item.dataset.window=field;item.dataset.direction=direction;item.setAttribute('aria-label',copy[field]+': '+copy[direction]+' '+format(detail.delta));directions.append(item);}
+  for(const field of fields){const detail=reading.fields?.[field]||{},direction=detail.direction||'unknown',arrow={up:'↑',down:'↓',flat:'→',unknown:'?'}[direction]||'?';const item=node('span','pcr-reading-window',copy[field]+' '+arrow+' '+format(detail.delta));item.dataset.window=field;item.dataset.direction=direction;item.setAttribute('aria-label',full[field]+': '+full[direction]+' '+format(detail.delta));directions.append(item);}
   root.append(directions,helpButton(copy[reading.state]||copy.insufficient,copy.rule));
   if(!compact)root.append(node('p','pcr-reading-notice',copy.notice));
 }

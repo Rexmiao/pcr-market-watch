@@ -2,7 +2,16 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {handleCboeApi, cboeTesting as t} from '../worker/cboe.js';
 
-const seed = JSON.parse(await readFile(new URL('../data/cboe-seed.json', import.meta.url), 'utf8'));
+// These scenarios model a source whose latest saved day is 2026-11-23 and whose
+// 2026-11-24 page is not yet published. Truncate the real seed to that cutoff so
+// later seed refreshes cannot silently change the scenario under test.
+const SEED_CUTOFF = '2026-11-23';
+const fullSeed = JSON.parse(await readFile(new URL('../data/cboe-seed.json', import.meta.url), 'utf8'));
+const seed = {...fullSeed, asof:SEED_CUTOFF, sourceLatestDate:SEED_CUTOFF,
+  observations:fullSeed.observations.filter(row => row.date <= SEED_CUTOFF),
+  expectedSessionDates:(fullSeed.expectedSessionDates||[]).filter(date => date <= SEED_CUTOFF)};
+seed.coverage = {...fullSeed.coverage, expectedEnd:SEED_CUTOFF, expectedSessions:seed.expectedSessionDates.length, verifiedSessions:seed.observations.length};
+assert.equal(seed.observations.at(-1).date, SEED_CUTOFF);
 const snapshot = seed.observations.find(row => row.date === '2026-11-23');
 assert.equal(snapshot.metrics.index.ratio, 1.21);
 assert.equal(snapshot.metrics.total.ratio, 0.94);

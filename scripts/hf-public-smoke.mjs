@@ -10,7 +10,7 @@ async function run(args,{env=process.env}={}){return await new Promise((accept,r
 const request=(path,{owner=false,...init}={})=>fetch(origin+path,{...init,headers:{...(owner?{'x-pcr-authorization':'Basic '+Buffer.from('pcr:'+password).toString('base64')}:{}) ,...init.headers},signal:AbortSignal.timeout(20000)});
 let attempted=false;
 try{
-  attempted=true;await run(['run','-d','--name',container,'-p','127.0.0.1:8797:7860','--env','PCR_CLOUD_PASSWORD','--env','PCR_PUBLIC_VIEW=1','--env','PCR_CLOUD_PUBLIC_ORIGIN='+origin,process.env.PCR_HF_IMAGE||'pcr-market-watch-hf:0.2.18'],{env:{...process.env,PCR_CLOUD_PASSWORD:password}});
+  attempted=true;await run(['run','-d','--name',container,'-p','127.0.0.1:8797:7860','--env','PCR_CLOUD_PASSWORD','--env','PCR_PUBLIC_VIEW=1','--env','PCR_CLOUD_PUBLIC_ORIGIN='+origin,process.env.PCR_HF_IMAGE||'pcr-market-watch-hf:0.2.19'],{env:{...process.env,PCR_CLOUD_PASSWORD:password}});
   let ready=false;for(let i=0;i<30;i++){try{const response=await request('/api/access');if(response.status===200){ready=true;break;}}catch{}await new Promise(accept=>setTimeout(accept,500));}assert(ready);
   assert.deepEqual(await (await request('/api/access')).json(),{authenticated:false,publicReadOnly:true,canRefresh:true});
   const home=await request('/');assert.equal(home.status,200);assert((await home.text()).includes('/public-access.js'));assert.equal((await request('/public-access.js')).status,200);

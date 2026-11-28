@@ -2,3 +2,41 @@
 .market-overview{padding:15px 18px 12px;background:#fff;max-width:100%}.market-overview.is-floating{position:sticky;top:8px;z-index:30;box-shadow:0 5px 20px #21334f16}.market-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.market-head h2{font-size:1rem}.market-head p,.market-source-line{font-size:.8125rem;line-height:1.5;color:#6c7a90}.market-head p{margin-top:4px}.market-actions{display:flex;gap:8px}.market-actions .button{padding:8px 11px;font-size:.8125rem;min-height:36px}.market-overview .market-grid{display:flex;overflow-x:auto;gap:10px;scrollbar-width:thin}.market-overview .market-card{flex:1 0 145px;padding:10px 12px}.market-overview .market-price{font-size:1.125rem}.market-overview .market-change{font-size:1rem}.market-overview .market-card h3{margin-bottom:6px}.market-overview .market-card small{font-size:.75rem;margin-top:3px}.market-overview .market-contract{white-space:normal}.market-overview .market-source-line{margin-top:9px}@media(max-width:600px){.market-overview{padding:12px;top:0}.market-head{align-items:flex-start}.market-head p{max-width:150px}.market-actions{flex-wrap:wrap;justify-content:flex-end}.market-overview .market-card{flex:0 0 145px}.market-overview.is-floating{top:0}.market-overview .market-source-line{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
 .market-overview .market-head h2{font-size:1rem}.market-overview .market-head p{font-size:.8125rem;margin-top:3px}.market-overview .market-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.market-actions{display:flex;gap:8px}.market-overview .button{padding:6px 10px;min-height:34px;font-size:.8125rem}.market-overview .market-card{padding:9px 12px;border:0;border-right:1px solid #e6ebf3;border-radius:0}.market-overview .market-card:last-child{border-right:0}.market-overview .market-card h3{font-size:.8125rem}.market-overview .market-price{display:inline;font-size:.9375rem;font-weight:500;color:#5a6980}.market-overview .market-change{display:inline;margin-left:8px;font-size:1rem}.market-overview .market-card .market-contract{display:none}.market-overview .market-source-line{font-size:.75rem;line-height:1.5}@media(max-width:600px){.market-overview .market-card{padding:7px 10px;flex-basis:175px}.market-overview .market-head p{display:none}}
 .market-overview .market-card[data-market="bitcoin"]{flex-basis:175px}
+
+/* UI refresh (v0.2.19): compact floating market bar. Shortcuts share the
+   header row; once the bar sticks, secondary lines collapse. */
+.market-overview-sentinel{height:0}
+.market-overview .market-head{flex-wrap:wrap;align-items:center}
+.market-overview .market-head>div:first-child{flex:0 1 auto;min-width:0}
+.market-overview .market-shortcuts{flex:1 1 320px;margin:0;align-items:center}
+.market-overview .market-actions{flex:0 0 auto;margin-left:auto}
+.market-overview .market-shortcuts .pcr-jump[aria-disabled="true"]{border-style:dashed}
+.market-overview.is-stuck{padding:8px 14px 6px;border-radius:12px}
+.market-overview.is-stuck .market-head{margin-bottom:6px;gap:8px 12px}
+.market-overview.is-stuck #market-overview-note,.market-overview.is-stuck .market-card small{display:none}
+.market-overview.is-stuck .market-head h2{font-size:.9375rem}
+.market-overview.is-stuck .market-card{padding:3px 12px;flex:0 0 auto;white-space:nowrap}
+.market-overview.is-stuck .market-card h3{display:inline;margin:0 8px 0 0;font-size:.75rem;color:#5e6d83}
+.market-overview.is-stuck .market-price{font-size:.875rem}
+.market-overview.is-stuck .market-change{font-size:.875rem;margin-left:6px}
+.market-overview.is-stuck .market-card.is-stale h3:after{content:" *";color:#8a5a14}
+.market-overview.is-stuck .market-source-line{margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.market-overview.is-stuck .market-actions .button{min-height:32px;padding:4px 10px}
+.market-overview.is-stuck .market-shortcuts .pcr-jump{min-height:28px;padding:3px 8px}
+@media(max-width:900px){
+  .market-overview.is-stuck .market-head>div:first-child{display:none}
+  .market-overview.is-stuck .market-shortcuts{flex:1 1 0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin}
+  .market-overview.is-stuck .market-shortcuts .pcr-jump{flex:0 0 auto}
+}
+@media(max-width:600px){
+  .market-overview .market-shortcuts{order:3;flex:1 1 100%}
+  .market-overview.is-stuck{padding:6px 10px 5px}
+  .market-overview.is-stuck .market-head{gap:5px 8px}
+  .market-overview.is-stuck .market-head>div:first-child{display:block}.market-overview.is-stuck .market-head h2{font-size:.875rem}
+  .market-overview.is-stuck .market-shortcuts{order:3;flex:1 1 100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));overflow:visible;gap:4px}
+  .market-overview.is-stuck .market-shortcuts .pcr-jump{font-size:.75rem;padding:3px 4px;min-height:28px;text-align:center}
+  .market-overview.is-stuck .market-actions{flex-wrap:nowrap;margin-left:auto}
+  .market-overview.is-stuck .market-actions .button{font-size:.75rem;padding:3px 8px}
+  .market-overview.is-stuck .market-card{flex-basis:auto;flex-shrink:0}
+  .market-overview.is-stuck:not(.has-issue) .market-source-line{display:none}
+}

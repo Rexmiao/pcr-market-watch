@@ -26,13 +26,18 @@ function runNode(source){
 function freezeTime(epoch){const NativeDate=globalThis.Date;globalThis.Date=class extends NativeDate{constructor(...args){super(...(args.length?args:[epoch]));}static now(){return epoch;}};return()=>{globalThis.Date=NativeDate;};}
 function htmlFor(payload){return '<script>self.__next_f.push('+JSON.stringify([1,'25:'+JSON.stringify(['$','$L33',null,{data:payload}])+'\n'])+')</script>';}
 const post=path=>new Request(SOURCE_ORIGIN+path,{method:'POST',headers:{'content-type':'application/json'},body:'{}'});
+// The fixture supplies 2026-11-24 and TARGET through mocked source pages, so it
+// needs a Cboe seed ending before them. Truncate the bundled seed (which later
+// refreshes may extend) instead of depending on its current last date.
+function olderCboeSeed(value,cutoff='2026-11-23'){const observations=value.observations.filter(row=>row.date<=cutoff),expectedSessionDates=(value.expectedSessionDates||[]).filter(date=>date<=cutoff);return {...value,asof:cutoff,sourceLatestDate:cutoff,observations,expectedSessionDates,coverage:{...value.coverage,expectedEnd:cutoff,expectedSessions:expectedSessionDates.length,verifiedSessions:observations.length}};}
 
 test('real Core and Cboe worker caches survive SQLite backup and a new Node process without refetching',async()=>{
   const directory=await mkdtemp(join(tmpdir(),'pcr-worker-cache-'));assert.equal(dirname(resolve(directory)),resolve(tmpdir()));
   const nativeFetch=globalThis.fetch,nativeCaches=globalThis.caches,restoreTime=freezeTime(EPOCH);
   backendTesting.clearMemory();cboeTesting.clearMemory();
   try{
-    const [seed,cboeSeed]=await Promise.all(['../data/seed.json','../data/cboe-seed.json'].map(async path=>JSON.parse(await readFile(new URL(path,import.meta.url),'utf8'))));
+    const [seed,bundledCboeSeed]=await Promise.all(['../data/seed.json','../data/cboe-seed.json'].map(async path=>JSON.parse(await readFile(new URL(path,import.meta.url),'utf8'))));
+    const cboeSeed=olderCboeSeed(bundledCboeSeed);
     assert(seed.asof<TARGET&&cboeSeed.asof<TARGET,'Regression fixture must use the older bundled seed.');
     const originalRaw=backendTesting.rawFromSeed(seed),fixtureRows={};
     for(const [symbol,rows]of Object.entries(originalRaw.data)){
@@ -83,7 +88,8 @@ test('real Core and Cboe worker caches survive SQLite backup and a new Node proc
       let network=0;globalThis.fetch=async()=>{network++;throw Error('No refetch is permitted after restoring a cache.');};
       const db=await createLocalD1({databasePath:${JSON.stringify(restoredPath)}});installCloudWorkerCache({database:db,env:{PCR_RUNTIME:'cloud'},now:()=>epoch});
       const seed=JSON.parse(await readFile(new URL(${JSON.stringify(moduleUrl('../data/seed.json'))}),'utf8'));
-      const cboeSeed=JSON.parse(await readFile(new URL(${JSON.stringify(moduleUrl('../data/cboe-seed.json'))}),'utf8'));
+      ${olderCboeSeed.toString()}
+      const cboeSeed=olderCboeSeed(JSON.parse(await readFile(new URL(${JSON.stringify(moduleUrl('../data/cboe-seed.json'))}),'utf8')));
       const origin='http://127.0.0.1:8766';
       const core=await(await handleApi(new Request(origin+'/api/watchlist'),{},null,seed)).json();
       const symbol=await(await handleApi(new Request(origin+'/api/symbol?symbol=SNDK'),{},null,seed)).json();

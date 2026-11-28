@@ -8,7 +8,7 @@ const text={
     source:'查看 Cboe 官方来源',published:'单日卡数据日期',selected:'所选日期',checked:'上次检查',put:'Put 成交量',call:'Call 成交量',missing:'未取得',pending:'完整日统计需要等待源发布；日历日期可以晚于数据日期。',
     trendTitle:'Cboe 历史 · 单日与 5／20／60 日趋势',metric:'统计口径',range:'历史区间',halfYear:'近半年 · 126 个交易日',oneYear:'近一年 · 252 个交易日',all:'全部已保存记录',daily:'单日 PCR',p5:'5 日成交量 PCR',p20:'20 日成交量 PCR',p60:'60 日成交量 PCR',
     historyAnchor:'{metric} · 历史最后完整记录 {date}',historyThrough:'所选日期 {requested}；历史曲线截至此前已发布日 {actual}，并未当作所选日的数值。',historyExact:'历史曲线截至所选交易日 {date}。',historyLoading:'正在读取历史记录，保留已有曲线。',historyFailure:'历史数据检查失败，保留最后可用的已发布记录。',historyEmpty:'所选日期之前没有已保存的历史记录。可检查数据以补取缺口，未取得的窗口保持留空。',
-    methodology:'5／20／60 日 PCR＝对应窗口内合计 Put 成交量 ÷ 合计 Call 成交量，不是每天 PCR 的算术平均。窗口中缺少任何所需交易日时留空；青绿色为 5 日、蓝色为 20 日、橘色为 60 日、浅蓝为单日。',
+    methodology:'5／20／60 日 PCR＝对应窗口内合计 Put 成交量 ÷ 合计 Call 成交量，不是每天 PCR 的算术平均。窗口中缺少任何所需交易日时留空；青绿色为 5 日、蓝色为 20 日、橘色为 60 日、灰色为单日。',
     partial:'本次已检查 {count} 个交易日，新增 {added} 日；仍有 {gaps} 个缺口。再次检查可继续补取，每次最多 15 日。',partialUnknown:'本次分批补取已完成；未取得的交易日及滚动窗口仍留空。',coverage:'当前保存的历史：{start}—{end}。',cooldown:'检查较频繁，请在 {seconds} 秒后重试。',
   },
   en:{
@@ -18,7 +18,7 @@ const text={
     source:'View the official Cboe source',published:'Daily-card activity date',selected:'Selected date',checked:'Last checked',put:'Put volume',call:'Call volume',missing:'Unavailable',pending:'The calendar date can be later than the activity date while the source prepares its full-day report.',
     trendTitle:'Cboe history · Daily and 5/20/60-session trends',metric:'Measure',range:'History range',halfYear:'6 months · 126 sessions',oneYear:'1 year · 252 sessions',all:'All saved records',daily:'Daily PCR',p5:'5-session volume PCR',p20:'20-session volume PCR',p60:'60-session volume PCR',
     historyAnchor:'{metric} · Last complete historical observation: {date}',historyThrough:'Selected date: {requested}. History ends on the previous published day, {actual}; its values are not presented as the selected day.',historyExact:'History ends on the selected session, {date}.',historyLoading:'Loading history; existing curves remain visible.',historyFailure:'History could not be refreshed. The last available published records are retained.',historyEmpty:'No saved history precedes the selected date. Check data to fill available gaps; missing windows remain blank.',
-    methodology:'5/20/60-session PCR = total put volume ÷ total call volume in the corresponding window, not the arithmetic mean of daily ratios. A window stays blank when a required session is missing. Teal: 5 sessions; blue: 20; orange: 60; light blue: daily.',
+    methodology:'5/20/60-session PCR = total put volume ÷ total call volume in the corresponding window, not the arithmetic mean of daily ratios. A window stays blank when a required session is missing. Teal: 5 sessions; blue: 20; orange: 60; gray: daily.',
     partial:'Checked {count} sessions and added {added}; {gaps} gaps remain. Check again to continue, up to 15 sessions per request.',partialUnknown:'This backfill batch is complete. Unavailable sessions and rolling windows remain blank.',coverage:'Saved history: {start}—{end}.',cooldown:'Checks are too frequent. Retry in {seconds} seconds.',
   },
 };

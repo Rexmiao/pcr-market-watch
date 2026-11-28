@@ -1,4 +1,4 @@
-import {getLanguage, setLanguage} from './i18n.js';
+import {getLanguage, setLanguage, renderLanguageSwitch, bindLanguageSwitch} from './i18n.js';
 
 // Translate text nodes so links, data tables and their saved dates stay intact.
 const english = {
@@ -93,14 +93,13 @@ while (walker.nextNode()) {
   if (chinese) nodes.push({node, original:original.replace(trimmed,chinese), translated:original.replace(trimmed,english[chinese])});
 }
 const toggle = document.getElementById('page-language');
-if (toggle) { toggle.className = 'button secondary language-toggle'; toggle.style.marginLeft = 'auto'; }
 function render() {
   const en = getLanguage() === 'en';
   document.documentElement.lang = en ? 'en' : 'zh-CN';
   document.querySelector('.site-nav')?.setAttribute('aria-label', en ? 'Site navigation' : '网站导航');
   for (const {node, original, translated} of nodes) node.nodeValue = en ? translated : original;
-  if (toggle) { toggle.textContent = en ? '中文' : 'English'; toggle.setAttribute('aria-label', en ? 'Switch to Chinese' : '切换到英文'); }
+  renderLanguageSwitch(toggle, getLanguage());
 }
-toggle?.addEventListener('click', () => setLanguage(getLanguage() === 'en' ? 'zh' : 'en'));
+bindLanguageSwitch(toggle, next => { if (next !== getLanguage()) setLanguage(next); });
 window.addEventListener('pcr-language-change', render);
 render();

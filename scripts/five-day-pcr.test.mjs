@@ -89,7 +89,7 @@ test('five-session historical statistics use their own prior 252 observations an
 test('four history series retain all 600 observations within the bounded 3000-row chart limit',()=>{
   const rows=Array.from({length:600},(_,i)=>({date:new Date(Date.UTC(2024,0,i+1)).toISOString().slice(0,10),p:50,c:100,r20:.5,r60:.5}));
   const data={asof:rows.at(-1).date,instruments:{AMD:{rows}}},state={symbol:'AMD',date:data.asof,range:'all',volumeWindow:'5',language:'en'};
-  const config=buildConfigs(data,state)[1];assert.equal(config.rows.length,2400);assert.equal(config.spec.colors['5-session volume PCR'],'#208980');
+  const config=buildConfigs(data,state)[1];assert.equal(config.rows.length,2400);assert.equal(config.spec.colors['5-session volume PCR'],'#2fbfa8');
   const excess=Array.from({length:751},(_,i)=>({...rows[0],date:new Date(Date.UTC(2024,0,i+1)).toISOString().slice(0,10)}));
   assert.throws(()=>buildConfigs({asof:excess.at(-1).date,instruments:{AMD:{rows:excess}}},{...state,date:excess.at(-1).date}),/HISTORY_TOO_LONG/);
 });

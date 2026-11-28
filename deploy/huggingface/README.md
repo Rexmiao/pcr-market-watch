@@ -134,3 +134,9 @@ Bounded current-page caches reuse validated historical records and short-lived d
 Current hosted application/sign-in and the GitHub Pages showcase default to English on a first visit without a valid URL or saved choice. Valid Chinese URL/device choices remain Chinese, and the control saves either selection. Document links match the selected language; historical static snapshots retain their original language. The showcase is a static feature/download entry point; complete interaction runs on a separately deployed local/cloud backend. The existing GitHubv0.2.3 ZIP is unchanged.
 
 当前托管应用／登录与GitHub Pages介绍页首次无有效URL或已存选择时默认英文，中文直达／设备偏好仍为中文，双向切换保存；文档链接对应所选语言，旧静态快照保留原语言。介绍页是静态功能／下载入口，完整交互由独立本机／云后端运行；GitHub既有v0.2.3 ZIP不变。
+
+## Interface refresh / 界面整理（v0.2.19, packaged locally, not deployed）
+
+Source v0.2.19 is a front-end-only change: a dark blue-slate theme on every app page (charts and tooltips included), a homepage PCR snapshot strip (TOTAL first), a wide summary table with a sticky first column and decimal-aligned numbers, a compact floating quote bar, an English / 中文 switch showing both options, unified accent bars and PCR trend colours ordered by importance (daily gray, 5-session teal, 20-session bright blue, 60-session amber). No API, calculation, database migration, credential, quote permission, cooldown, polling or public/owner boundary changes. The Windows ZIP and this source package were built and checked locally only; the Space is not updated until the existing backup → PAUSED → upload/start → GET-only verification procedure runs. The released GitHub v0.2.18 assets stay unchanged.
+
+源码v0.2.19只改前端：全部应用页面改为蓝灰深色主题（含图表与悬浮提示），首页新增PCR快照指标条（TOTAL置首），摘要宽表首列固定、数字按小数点对齐，悬浮行情滚动后收为紧凑条，语言切换同时显示English／中文，色条统一，PCR趋势线按重要性配色（单日灰、5日青绿、20日亮蓝、60日琥珀）。不改API、算法、数据库迁移、凭据、行情权限、冷却、轮询或公开／所有者边界。Windows ZIP与本源包仅在本机构建和核验；Space需按既有备份→PAUSED→上传／启动→只GET核验流程执行后才更新。已发布的GitHub v0.2.18资产不变。

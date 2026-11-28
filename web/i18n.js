@@ -216,6 +216,18 @@ const messages={
 export function registerTranslations(entries){Object.assign(messages,entries);}
 export function getLanguage(){return language;}
 export function t(key,params={},lang=language){const pair=messages[key],template=pair?pair[lang==='en'?1:0]:key;return template.replace(/\{(\w+)\}/g,(_,name)=>String(params[name]??''));}
-export function translatePage(root=document){for(const element of root.querySelectorAll('[data-i18n]'))element.textContent=t(element.dataset.i18n);for(const [attribute,data] of [['placeholder','i18nPlaceholder'],['aria-label','i18nAria'],['title','i18nTitle']])for(const element of root.querySelectorAll('[data-'+data.replace(/[A-Z]/g,c=>'-'+c.toLowerCase())+']'))element.setAttribute(attribute,t(element.dataset[data]));document.documentElement.lang=language==='en'?'en':'zh-CN';const toggle=document.getElementById('language-toggle');if(toggle){toggle.textContent=language==='en'?'中文':'English';toggle.setAttribute('aria-label',language==='en'?'切换到中文':'Switch to English');}if(document.body.dataset.page==='dashboard')document.title=t('documentTitle');}
+export function translatePage(root=document){for(const element of root.querySelectorAll('[data-i18n]'))element.textContent=t(element.dataset.i18n);for(const [attribute,data] of [['placeholder','i18nPlaceholder'],['aria-label','i18nAria'],['title','i18nTitle']])for(const element of root.querySelectorAll('[data-'+data.replace(/[A-Z]/g,c=>'-'+c.toLowerCase())+']'))element.setAttribute(attribute,t(element.dataset[data]));document.documentElement.lang=language==='en'?'en':'zh-CN';renderLanguageSwitch(document.getElementById('language-toggle'),language);if(document.body.dataset.page==='dashboard')document.title=t('documentTitle');}
 export function setLanguage(next){if(!['zh','en'].includes(next))return;language=next;try{localStorage.setItem(LANGUAGE_KEY,next);}catch{}translatePage();window.dispatchEvent(new CustomEvent('pcr-language-change',{detail:{language:next}}));}
-export function initLanguageToggle(){const toggle=document.getElementById('language-toggle');if(toggle&&!toggle.dataset.languageBound){toggle.dataset.languageBound='true';toggle.addEventListener('click',()=>setLanguage(language==='en'?'zh':'en'));}translatePage();}
+// The switch shows both languages; the current one is pressed. A legacy single
+// button (no [data-lang] children) keeps its previous "other language" label.
+export function renderLanguageSwitch(toggle,current){
+  if(!toggle)return;const options=toggle.querySelectorAll?[...toggle.querySelectorAll('[data-lang]')]:[];
+  if(!options.length){toggle.textContent=current==='en'?'中文':'English';toggle.setAttribute('aria-label',current==='en'?'切换到中文':'Switch to English');return;}
+  toggle.setAttribute('aria-label',current==='en'?'Language':'语言');
+  for(const option of options){const active=option.dataset.lang===current;option.setAttribute('aria-pressed',String(active));option.setAttribute('aria-label',option.dataset.lang==='en'?(active?'English (current)':'Switch to English'):(active?'中文（当前）':'切换到中文'));}
+}
+export function bindLanguageSwitch(toggle,choose){
+  if(!toggle||toggle.dataset.languageBound)return;toggle.dataset.languageBound='true';
+  toggle.addEventListener('click',event=>{const option=event.target?.closest?.('[data-lang]');if(option&&toggle.contains(option))choose(option.dataset.lang);else if(!toggle.querySelector?.('[data-lang]'))choose(language==='en'?'zh':'en');});
+}
+export function initLanguageToggle(){bindLanguageSwitch(document.getElementById('language-toggle'),next=>{if(next!==language)setLanguage(next);});translatePage();}

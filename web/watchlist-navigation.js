@@ -17,7 +17,10 @@ if(document.getElementById('watchlist-panel')){
     if(!panel?.classList.contains('is-floating'))return 12;
     const style=getComputedStyle(panel);
     if(!['sticky','fixed'].includes(style.position))return 12;
-    return panel.getBoundingClientRect().height+Math.max(0,parseFloat(style.top)||0)+12;
+    // Jumps land below the bar, where it is stuck and compact: measure that height.
+    const wasStuck=panel.classList.contains('is-stuck');if(!wasStuck)panel.classList.add('is-stuck');
+    const height=panel.getBoundingClientRect().height;if(!wasStuck)panel.classList.remove('is-stuck');
+    return height+Math.max(0,parseFloat(style.top)||0)+12;
   }
   function position(behavior='instant',force=false){
     const target=document.getElementById(targets[active]);if(!target||!available(active))return;
@@ -62,6 +65,12 @@ if(document.getElementById('watchlist-panel')){
     // view. A deep-link view change must not enter that preference-write stack.
     if(active&&Date.now()<=activeUntil&&groupAtHash()===active&&!wasAvailable&&available(active))requestAnimationFrame(()=>{if(Date.now()<=activeUntil&&groupAtHash()===active&&available(active))activate();});
     settle();
+  });
+  // Summary rows select their item first; this only moves the view and focus.
+  window.addEventListener('pcr-market-focus-request',event=>{
+    const target=document.getElementById(event.detail?.target);if(!target||!Object.values(targets).includes(target.id))return;
+    active=null;activeUntil=0;
+    requestAnimationFrame(()=>{const offset=topOffset(),top=Math.max(0,target.getBoundingClientRect().top+window.scrollY-offset);target.style.scrollMarginTop=offset+'px';target.focus({preventScroll:true});window.scrollTo({top,behavior:window.matchMedia?.('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});});
   });
   window.addEventListener('pcr-language-change',renderLinks);
   window.addEventListener('load',settle);

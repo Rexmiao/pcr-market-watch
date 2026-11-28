@@ -140,11 +140,13 @@ function renderLanguage(){
   for(const attribute of ['aria-label','alt','data-caption'])for(const element of document.querySelectorAll('[data-i18n-'+attribute+']'))element.setAttribute(attribute,copy[element.getAttribute('data-i18n-'+attribute)]);
   for(const element of document.querySelectorAll('[data-i18n-href]'))element.href=links[language][element.dataset.i18nHref];
   document.documentElement.lang=language==='en'?'en':'zh-CN';document.title=copy.title;document.querySelector('meta[name="description"]').content=copy.description;
-  languageToggle.textContent=language==='en'?'中文':'English';languageToggle.lang=language==='en'?'zh-CN':'en';languageToggle.setAttribute('aria-label',language==='en'?'切换到中文':'Switch to English');
+  // Both languages stay visible; the current one is pressed.
+  languageToggle.setAttribute('aria-label',language==='en'?'Language':'语言');
+  for(const option of languageToggle.querySelectorAll?languageToggle.querySelectorAll('[data-lang]'):[]){const active=option.dataset.lang===language;option.setAttribute('aria-pressed',String(active));option.setAttribute('aria-label',option.dataset.lang==='en'?(active?'English (current)':'Switch to English'):(active?'中文（当前）':'切换到中文'));}
   const image=document.getElementById('dialog-image'),caption=document.getElementById('image-caption');
   if(image.getAttribute('src')){const button=[...document.querySelectorAll('[data-image]')].find(item=>image.getAttribute('src')===item.dataset.image);if(button){image.alt=button.querySelector('img').alt;caption.textContent=button.dataset.caption;}}
 }
-languageToggle.addEventListener('click',()=>{language=language==='en'?'zh':'en';renderLanguage();try{localStorage.setItem(storageKey,language);}catch{}try{const url=new URL(location.href);url.searchParams.set('lang',language);history.replaceState(null,'',url);}catch{}});
+languageToggle.addEventListener('click',event=>{const next=event?.target?.closest?.('[data-lang]')?.dataset.lang;if(!['zh','en'].includes(next)||next===language)return;language=next;renderLanguage();try{localStorage.setItem(storageKey,language);}catch{}try{const url=new URL(location.href);url.searchParams.set('lang',language);history.replaceState(null,'',url);}catch{}});
 renderLanguage();
 const header=document.querySelector('.site-header');
 function headerOffset(){document.documentElement.style.setProperty('--header-offset',(header.getBoundingClientRect().height+20)+'px');}
