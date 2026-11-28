@@ -1,8 +1,8 @@
-# 发布与安装规格（v0.2.21源码与Windows发行）
+# 发布与安装规格（v0.2.22源码与Windows发行）
 
 **简体中文** | [English](RELEASE_SPEC.en.md)
 
-当前公开Windows发行是[v0.2.21](https://github.com/Rexmiao/pcr-market-watch/releases/tag/v0.2.21)，新增自定义域名来源支持；v0.2.20在v0.2.19深色主题之上新增日间／夜间切换；v0.2.19则在v0.2.18的伽马／最大痛苦、30日逐期归档／历史查看与首次英文等程序之上，新增深色主题、PCR快照指标条与摘要宽表整理；个人数据库、凭证及任务配置不随包。历史v0.2.3标签与附件保留原样。
+当前公开Windows发行是[v0.2.22](https://github.com/Rexmiao/pcr-market-watch/releases/tag/v0.2.22)，登录页记住语言；v0.2.21新增自定义域名来源支持；v0.2.20在v0.2.19深色主题之上新增日间／夜间切换；v0.2.19则在v0.2.18的伽马／最大痛苦、30日逐期归档／历史查看与首次英文等程序之上，新增深色主题、PCR快照指标条与摘要宽表整理；个人数据库、凭证及任务配置不随包。历史v0.2.3标签与附件保留原样。
 
 v0.2.21由CI于2026-11-28T10:11:49Z发布，标签对应提交[0cd70dccb471e1e84a57f0648c53da2d69fe8649](https://github.com/Rexmiao/pcr-market-watch/commit/0cd70dccb471e1e84a57f0648c53da2d69fe8649)；Windows ZIP为3,728,995字节，SHA-256 `929ecb4fb521bd2a75235d3b54a8c7528d68cc5d9218edb8fd6ef785512a2738`。v0.2.20由CI于2026-11-28T09:38:48Z发布，标签对应提交[341b78eb181e0df188dab49d130bf42e0d00ebde](https://github.com/Rexmiao/pcr-market-watch/commit/341b78eb181e0df188dab49d130bf42e0d00ebde)；Windows ZIP为3,724,407字节，SHA-256 `a8c9f4922dbd356643ee84e7168b05f53e9d4bb1a05ebc51f542b47ae2abf820`。v0.2.19由CI于2026-11-28T08:31:28Z发布，标签对应提交[b29e3a21c4ef9407078aed38dde93a89964677cc](https://github.com/Rexmiao/pcr-market-watch/commit/b29e3a21c4ef9407078aed38dde93a89964677cc)；Windows ZIP为3,706,122字节，SHA-256 `bef29f24aaa8aae5bffa27b6987071a52ca8d516729f157ab4f82708b9d26743`。v0.2.18由CI于2026-11-27T07:58:47Z发布，标签对应提交[79a2cfb981b4d79f68a0f498b98d90a636e510a4](https://github.com/Rexmiao/pcr-market-watch/commit/79a2cfb981b4d79f68a0f498b98d90a636e510a4)；Windows ZIP为3,647,876字节，SHA-256清单为103字节。后续main的文档／测试／CI注册可以演进，不重写该标签、ZIP或校验清单；重复发布检查发现该Release已存在时保留原附件，不覆盖资产。更改可安装运行行为应另发新版本。
 
@@ -399,3 +399,5 @@ v0.2.21由CI于2026-11-28T10:11:49Z发布（提交`0cd70dc`），ZIP为3,728,995
 | --- | --- |
 | REL-042-001 | `theme-mode.js`把页面`<html lang>`（来自已存或链接语言）同步为功能cookie `pcr-lang`（仅zh／en，属性与`pcr-theme`相同：内嵌huggingface.co时SameSite=None; Secure; Partitioned，否则Lax），值未变时不重写；网关在URL无有效`?lang=`时读取该cookie决定登录页及私人页面401登录框语言，无效值回退英文。CSP、CSRF、会话cookie与登录后跳转不变。 |
 | REL-042-002 | 验收：cookie zh时登录页／401登录框／密码错误页为中文且表单保留语言，`?lang=en`优先于cookie，大小写／仿冒名／编码注入／其他语言均被忽略且页面无脚本；挂载即同步、切换语言即更新、已同步不重写、内嵌用分区cookie。发布沿用GitHub CI与HF备份→PAUSED→上传／启动→只GET核对流程，并在自定义域名上复核。 |
+
+v0.2.22发布记录（2026-11-28）：CI于11:22:07Z发布（提交`27300f7`），ZIP为3,739,787字节，SHA-256 `c169be701f097fd9aa9a6105e8c904e3c9624b61b3ec940de10b8709940595ae`，Release正文首次由工作流自动采用`docs/release-notes/v0.2.22.md`（0个相对链接）。HF暂停前后备份未变，Space提交`b68bc71`，两个域名均READY；重启后只GET核对原记录一致，自定义域名14项检查与6项登录语言检查通过；实际浏览器以中文打开应用后，不带`?lang`访问私人页面显示中文登录框。
